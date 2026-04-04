@@ -9,6 +9,7 @@ import {
   SPLASH_MIN_DURATION_MS,
   SPLASH_SESSION_STORAGE_KEY,
 } from "@/shared/config/constants";
+import { hasCompletedOnboarding } from "@/shared/utils/onboardingCompletion";
 
 import video1 from "@/assets/videos/onboarding-1.mp4";
 import video2 from "@/assets/videos/onboarding-2.mp4";
@@ -27,7 +28,7 @@ function hasSplashSeenThisSession(): boolean {
 
 export default function SplashScreen() {
   const navigate = useNavigate();
-  const { status } = useAuth();
+  const { status, user } = useAuth();
   const [minDurationDone, setMinDurationDone] = useState(() =>
     hasSplashSeenThisSession(),
   );
@@ -64,9 +65,16 @@ export default function SplashScreen() {
     } catch {
       /* ignore */
     }
-    /** Always open onboarding after splash. */
+    if (user) {
+      navigate("/home", { replace: true });
+      return;
+    }
+    if (hasCompletedOnboarding()) {
+      navigate("/sign-in", { replace: true });
+      return;
+    }
     navigate("/onboarding", { replace: true });
-  }, [minDurationDone, authResolved, navigate]);
+  }, [minDurationDone, authResolved, navigate, user]);
 
   return (
     <div className={styles.root} role="presentation">

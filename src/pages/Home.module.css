@@ -1,0 +1,72 @@
+.container {
+  min-height: 100vh;
+  padding: env(safe-area-inset-top, 20px) 0
+    calc(110px + env(safe-area-inset-bottom, 20px));
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  width: 100%;
+}
+
+.title {
+  font-family: var(--Family-Headings);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.iconBtn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.iconBtn:active {
+  transform: scale(0.92);
+  background: var(--surface-variant);
+}
+
+.notificationBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border: 2px solid var(--card-bg);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Dark mode specific adjustments if needed */
+[data-theme="dark"] .iconBtn {
+  background: var(--card-elevated);
+  border-color: rgba(255, 255, 255, 0.05);
+}

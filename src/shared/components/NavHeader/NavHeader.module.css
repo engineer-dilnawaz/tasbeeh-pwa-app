@@ -1,0 +1,59 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  width: auto;
+  padding: 0 16px;
+  background: var(--bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  /* Pull to edges to ignore parent padding */
+  margin-left: calc(var(--page-padding, 12.5px) * -1);
+  margin-right: calc(var(--page-padding, 12.5px) * -1);
+  margin-top: -16px;
+  box-sizing: border-box;
+}
+
+.backBtn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--border); /* Greyish border */
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.backBtn:active {
+  transform: scale(0.9);
+  background: var(--surface-variant);
+}
+
+.title {
+  font-family: var(--Family-Headings);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.spacer {
+  min-width: 44px; /* Mirrors backBtn minimum width */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Dark mode overrides */
+[data-theme='dark'] .backBtn {
+  border-color: rgba(255, 255, 255, 0.15); /* Slightly lighter grey for dark mode visibility */
+}

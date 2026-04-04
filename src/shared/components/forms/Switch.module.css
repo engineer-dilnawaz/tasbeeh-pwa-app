@@ -1,0 +1,30 @@
+.switch {
+  width: 44px;
+  height: 24px;
+  background-color: rgba(120, 120, 128, 0.3);
+  border-radius: 12px;
+  padding: 2px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.switchActive {
+  background-color: var(--accent);
+}
+
+.switchHandle {
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff !important;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

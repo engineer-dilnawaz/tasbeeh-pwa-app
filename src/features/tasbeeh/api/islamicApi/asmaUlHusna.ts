@@ -1,37 +1,32 @@
-import axios from "axios";
-import { getIslamicApiKey, ISLAMIC_API_ORIGIN, ISLAMIC_API_V1_BASE } from "./config";
+import { islamicApiInstance } from "@/services/api/islamicApiInstance";
+import { ISLAMIC_API_ORIGIN } from "./config";
 import type { AsmaUlHusnaData, AsmaUlHusnaErrorResponse, AsmaUlHusnaSuccessResponse } from "./types";
 
 /**
- * GET `/asma-ul-husna/?language=&api_key=`
- * @param language ISO code (e.g. en, ur, ar) — see API docs for full list.
+ * GET `/asma-ul-husna/?language=`
+ * @param language ISO code (e.g. en, ur, ar)
  */
 export async function fetchAsmaUlHusna(language: string): Promise<AsmaUlHusnaData> {
-  const apiKey = getIslamicApiKey();
-  if (!apiKey) {
-    throw new Error("Missing VITE_ISLAMIC_API_KEY");
-  }
-
-  const { data } = await axios.get<AsmaUlHusnaSuccessResponse | AsmaUlHusnaErrorResponse>(
-    `${ISLAMIC_API_V1_BASE}/asma-ul-husna/`,
+  // Using the centralized instance (automatically attaches API key)
+  const { data } = await islamicApiInstance.get<AsmaUlHusnaSuccessResponse | AsmaUlHusnaErrorResponse>(
+    "/asma-ul-husna/",
     {
-      params: {
-        language: language.trim() || "en",
-        api_key: apiKey,
-      },
-      timeout: 25_000,
-      validateStatus: () => true,
-    },
+      params: { language: language.trim() || "en" },
+    }
   );
 
   if (!data || typeof data !== "object") {
     throw new Error("Invalid Asma-ul-Husna response");
   }
-  if (data.status === "error") {
+
+  // Handle API-specific error status even with 2xx HTTP response
+  if ("status" in data && data.status === "error") {
     throw new Error(data.message || "Asma-ul-Husna request failed");
   }
-  if (data.status !== "success" || !data.data) {
-    throw new Error("Unexpected Asma-ul-Husna response");
+
+  // Success data validation
+  if (!("data" in data) || !data.data) {
+    throw new Error("Unexpected Asma-ul-Husna response structure");
   }
 
   return data.data;

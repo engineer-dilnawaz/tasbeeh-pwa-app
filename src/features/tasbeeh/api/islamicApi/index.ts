@@ -1,4 +1,5 @@
 export { fetchAsmaUlHusna, resolveAsmaAudioUrl } from "./asmaUlHusna";
+export { fetchPrayerTimes } from "./prayerTimes";
 export {
   getIslamicApiKey,
   ISLAMIC_API_ORIGIN,
@@ -9,5 +10,7 @@ export type {
   AsmaUlHusnaName,
   AsmaUlHusnaErrorResponse,
   AsmaUlHusnaSuccessResponse,
+  PrayerTime,
+  PrayerTimeDayResponse,
 } from "./types";
 export { fetchRemoteTasbeeh, type RemoteTasbeehResponse } from "./tasbeehRemote";

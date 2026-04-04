@@ -9,9 +9,11 @@ export type AuthContextValue = {
   lastError: string | null;
   clearLastError: () => void;
   signInEmailPassword: (email: string, password: string) => Promise<void>;
-  registerEmailPassword: (email: string, password: string) => Promise<void>;
+  registerEmailPassword: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>;
   sendMagicLink: (email: string) => Promise<void>;
   signInGoogle: () => Promise<void>;
+  signInFacebook: () => Promise<void>;
+  signInAnonymously: () => Promise<void>;
   requestPasswordResetEmail: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 };

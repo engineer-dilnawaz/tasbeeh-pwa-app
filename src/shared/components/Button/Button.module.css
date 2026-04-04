@@ -78,17 +78,17 @@
 }
 
 .btn--glass {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff; /* glass usually sits on images, force white */
+  background: var(--accent-subtle);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--bg-primary) 35%, transparent);
 }
 
 .btn--glass:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: color-mix(in srgb, var(--text-primary) 12%, transparent);
+  border-color: var(--border);
 }
 
 /* CONTENT ELEMENTS */

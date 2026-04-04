@@ -35,10 +35,11 @@
 }
 
 .title {
-  font-size: 1.5rem;
+  font-family: var(--Family-Headings);
+  font-size: var(--Size-H1-Font-Size);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: var(--Letter-Spacing-Heading);
+  line-height: var(--Size-H1-Line-Height);
   color: var(--text-primary);
   margin: 0 0 8px;
 }
@@ -54,8 +55,11 @@
 }
 
 .prose h2 {
-  font-size: 1rem;
+  font-family: var(--Family-Headings);
+  font-size: var(--Size-H2-Font-Size);
+  line-height: var(--Size-H2-Line-Height);
   font-weight: 700;
+  letter-spacing: var(--Letter-Spacing-Heading);
   color: var(--text-primary);
   margin: 28px 0 12px;
 }
@@ -65,14 +69,14 @@
 }
 
 .prose p {
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: var(--Size-Body-Font-Size);
+  line-height: var(--Size-Body-Line-Height);
   margin: 0 0 14px;
 }
 
 .prose ul {
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: var(--Size-Body-Font-Size);
+  line-height: var(--Size-Body-Line-Height);
   margin: 0 0 14px;
   padding-left: 1.25rem;
 }

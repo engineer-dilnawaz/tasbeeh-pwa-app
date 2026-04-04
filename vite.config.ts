@@ -31,8 +31,8 @@ export default defineConfig({
         name: "Tasbeeh Flow",
         short_name: "Tasbeeh",
         description: "A calm and minimal tasbeeh app for daily dhikr",
-        theme_color: "#0B0F0E",
-        background_color: "#0B0F0E",
+        theme_color: "#f6f2e7",
+        background_color: "#f6f2e7",
         display: "standalone",
         orientation: "portrait",
         start_url: "/",
@@ -61,7 +61,11 @@ export default defineConfig({
           },
         ],
         /** Do not SPA-fallback asset or module URLs (would return index.html as text/html for .js). */
-        navigateFallbackDenylist: [/^\/assets\//, /^\/src\//, /\.(?:js|mjs|css|png|svg|ico|woff2?|mp4|webm)$/i],
+        navigateFallbackDenylist: [
+          /^\/assets\//,
+          /^\/src\//,
+          /\.(?:js|mjs|css|png|svg|ico|woff2?|mp4|webm)$/i,
+        ],
       },
     }),
   ],

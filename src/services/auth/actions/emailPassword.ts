@@ -2,16 +2,24 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  updateProfile,
   type Auth,
   type UserCredential,
 } from "firebase/auth";
 
-export function registerWithEmailPassword(
+export async function registerWithEmailPassword(
   auth: Auth,
   email: string,
   password: string,
+  firstName?: string,
+  lastName?: string,
 ): Promise<UserCredential> {
-  return createUserWithEmailAndPassword(auth, email.trim(), password);
+  const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
+  if (firstName || lastName) {
+    const fullName = [firstName, lastName].filter(Boolean).join(" ");
+    await updateProfile(cred.user, { displayName: fullName });
+  }
+  return cred;
 }
 
 export function signInWithEmailPassword(

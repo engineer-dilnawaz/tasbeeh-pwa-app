@@ -1,0 +1,21 @@
+/**
+ * Terms page H1 — Headings/H1: "Terms &" medium + "Conditions" bold (design tokens).
+ */
+.title {
+  margin: 0 0 8px;
+  font-family: var(--Family-Headings, "Dubai", "Plus Jakarta Sans", sans-serif);
+  font-size: var(--Size-H1-Font-Size, 32px);
+  font-style: normal;
+  line-height: var(--Size-H1-Line-Height, 36px);
+  letter-spacing: var(--Letter-Spacing-Heading, 0px);
+}
+
+.titleMedium {
+  color: var(--Text-Colors-Title-Color, #234840);
+  font-weight: 500;
+}
+
+.titleBold {
+  color: var(--Text-Colors-Title-Highlight-1, #e57859);
+  font-weight: 700;
+}

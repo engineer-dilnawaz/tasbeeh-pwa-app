@@ -21,6 +21,8 @@ import {
   storeEmailForSignIn,
 } from "./actions/emailLink";
 import { signInWithGoogle } from "./actions/google";
+import { signInWithFacebook } from "./actions/facebook";
+import { signInAnonymouslyUser } from "./actions/anonymous";
 import { useRemoteConfig } from "@/shared/hooks/useRemoteConfig";
 import { AuthContext, type AuthContextValue, type AuthStatus } from "./authContext";
 
@@ -127,11 +129,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const registerEmailPassword = useCallback(async (email: string, password: string) => {
+  const registerEmailPassword = useCallback(async (email: string, password: string, firstName?: string, lastName?: string) => {
     if (!firebaseAuth) return;
     setLastError(null);
     try {
-      await registerWithEmailPassword(firebaseAuth, email, password);
+      await registerWithEmailPassword(firebaseAuth, email, password, firstName, lastName);
       trackSignUp("password");
     } catch (e) {
       setLastError(formatAuthError(e));
@@ -157,6 +159,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signInWithGoogle(firebaseAuth);
       trackLogin("google");
+    } catch (e) {
+      setLastError(formatAuthError(e));
+      throw e;
+    }
+  }, []);
+
+  const signInFacebook = useCallback(async () => {
+    if (!firebaseAuth) return;
+    setLastError(null);
+    try {
+      await signInWithFacebook(firebaseAuth);
+      trackLogin("facebook");
+    } catch (e) {
+      setLastError(formatAuthError(e));
+      throw e;
+    }
+  }, []);
+
+  const signInAnonymously = useCallback(async () => {
+    if (!firebaseAuth) return;
+    setLastError(null);
+    try {
+      await signInAnonymouslyUser(firebaseAuth);
+      trackLogin("anonymous");
     } catch (e) {
       setLastError(formatAuthError(e));
       throw e;
@@ -195,6 +221,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       registerEmailPassword,
       sendMagicLink,
       signInGoogle,
+      signInFacebook,
+      signInAnonymously,
       requestPasswordResetEmail,
       signOut,
     }),
@@ -207,6 +235,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       registerEmailPassword,
       sendMagicLink,
       signInGoogle,
+      signInFacebook,
+      signInAnonymously,
       requestPasswordResetEmail,
       signOut,
     ],

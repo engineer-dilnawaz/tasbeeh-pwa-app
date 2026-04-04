@@ -2,62 +2,56 @@
   position: relative;
   width: 100vw;
   height: 100vh;
-  /* Use viewport height fix for mobile */
   height: 100dvh;
   overflow: hidden;
-  background-color: #0B0F0E;
-  color: #FFFFFF;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .videoBackground {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
-  height: 60%;
+  height: 100%;
+  min-height: 100%;
   object-fit: cover;
+  object-position: center;
   z-index: 1;
 }
 
-.overlay {
+/*
+ * Black bottom scrim — taller band above tagline / controls (last slide + CTA = a bit more).
+ */
+.overlayVideo {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60%;
-  /* Blend from transparent at top to solid dark UI color at the bottom match point */
-  background: linear-gradient(to bottom, rgba(11,15,14,0.1) 0%, rgba(11,15,14,0.2) 60%, rgba(11,15,14,0.85) 90%, #0B0F0E 100%);
+  inset: 0;
+  pointer-events: none;
   z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 38%,
+    color-mix(in srgb, #000000 16%, transparent) 58%,
+    color-mix(in srgb, #000000 38%, transparent) 74%,
+    color-mix(in srgb, #000000 62%, transparent) 88%,
+    color-mix(in srgb, #000000 85%, transparent) 96%,
+    color-mix(in srgb, #000000 94%, transparent) 100%
+  );
 }
 
-.header {
-  position: absolute;
-  top: env(safe-area-inset-top, 24px);
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.logoGroup {
-  display: flex;
-  align-items: center;
-}
-
-.appLogo {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  /* Optional drop shadow so the white logo punches out over lighter video frames */
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-}
-
-.appName {
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
+/* Last slide + fixed Proceed: extend scrim further up */
+.overlayVideoLastWithCta {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 18%,
+    color-mix(in srgb, #000000 14%, transparent) 42%,
+    color-mix(in srgb, #000000 32%, transparent) 58%,
+    color-mix(in srgb, #000000 52%, transparent) 72%,
+    color-mix(in srgb, #000000 72%, transparent) 84%,
+    color-mix(in srgb, #000000 88%, transparent) 93%,
+    color-mix(in srgb, #000000 96%, transparent) 100%
+  );
 }
 
 .loaderWrapper {
@@ -77,15 +71,110 @@
   left: 0;
   width: 100%;
   z-index: 10;
+  padding-left: 24px;
+  padding-right: 24px;
+  bottom: max(env(safe-area-inset-bottom, 0px), 32px);
+  box-sizing: border-box;
+}
+
+/* Reserve space above the fixed Proceed bar when it’s visible (56px + gap). */
+.bottomContentWithCta {
+  padding-bottom: 70px;
+}
+
+.bottomStack {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 0;
 }
 
 .taglineAndDots {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  gap: 8px;
 }
+
+.proceedWrap {
+  position: fixed;
+  left: 24px;
+  right: 24px;
+  bottom: max(env(safe-area-inset-bottom, 0px), 32px);
+  width: auto;
+  z-index: 11;
+  box-sizing: border-box;
+}
+
+.proceedBtnRing {
+  position: relative;
+  width: 100%;
+  border-radius: 26px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * Mount Lottie whenever last slide is shown (not only when CTA reveals). If we mount
+ * only after ctaShown, useLottie’s first effect runs with no DOM ref and never reloads.
+ */
+.proceedLottieIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.proceedLottieVisible {
+  opacity: 1;
+}
+
+.proceedLottieIcon :global(svg) {
+  display: block;
+}
+
+/* “Proceed” + arrow as one centered row with a small gap (not full-width text + edge icon) */
+.proceedBtn {
+  height: 56px !important;
+  font-size: 16px !important;
+  border: none !important;
+  color: #ffffff !important;
+  background: var(--accent) !important;
+  box-shadow: none !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.proceedBtn > span:first-of-type {
+  flex: 0 1 auto;
+  width: auto;
+}
+
+.proceedBtn > span:last-of-type {
+  flex-shrink: 0;
+}
+
+.proceedBtn > span:last-of-type :global(svg) {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.proceedBtn:focus,
+.proceedBtn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.proceedBtn:hover {
+  background: color-mix(in srgb, var(--accent) 88%, #ffffff) !important;
+}
+
 
 .taglineWrapper {
   flex: 1;
@@ -94,96 +183,43 @@
 }
 
 .tagline {
-  display: flex;
-  flex-direction: column;
+  min-width: 0;
 }
 
-.tagline h1 {
+.taglineHeading {
   font-size: 36px;
   font-weight: 700;
   margin: 0;
   letter-spacing: -0.6px;
   line-height: 1.15;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 2px 14px rgba(0, 0, 0, 0.4));
+}
+
+.taglineLine {
+  display: block;
 }
 
 .indicators {
   display: flex;
   align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
 }
 
 .dot {
   width: 6px;
   height: 6px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid color-mix(in srgb, #ffffff 45%, transparent);
   background-color: transparent;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .activeDot {
   width: 20px;
-  border-color: #FFFFFF;
-  background-color: #FFFFFF;
+  border-color: #ffffff;
+  background-color: #ffffff;
 }
 
-.actions {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.mainActionBtn {
-  height: 56px !important;
-  font-size: 16px !important;
-  color: #111111 !important;
-  background: #FFFFFF !important;
-}
-
-.socialRow {
-  display: flex;
-  justify-content: space-between;
-}
-
-.socialRow > * {
-  flex: 1;
-  height: 54px !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: transparent !important;
-}
-
-.guestDivider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.line {
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.15);
-  flex: 1;
-}
-
-.guestBtn {
-  background: none;
-  border: none;
-  color: #FFFFFF;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.5);
-  text-underline-offset: 4px;
-  cursor: pointer;
-}
-
-.terms {
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.5;
-}
-
-.terms strong {
-  color: #FFFFFF;
-  font-weight: 600;
-}

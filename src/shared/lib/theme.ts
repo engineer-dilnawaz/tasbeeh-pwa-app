@@ -1,13 +1,18 @@
 import { THEME_COLOR_META, type ThemeId } from "@/shared/config/constants";
-import { applyPineGreenPaletteToRoot, getThemeColors } from "@/shared/theme";
+import {
+  applyPineGreenPaletteToRoot,
+  getThemeColors,
+  pickPineGreenPalette,
+} from "@/shared/theme";
 
 export function normalizeTheme(theme: string | undefined): ThemeId {
   if (theme === "light" || theme === "dark") return theme;
-  return "dark";
+  /** Default: light (Early Dawn #f6f2e7) — matches `defaultThemeColors.background` / `--bg-primary`. */
+  return "light";
 }
 
 function applyThemeColorVariables(theme: ThemeId) {
-  applyPineGreenPaletteToRoot(getThemeColors(theme));
+  applyPineGreenPaletteToRoot(pickPineGreenPalette(getThemeColors(theme).scales));
 }
 
 export function applyThemeToDocument(theme: string): ThemeId {

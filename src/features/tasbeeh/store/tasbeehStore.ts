@@ -9,9 +9,11 @@ interface TasbeehStoreState {
   currentIndex: number;
   streak: number;
   totalRecitations: number;
+  favoriteAsmaNames: number[];
   increment: () => void;
   setTasbeehList: (list: TasbeehItem[]) => void;
   resetProgress: () => void;
+  toggleFavoriteAsma: (nameNumber: number) => void;
 }
 
 export const useTasbeehStore = create<TasbeehStoreState>()(
@@ -22,6 +24,7 @@ export const useTasbeehStore = create<TasbeehStoreState>()(
       currentIndex: 0,
       streak: 0,
       totalRecitations: 0,
+      favoriteAsmaNames: [],
 
       increment: () => {
         const { count, currentIndex, tasbeehList, totalRecitations } = get();
@@ -49,6 +52,15 @@ export const useTasbeehStore = create<TasbeehStoreState>()(
         }),
 
       resetProgress: () => set({ count: 0, currentIndex: 0 }),
+      
+      toggleFavoriteAsma: (num) => {
+        const { favoriteAsmaNames } = get();
+        if (favoriteAsmaNames.includes(num)) {
+          set({ favoriteAsmaNames: favoriteAsmaNames.filter(n => n !== num) });
+        } else {
+          set({ favoriteAsmaNames: [...favoriteAsmaNames, num] });
+        }
+      },
     }),
     {
       name: "tasbeeh-react-ui",
@@ -59,6 +71,7 @@ export const useTasbeehStore = create<TasbeehStoreState>()(
         currentIndex: s.currentIndex,
         streak: s.streak,
         totalRecitations: s.totalRecitations,
+        favoriteAsmaNames: s.favoriteAsmaNames,
       }),
     },
   ),

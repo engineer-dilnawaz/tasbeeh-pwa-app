@@ -8,9 +8,7 @@ type ThemePickerProps = {
 
 export function ThemePicker({ theme, onSelect }: ThemePickerProps) {
   return (
-    <div className="settings-group settings-group--appearance">
-      <h4 className="appearance-title">Theme</h4>
-      <p className="settings-hint">Choose a look — tap a card to apply</p>
+    <div className="settings-group--appearance">
       <div className="theme-grid">
         {THEME_MENU_CARDS.map((card) => {
           const active = theme === card.id;

@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { installGlobalErrorHandlers } from "@/services/crashlytics";
 import { applyThemeToDocument, readStoredTheme } from "@/shared/lib/theme";
+import "@/shared/styles/dubai-font.css";
 import "@/shared/styles/global.css";
 import App from "@/App.tsx";
 import { AppProviders } from "@/app/providers.tsx";

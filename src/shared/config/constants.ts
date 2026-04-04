@@ -5,6 +5,9 @@ export const TASBEEH_CONTENT_VERSION = "arabic-urdu-v1";
 /** Session-only: splash timer is skipped for the rest of the browser tab after first completion. */
 export const SPLASH_SESSION_STORAGE_KEY = "tasbeeh_splash_seen";
 
+/** First-time onboarding; local-only until synced with auth backend (e.g. Firebase). */
+export const ONBOARDING_COMPLETED_STORAGE_KEY = "tasbeeh_onboarding_completed";
+
 /** Minimum time the splash screen stays visible before routing (ms). */
 export const SPLASH_MIN_DURATION_MS = 2500;
 
