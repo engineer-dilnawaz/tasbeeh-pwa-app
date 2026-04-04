@@ -13,7 +13,7 @@ once after architecture setup, then rerun after major changes.
 
 ---
 
-# Skill: project-scan (React Native)
+# Skill: project-scan
 
 Scan the project and write a single consolidated instruction file to
 `.claude/rules/app-context/app-context.rules.md`.
