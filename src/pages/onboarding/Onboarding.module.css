@@ -1,0 +1,189 @@
+.container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  /* Use viewport height fix for mobile */
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #0B0F0E;
+  color: #FFFFFF;
+}
+
+.videoBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  /* Blend from transparent at top to solid dark UI color at the bottom match point */
+  background: linear-gradient(to bottom, rgba(11,15,14,0.1) 0%, rgba(11,15,14,0.2) 60%, rgba(11,15,14,0.85) 90%, #0B0F0E 100%);
+  z-index: 2;
+}
+
+.header {
+  position: absolute;
+  top: env(safe-area-inset-top, 24px);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logoGroup {
+  display: flex;
+  align-items: center;
+}
+
+.appLogo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  /* Optional drop shadow so the white logo punches out over lighter video frames */
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+.appName {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.loaderWrapper {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottomContent {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.taglineAndDots {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.taglineWrapper {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+.tagline {
+  display: flex;
+  flex-direction: column;
+}
+
+.tagline h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.6px;
+  line-height: 1.15;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.indicators {
+  display: flex;
+  align-items: center;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background-color: transparent;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.activeDot {
+  width: 20px;
+  border-color: #FFFFFF;
+  background-color: #FFFFFF;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mainActionBtn {
+  height: 56px !important;
+  font-size: 16px !important;
+  color: #111111 !important;
+  background: #FFFFFF !important;
+}
+
+.socialRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.socialRow > * {
+  flex: 1;
+  height: 54px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: transparent !important;
+}
+
+.guestDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.line {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.15);
+  flex: 1;
+}
+
+.guestBtn {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.5);
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.terms {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+.terms strong {
+  color: #FFFFFF;
+  font-weight: 600;
+}
