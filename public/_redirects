@@ -1,0 +1,2 @@
+# Netlify SPA fallback — required for direct loads of /privacy, /data-deletion, etc.
+/*    /index.html   200

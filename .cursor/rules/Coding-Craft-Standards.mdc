@@ -1,0 +1,171 @@
+---
+alwaysApply: true
+---
+
+# Tasbeeh PWA — Coding Craft & Standards
+
+This app is not a utility. It is a personal spiritual companion — something Dilnawaz opens to find peace, to do zikr, to feel calm. Every line of code serves that purpose. Write code the way a thoughtful, experienced engineer writes it: with intention, clarity, and care. No sloppiness, no shortcuts that trade soul for speed.
+
+## The Standard: Human-Crafted Code
+
+The code in this project should read like it was written by someone who has been building production apps for years and takes pride in their work. That means:
+
+**No AI tells.** Avoid these patterns that scream "generated":
+
+- Overly verbose comments explaining the obvious (`// increment the counter` above `count++`)
+- Redundant documentation blocks on every function — comment only when the _why_ isn't obvious from the code
+- Perfect alphabetical ordering of everything — humans group by relevance, not alphabet
+- Cookie-cutter structure where every file looks identical regardless of its purpose
+- Unnecessary abstractions that add layers without adding clarity
+
+**What human-crafted code looks like:**
+
+- Variable names that reveal intent without being novels: `isCompleted` over `hasTheUserFinishedTheCurrentTasbeeh`
+- Functions that do one thing and do it well — but not artificially split into 10 micro-functions
+- Imports grouped logically: React/libs first, then internal modules, then styles — with a blank line between groups
+- Consistent but not robotic formatting — the codebase has a rhythm, follow it
+
+## TypeScript — Strict and Meaningful
+
+TypeScript is here to catch bugs and document intent, not to satisfy a linter.
+
+- **No `any`.** Ever. If you're reaching for `any`, you haven't understood the data shape yet. Stop and figure it out.
+- **Prefer `interface` for object shapes** that describe entities (TasbeehItem, UserStats). Use `type` for unions, intersections, and computed types.
+- **Name types after what they represent**, not what they're used for: `DailyStreak` not `StreakDataForStatsPage`.
+- **Export types from the module that owns them.** If `TasbeehPhrase` is defined in `features/tasbeeh/`, that's where its type lives.
+- **Generic types** when a pattern genuinely repeats — not as a flex. If the generic is only ever instantiated with one type, it shouldn't be generic.
+
+```typescript
+// Good — clear, minimal, tells you what it is
+interface TasbeehPhrase {
+  arabic: string;
+  transliteration: string;
+  translation: string;
+  target: number;
+}
+
+// Bad — over-engineered for no reason
+type GenericCountableItem<
+  T extends string,
+  M extends Record<string, unknown>,
+> = {
+  label: T;
+  metadata: M;
+  targetCount: number;
+};
+```
+
+## React Components — Thin, Focused, Alive
+
+Components in this app are the interface between Dilnawaz and his spiritual practice. They should feel intentional.
+
+**Component structure — follow this order consistently:**
+
+1. Type definitions (props interface, if not imported)
+2. The component function
+3. Hooks (state, refs, effects — in logical order, not alphabetical)
+4. Derived values and computations
+5. Event handlers
+6. The return (JSX)
+7. Helper functions scoped to this component (below the component, or extracted if reused)
+
+**Naming:**
+
+- Components: PascalCase, noun-based — `ProgressRing`, `TasbeehCounter`, `DailyInsight`
+- Hooks: `use` prefix, verb-based — `useTasbeehProgress`, `useAyatRotation`
+- Handlers: `handle` prefix — `handleCountTap`, `handleReset`
+- Booleans: `is`/`has`/`should` prefix — `isAnimating`, `hasReachedTarget`
+
+**Keep components focused.** A component should have one clear responsibility. If `Home.tsx` is doing fetching, state management, animation orchestration, AND rendering — that's a signal to extract. But extract because it makes the code clearer, not to hit some arbitrary line count.
+
+## Zustand — Simple State, Done Right
+
+The app uses Zustand with localStorage persistence. Respect the simplicity.
+
+- **One store per domain.** `tasbeehStore` handles counting logic. Don't scatter tasbeeh state across multiple stores.
+- **Actions live in the store**, not in components. Components call `store.increment()`, they don't manually set state.
+- **Selectors should be granular.** Use `useStore(state => state.count)` — not `useStore()` which subscribes to everything and causes unnecessary re-renders.
+- **Derived values** — compute them in selectors or in the component, not in the store. The store holds source-of-truth state, not computed state.
+
+```typescript
+// Good — granular selector, component only re-renders when count changes
+const count = useTasbeehStore((state) => state.count);
+
+// Bad — subscribes to entire store, re-renders on any change
+const store = useTasbeehStore();
+```
+
+## CSS & Theming — Calm by Design
+
+This app uses CSS custom properties for theming (dark, default, pineGreen). Every visual choice should feel considered.
+
+- **Use the existing CSS variables.** Don't hardcode colors. If a new color is needed, add it to the theme system — don't inline a hex value.
+- **Spacing should breathe.** Generous padding, intentional whitespace. This is a meditation companion, not a dashboard.
+- **Transitions on everything interactive.** Buttons, cards, toggles — nothing should snap. Ease-in-out, 200-300ms for micro-interactions.
+- **Class naming:** kebab-case, descriptive of what the element is — `.progress-ring`, `.daily-insight-card`, `.counter-display`. No `.div1`, no `.wrapper3`.
+
+## Framer Motion — Animations That Calm
+
+Animations are a core part of this app's identity. They should make Dilnawaz feel at peace, not impressed.
+
+- **Ease curves:** prefer `easeInOut` or custom spring configs with low stiffness. Never `linear` for UI elements — it feels mechanical.
+- **Duration:** micro-interactions 150-300ms, page transitions 300-500ms, ambient animations can be longer (1-3s with repeat).
+- **Entry animations:** fade + subtle scale (0.95 → 1.0) or fade + translateY (10px → 0). Nothing dramatic.
+- **Exit animations:** match the entry but reversed. Use `AnimatePresence` with `mode="wait"` for page transitions.
+- **The counter animation is sacred.** When the user taps to count, the feedback should feel physical — a gentle pulse, a soft ripple, not a flashy bounce. Think of touching prayer beads.
+
+```typescript
+// Good — subtle, calm entrance
+<motion.div
+  initial={{ opacity: 0, y: 8 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3, ease: 'easeOut' }}
+>
+
+// Bad — aggressive, distracting
+<motion.div
+  initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+  transition={{ type: 'spring', bounce: 0.8 }}
+>
+```
+
+## React Query — Server State Separation
+
+React Query handles remote data (Islamic API, Firebase reads). Zustand handles local state (counter, streak, preferences). Never mix them.
+
+- **Query keys:** structured arrays — `['asmaUlHusna']`, `['ayat', dayIndex]`. Consistent and predictable.
+- **Stale time:** be generous. Asma-ul-Husna doesn't change — `staleTime: Infinity`. Daily rotation content — `staleTime: 1000 * 60 * 60` (1 hour).
+- **Error boundaries:** graceful degradation. If the API is down, show cached content or a gentle fallback — never a blank screen or a raw error.
+- **Loading states:** skeleton screens or subtle pulse animations, not spinners. The user opened the app for peace, not to watch a wheel spin.
+
+## Firebase — Clean Integration
+
+- **Auth state:** use a dedicated hook (`useAuth` or similar) that provides the current user. Don't call `firebase.auth().currentUser` directly in components.
+- **Firestore reads:** through React Query wrappers, not raw `onSnapshot` calls scattered in components.
+- **Listener cleanup:** every `onSnapshot` gets cleaned up in a `useEffect` return. No exceptions.
+- **Remote Config:** access through a centralized config hook. Components ask for feature flags, they don't know Remote Config exists.
+
+## File Organization
+
+Follow the existing domain-driven structure. New code goes where it belongs:
+
+- **New tasbeeh feature?** → `features/tasbeeh/`
+- **New shared component?** → `shared/components/`
+- **New utility hook?** → `shared/hooks/`
+- **New page?** → `pages/`
+- **New service integration?** → `services/`
+
+Don't create files you don't need. One component per file. One hook per file (unless tightly coupled helpers live with their parent hook). No `utils.ts` junk drawers — name the file after what it does.
+
+## Code Review Lens
+
+When reviewing or writing code, ask these questions:
+
+1. Would I understand this code in 6 months without the current context?
+2. Does this component do one thing clearly?
+3. Are the animations contributing to calm, or showing off?
+4. Is the TypeScript helping or just adding ceremony?
+5. Would an experienced engineer look at this and nod — or squint?
+
+If any answer is no, revise before committing.

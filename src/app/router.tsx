@@ -5,6 +5,8 @@ import AddTasbeeh from "@/pages/AddTasbeeh";
 import EmailLinkFallback from "@/pages/EmailLinkFallback";
 import Home from "@/pages/Home";
 import Settings from "@/pages/Settings";
+import DataDeletion from "@/pages/data-deletion";
+import Privacy from "@/pages/privacy";
 import SignIn from "@/pages/sign-in";
 import SplashScreen from "@/pages/splash";
 import Stats from "@/pages/Stats";
@@ -18,6 +20,8 @@ export function AppRouter() {
       <Route path="/" element={<SplashScreen />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/sign-in" element={<SignIn />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/data-deletion" element={<DataDeletion />} />
       <Route path="/auth/email-link" element={<EmailLinkFallback />} />
       <Route element={<AppLayout />}>
         <Route path="/home" element={<Home />} />
