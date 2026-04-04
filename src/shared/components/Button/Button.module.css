@@ -1,0 +1,130 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+  padding: 0 24px;
+  height: 54px;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.btn--full-width {
+  width: 100%;
+}
+
+.btn--icon-only {
+  padding: 0;
+  width: 54px;
+}
+
+/* SHAPES */
+.btn--pill {
+  border-radius: 100px;
+}
+
+.btn--squircle {
+  border-radius: 0; /* Let the SVG mask handle the curve entirely */
+}
+
+/* VARIANTS */
+.btn--primary {
+  background: var(--text-primary);
+  color: var(--card-bg);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.btn--primary:hover {
+  background: var(--text-secondary);
+}
+
+.btn--secondary {
+  background: var(--card-bg);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.05); /* very subtle hover */
+}
+
+:global([data-theme="light"]) .btn--secondary:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="light"]) .btn--ghost:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.btn--glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff; /* glass usually sits on images, force white */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn--glass:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* CONTENT ELEMENTS */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.text {
+  position: relative;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* STATES */
+.btn--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
