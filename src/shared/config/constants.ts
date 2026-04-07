@@ -1,4 +1,9 @@
-import type { SpiritualAyat, SpiritualHadith, TasbeehItem } from "../types/models";
+import type {
+  SpiritualAyat,
+  SpiritualHadith,
+  TasbeehItem,
+} from "../types/models";
+import { TASBEEH_CATALOG_SEED, tasbeehToLegacyItem } from "./tasbeehCatalogSeed";
 
 export const TASBEEH_CONTENT_VERSION = "arabic-urdu-v1";
 
@@ -11,32 +16,10 @@ export const ONBOARDING_COMPLETED_STORAGE_KEY = "tasbeeh_onboarding_completed";
 /** Minimum time the splash screen stays visible before routing (ms). */
 export const SPLASH_MIN_DURATION_MS = 2500;
 
-export const DEFAULT_TASBEEH: TasbeehItem[] = [
-  {
-    text: "يَا سَلَامُ يَا مُؤْمِنُ يَا اللَّهُ",
-    transliteration: "Ya Salam Ya Mu'minu Ya Allah",
-    urdu: "اے سلام، اے مومن، اے اللہ",
-    target: 100,
-  },
-  {
-    text: "يَا رَحْمَٰنُ يَا رَحِيمُ يَا اللَّهُ",
-    transliteration: "Ya Rahman Ya Rahim Ya Allah",
-    urdu: "اے رحمان، اے رحیم، اے اللہ",
-    target: 100,
-  },
-  {
-    text: "يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
-    transliteration: "Ya Zal-Jalali Wal-Ikram",
-    urdu: "اے ذوالجلال والاکرام",
-    target: 100,
-  },
-  {
-    text: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
-    transliteration: "La hawla wa la quwwata illa billah",
-    urdu: "اللہ کی ذات کے سوا نہ طاقت ہے نہ کوئی چارہ",
-    target: 100,
-  },
-];
+/** Counter list derived from bundled catalog seed (see `TASBEEH_CATALOG_SEED`). */
+export const DEFAULT_TASBEEH: TasbeehItem[] = TASBEEH_CATALOG_SEED.flatMap(
+  (s) => s.items,
+).map(tasbeehToLegacyItem);
 
 export const AYAT_OF_THE_DAY: SpiritualAyat[] = [
   {
@@ -111,6 +94,6 @@ export const VALID_THEMES = ["light", "dark"] as const;
 export type ThemeId = (typeof VALID_THEMES)[number];
 
 export const THEME_COLOR_META: Record<ThemeId, string> = {
-  light: "#f6f2e7",
-  dark: "#0e1d1a",
+  light: "#f8fafc",
+  dark: "#020617",
 };

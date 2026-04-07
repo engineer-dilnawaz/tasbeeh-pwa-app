@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--pine-green-700, #152b26);
+  background: rgb(22 101 52);
 }
 
 .lottie {

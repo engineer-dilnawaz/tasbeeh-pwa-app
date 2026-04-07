@@ -4,8 +4,13 @@
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: rgb(248 250 252);
+  color: rgb(15 23 42);
+}
+
+:global(html.dark) .container {
+  background-color: rgb(2 6 23);
+  color: rgb(248 250 252);
 }
 
 .videoBackground {
@@ -142,7 +147,7 @@
   font-size: 16px !important;
   border: none !important;
   color: #ffffff !important;
-  background: var(--accent) !important;
+  background: rgb(21 128 61) !important;
   box-shadow: none !important;
   position: relative !important;
   display: flex !important;
@@ -172,7 +177,31 @@
 }
 
 .proceedBtn:hover {
-  background: color-mix(in srgb, var(--accent) 88%, #ffffff) !important;
+  background: rgb(22 163 74) !important;
+}
+
+:global(html.accent-purple) .proceedBtn {
+  background: rgb(147 51 234) !important;
+}
+
+:global(html.accent-purple) .proceedBtn:hover {
+  background: rgb(168 85 247) !important;
+}
+
+:global(html.dark) .proceedBtn {
+  background: rgb(74 222 128) !important;
+}
+
+:global(html.dark) .proceedBtn:hover {
+  background: rgb(34 197 94) !important;
+}
+
+:global(html.dark.accent-purple) .proceedBtn {
+  background: rgb(192 132 252) !important;
+}
+
+:global(html.dark.accent-purple) .proceedBtn:hover {
+  background: rgb(216 180 254) !important;
 }
 
 

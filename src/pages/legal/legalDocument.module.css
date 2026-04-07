@@ -17,8 +17,20 @@
   gap: 6px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--accent);
+  color: rgb(21 128 61);
   text-decoration: none;
+}
+
+:global(html.accent-purple) .backLink {
+  color: rgb(147 51 234);
+}
+
+:global(html.dark) .backLink {
+  color: rgb(74 222 128);
+}
+
+:global(html.dark.accent-purple) .backLink {
+  color: rgb(192 132 252);
 }
 
 .backLink:hover {
@@ -30,38 +42,58 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: rgb(21 128 61);
   margin-bottom: 8px;
 }
 
+:global(html.accent-purple) .brand {
+  color: rgb(147 51 234);
+}
+
 .title {
-  font-family: var(--Family-Headings);
-  font-size: var(--Size-H1-Font-Size);
+  font-family: var(--font-primary);
+  font-size: 32px;
   font-weight: 700;
-  letter-spacing: var(--Letter-Spacing-Heading);
-  line-height: var(--Size-H1-Line-Height);
-  color: var(--text-primary);
+  letter-spacing: 0;
+  line-height: 36px;
+  color: rgb(15 23 42);
   margin: 0 0 8px;
+}
+
+:global(html.dark) .title {
+  color: rgb(248 250 252);
 }
 
 .updated {
   font-size: 13px;
-  color: var(--text-muted);
+  color: rgb(100 116 139);
   margin: 0 0 28px;
 }
 
+:global(html.dark) .updated {
+  color: rgb(148 163 184);
+}
+
 .prose {
-  color: var(--text-secondary);
+  color: rgba(15, 23, 42, 0.62);
+}
+
+:global(html.dark) .prose {
+  color: rgba(248, 250, 252, 0.65);
 }
 
 .prose h2 {
-  font-family: var(--Family-Headings);
-  font-size: var(--Size-H2-Font-Size);
-  line-height: var(--Size-H2-Line-Height);
+  font-family: var(--font-primary);
+  font-size: 24px;
+  line-height: 28px;
   font-weight: 700;
-  letter-spacing: var(--Letter-Spacing-Heading);
-  color: var(--text-primary);
+  letter-spacing: 0;
+  color: rgb(15 23 42);
   margin: 28px 0 12px;
+}
+
+:global(html.dark) .prose h2 {
+  color: rgb(248 250 252);
 }
 
 .prose h2:first-of-type {
@@ -69,14 +101,14 @@
 }
 
 .prose p {
-  font-size: var(--Size-Body-Font-Size);
-  line-height: var(--Size-Body-Line-Height);
+  font-size: 16px;
+  line-height: 24px;
   margin: 0 0 14px;
 }
 
 .prose ul {
-  font-size: var(--Size-Body-Font-Size);
-  line-height: var(--Size-Body-Line-Height);
+  font-size: 16px;
+  line-height: 24px;
   margin: 0 0 14px;
   padding-left: 1.25rem;
 }
@@ -86,16 +118,28 @@
 }
 
 .prose a {
-  color: var(--accent);
+  color: rgb(21 128 61);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
+:global(html.accent-purple) .prose a {
+  color: rgb(147 51 234);
+}
+
+:global(html.dark) .prose a {
+  color: rgb(74 222 128);
+}
+
 .email {
   word-break: break-all;
   font-weight: 600;
-  color: var(--text-primary);
+  color: rgb(15 23 42);
+}
+
+:global(html.dark) .email {
+  color: rgb(248 250 252);
 }
 
 .note {
@@ -104,19 +148,36 @@
   border-radius: 14px;
   font-size: 13px;
   line-height: 1.5;
-  background: var(--accent-subtle);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
+  background: rgba(21, 128, 61, 0.1);
+  border: 1px solid rgb(226 232 240);
+  color: rgba(15, 23, 42, 0.62);
+}
+
+:global(html.accent-purple) .note {
+  background: rgba(147, 51, 234, 0.1);
+}
+
+:global(html.dark) .note {
+  border-color: rgb(51 65 85);
+  color: rgba(248, 250, 252, 0.65);
 }
 
 .crossLinks {
   margin-top: 28px;
   padding-top: 20px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgb(226 232 240);
   font-size: 14px;
 }
 
+:global(html.dark) .crossLinks {
+  border-top-color: rgb(51 65 85);
+}
+
 .crossLinks a {
-  color: var(--accent);
+  color: rgb(21 128 61);
   font-weight: 600;
+}
+
+:global(html.accent-purple) .crossLinks a {
+  color: rgb(147 51 234);
 }

@@ -6,6 +6,8 @@ import { useNavigate, type NavigateFunction } from "react-router-dom";
 import { trackLogin, trackSignUp } from "@/services/analytics";
 import { setCrashlyticsUserId } from "@/services/crashlytics";
 import { auth as firebaseAuth } from "@/services/firebase/app";
+import { tasbeehRepository } from "@/features/tasbeeh/api/tasbeeh.repository";
+import { syncUserDocument } from "@/services/firebase/users";
 import { formatAuthError } from "./errors";
 import {
   registerWithEmailPassword,
@@ -25,20 +27,22 @@ import { signInWithFacebook } from "./actions/facebook";
 import { signInAnonymouslyUser } from "./actions/anonymous";
 import { useRemoteConfig } from "@/shared/hooks/useRemoteConfig";
 import { AuthContext, type AuthContextValue, type AuthStatus } from "./authContext";
+import { twUi } from "@/shared/lib/twUi";
 
 function EmailLinkSplash() {
   const { t } = useRemoteConfig();
   return (
-    <div className="screen-pad" style={{ paddingTop: "48px" }}>
-      <p className="screen-title" style={{ fontSize: "1.1rem" }}>
-        {t("auth.completing")}
-      </p>
+    <div className={`px-3 pb-4 pt-12`}>
+      <p className={`${twUi.screenTitle} text-[1.1rem]`}>{t("auth.completing")}</p>
     </div>
   );
 }
 
 /** One completion per page load (avoids duplicate sign-in attempts under React Strict Mode). */
 let emailLinkCompletionOnce: Promise<void> | null = null;
+
+/** Previous Firebase uid — used to detect real sign-out vs initial null session. */
+let lastFirebaseUid: string | null = null;
 
 function runEmailLinkCompletion(navigate: NavigateFunction): Promise<void> {
   if (!firebaseAuth || !isCurrentUrlEmailSignInLink(firebaseAuth)) {
@@ -108,13 +112,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!firebaseAuth) return;
 
+    let syncCleanup: (() => void) | null = null;
+
     const unsub = onAuthStateChanged(firebaseAuth, (next) => {
+      const nextUid = next?.uid ?? null;
+      if (next) {
+        void syncUserDocument(next).catch(() => {});
+        syncCleanup = tasbeehRepository.initRealtimeSync();
+      } else {
+        if (syncCleanup) {
+          syncCleanup();
+          syncCleanup = null;
+        }
+        if (lastFirebaseUid !== null) {
+          // You could optionally clear local DB on sign out
+          // tasbeehLocal.clear(); 
+        }
+      }
+      lastFirebaseUid = nextUid;
       setUser(next);
       setCrashlyticsUserId(next?.uid ?? null);
       setStatus("ready");
     });
 
-    return () => unsub();
+    return () => {
+      unsub();
+      if (syncCleanup) syncCleanup();
+    };
   }, []);
 
   const signInEmailPassword = useCallback(async (email: string, password: string) => {
@@ -133,8 +157,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!firebaseAuth) return;
     setLastError(null);
     try {
-      await registerWithEmailPassword(firebaseAuth, email, password, firstName, lastName);
+      const cred = await registerWithEmailPassword(firebaseAuth, email, password, firstName, lastName);
       trackSignUp("password");
+      try {
+        await syncUserDocument(cred.user);
+      } catch {
+        /* Rules / network — onAuthStateChanged will call syncUserDocument again */
+      }
     } catch (e) {
       setLastError(formatAuthError(e));
       throw e;

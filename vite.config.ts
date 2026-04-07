@@ -1,12 +1,21 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import tailwindcss from "@tailwindcss/vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const pkg = JSON.parse(
+  readFileSync(path.resolve(__dirname, "package.json"), "utf8"),
+) as { version: string };
+
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -31,8 +40,8 @@ export default defineConfig({
         name: "Tasbeeh Flow",
         short_name: "Tasbeeh",
         description: "A calm and minimal tasbeeh app for daily dhikr",
-        theme_color: "#f6f2e7",
-        background_color: "#f6f2e7",
+        theme_color: "#f8fafc",
+        background_color: "#f8fafc",
         display: "standalone",
         orientation: "portrait",
         start_url: "/",
@@ -68,5 +77,6 @@ export default defineConfig({
         ],
       },
     }),
+    tailwindcss(),
   ],
 });

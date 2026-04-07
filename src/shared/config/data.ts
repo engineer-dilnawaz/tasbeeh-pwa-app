@@ -1,4 +1,10 @@
 /** App copy, milestones, theme metadata — import from here for pages and features. */
+export { FIRESTORE_COLLECTIONS, type FirestoreCollectionName } from "./firestoreCollections";
+export type { TasbeehSequenceDoc, TasbeehReference } from "../types/tasbeehCatalog";
+export {
+  TASBEEH_CATALOG_SEED,
+  tasbeehToLegacyItem,
+} from "./tasbeehCatalogSeed";
 export {
   DEFAULT_TASBEEH,
   AYAT_OF_THE_DAY,

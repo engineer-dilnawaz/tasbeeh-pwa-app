@@ -4,6 +4,7 @@ import { Clock, MapPin, Loader2 } from "lucide-react";
 import { usePrayerTimes } from "@/features/tasbeeh/hooks/usePrayerTimes";
 import { useGeolocation } from "@/shared/hooks/useGeolocation";
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
+import { useResolvedPalette } from "@/shared/components/ui/palette";
 import { useMemo } from "react";
 
 /**
@@ -43,6 +44,7 @@ function formatDisplayTime(timeStr: string, is24h: boolean) {
 }
 
 export default function PrayerTimes() {
+  const palette = useResolvedPalette();
   const { latitude, longitude, loading: locationLoading, error: locationError } = useGeolocation();
   const { use24HourFormat } = useSettingsStore();
 
@@ -71,31 +73,31 @@ export default function PrayerTimes() {
   ] : [];
 
   return (
-    <div className="page-container">
+    <div className="min-h-dvh">
       <NavHeader title="Prayer Times" />
       
       <motion.main 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="screen-pad"
+        className="px-3 py-2 pb-4"
       >
         <div style={{ textAlign: "center", marginBottom: "32px", marginTop: "16px" }}>
-          <p style={{ color: "var(--text-muted)", fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          <p style={{ color: palette.textMuted, fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
             PRECISION SPIRITUAL TIMINGS
           </p>
         </div>
 
         {isPending && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 0", gap: "16px" }}>
-            <Loader2 className="animate-spin" size={36} color="var(--accent)" />
-            <p style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: 700 }}>
+            <Loader2 className="animate-spin" size={36} color={palette.accent} />
+            <p style={{ fontSize: "13px", color: palette.textMuted, fontWeight: 700 }}>
               {locationLoading ? "Determining Coordinates..." : "Calculating Foundation..."}
             </p>
           </div>
         )}
 
         {(isError || locationError) && !isPending && (
-          <div className="squircle-card" style={{ color: "var(--accent)", border: "1px solid var(--accent-subtle)", textAlign: "center" }}>
+          <div className="squircle-card" style={{ color: palette.accent, border: `1px solid ${palette.accentSubtle}`, textAlign: "center" }}>
             <p style={{ fontWeight: 800, marginBottom: "4px" }}>Local Override Active</p>
             <p style={{ fontSize: "13px" }}>Geolocation restricts non-HTTPS origins. Defaulting to Karachi, Pakistan.</p>
           </div>
@@ -104,7 +106,7 @@ export default function PrayerTimes() {
         {todayResponse && !isPending && (
           <>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "var(--accent-subtle)", padding: "10px 16px", borderRadius: "12px", color: "var(--accent)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", background: palette.accentSubtle, padding: "10px 16px", borderRadius: "12px", color: palette.accent }}>
                 <MapPin size={18} />
                 <span style={{ fontSize: "15px", fontWeight: 800 }}>Karachi / Current Area</span>
               </div>
@@ -129,12 +131,12 @@ export default function PrayerTimes() {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                      <div style={{ padding: "8px", background: "var(--bg-primary)", borderRadius: "8px", color: "var(--accent)" }}>
+                      <div style={{ padding: "8px", background: palette.bg, borderRadius: "8px", color: palette.accent }}>
                         <Clock size={16} />
                       </div>
-                      <span style={{ fontSize: "17px", fontWeight: 800, color: "var(--text-primary)" }}>{p.name}</span>
+                      <span style={{ fontSize: "17px", fontWeight: 800, color: palette.textPrimary }}>{p.name}</span>
                     </div>
-                    <span style={{ fontSize: "18px", fontWeight: 800, fontFamily: "tabular-nums", color: "var(--text-primary)" }}>
+                    <span style={{ fontSize: "18px", fontWeight: 800, fontFamily: "tabular-nums", color: palette.textPrimary }}>
                       {timeOnly} {hasModifier && <span style={{ fontSize: "12px", opacity: 0.6 }}>{modifier}</span>}
                     </span>
                   </div>
@@ -143,11 +145,11 @@ export default function PrayerTimes() {
             </div>
 
             {todayResponse.hijri_date && (
-              <div style={{ marginTop: "32px", textAlign: "center", borderTop: "1px solid var(--border)", paddingTop: "24px" }}>
-                <p style={{ fontSize: "15px", color: "var(--text-primary)", fontWeight: 800 }}>
+              <div style={{ marginTop: "32px", textAlign: "center", borderTop: `1px solid ${palette.border}`, paddingTop: "24px" }}>
+                <p style={{ fontSize: "15px", color: palette.textPrimary, fontWeight: 800 }}>
                   {new Date(todayResponse.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
-                <p style={{ fontSize: "13px", color: "var(--accent)", fontWeight: 700, marginTop: "4px" }}>
+                <p style={{ fontSize: "13px", color: palette.accent, fontWeight: 700, marginTop: "4px" }}>
                   {todayResponse.hijri_date.day} {todayResponse.hijri_date.month?.en || ""} {todayResponse.hijri_date.year} AH
                 </p>
               </div>

@@ -30,68 +30,101 @@
   width: 54px;
 }
 
-/* SHAPES */
 .btn--pill {
   border-radius: 100px;
 }
 
 .btn--squircle {
-  border-radius: 0; /* Let the SVG mask handle the curve entirely */
+  border-radius: 0;
 }
 
-/* VARIANTS */
 .btn--primary {
-  background: var(--text-primary);
-  color: var(--card-bg);
+  background: rgb(15 23 42);
+  color: rgb(255 255 255);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
+:global(html.dark) .btn--primary {
+  background: rgb(248 250 252);
+  color: rgb(15 23 42);
+}
+
 .btn--primary:hover {
-  background: var(--text-secondary);
+  background: rgb(51 65 85);
+}
+
+:global(html.dark) .btn--primary:hover {
+  background: rgb(226 232 240);
 }
 
 .btn--secondary {
-  background: var(--card-bg);
-  border-color: var(--border);
-  color: var(--text-primary);
+  background: rgb(255 255 255);
+  border-color: rgb(226 232 240);
+  color: rgb(15 23 42);
+}
+
+:global(html.dark) .btn--secondary {
+  background: rgb(15 23 42);
+  border-color: rgb(51 65 85);
+  color: rgb(248 250 252);
 }
 
 .btn--secondary:hover {
-  background: rgba(255, 255, 255, 0.05); /* very subtle hover */
+  background: rgba(0, 0, 0, 0.03);
 }
 
-:global([data-theme="light"]) .btn--secondary:hover {
-  background: rgba(0, 0, 0, 0.03);
+:global(html.dark) .btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .btn--ghost {
   background: transparent;
-  color: var(--text-primary);
+  color: rgb(15 23 42);
+}
+
+:global(html.dark) .btn--ghost {
+  color: rgb(248 250 252);
 }
 
 .btn--ghost:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-:global([data-theme="light"]) .btn--ghost:hover {
   background: rgba(0, 0, 0, 0.06);
 }
 
+:global(html.dark) .btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .btn--glass {
-  background: var(--accent-subtle);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
+  background: rgba(21, 128, 61, 0.12);
+  border: 1px solid rgb(226 232 240);
+  color: rgb(15 23 42);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px color-mix(in srgb, var(--bg-primary) 35%, transparent);
+  box-shadow: 0 4px 20px rgba(248, 250, 252, 0.35);
+}
+
+:global(html.accent-purple) .btn--glass {
+  background: rgba(147, 51, 234, 0.1);
+}
+
+:global(html.dark) .btn--glass {
+  border-color: rgb(51 65 85);
+  color: rgb(248 250 252);
+  background: rgba(74, 222, 128, 0.14);
+}
+
+:global(html.dark.accent-purple) .btn--glass {
+  background: rgba(192, 132, 252, 0.14);
 }
 
 .btn--glass:hover {
-  background: color-mix(in srgb, var(--text-primary) 12%, transparent);
-  border-color: var(--border);
+  background: rgba(15, 23, 42, 0.08);
 }
 
-/* CONTENT ELEMENTS */
+:global(html.dark) .btn--glass:hover {
+  background: rgba(248, 250, 252, 0.1);
+}
+
 .icon {
   display: inline-flex;
   align-items: center;
@@ -123,7 +156,6 @@
   }
 }
 
-/* STATES */
 .btn--disabled {
   opacity: 0.6;
   cursor: not-allowed;

@@ -1,37 +1,30 @@
 .backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  background: color-mix(in oklab, var(--color-base-content) 38%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 2000;
 }
 
-.drawer {
+.panelWrap {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
-  width: 280px;
-  background: var(--bg-primary);
+  width: 296px;
   z-index: 2010;
   display: flex;
-  flex-direction: column;
-  box-shadow: 12px 0 32px rgba(0, 0, 0, 0.15);
-  border-right: 1px solid var(--border);
-  padding: env(safe-area-inset-top, 20px) 0 env(safe-area-inset-bottom, 20px);
+  max-width: min(296px, 92vw);
+  font-family: var(--font-primary);
 }
 
 .header {
-  padding: 24px 16px;
+  padding: 16px 16px 12px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
+  border-bottom: 1px solid var(--color-base-300);
+  margin-bottom: 8px;
 }
 
 .profileInfo {
@@ -40,57 +33,33 @@
   gap: 12px;
 }
 
-.avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-primary);
-  overflow: hidden;
-}
-
 .userName {
-  font-family: var(--Family-Headings);
+  font-family: var(--font-primary);
   font-size: 16px;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--color-base-content);
   letter-spacing: -0.01em;
 }
 
 .userRole {
   font-size: 11px;
-  color: var(--text-muted);
+  color: color-mix(in oklab, var(--color-base-content) 52%, transparent);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 2px;
 }
 
-.closeBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-}
-
 .menu {
   flex: 1;
   padding: 8px 16px;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .sectionTitle {
   font-size: 11px;
-  color: var(--text-muted);
+  color: color-mix(in oklab, var(--color-base-content) 48%, transparent);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -103,87 +72,54 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 4px;
+  padding: 10px 4px;
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.2s ease;
   text-align: left;
+  font-family: inherit;
 }
 
 .menuItem:active {
-  background: var(--card-bg);
-}
-
-.iconBox {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  background: color-mix(in oklab, var(--color-primary) 14%, transparent);
 }
 
 .itemText {
   flex: 1;
+  min-width: 0;
 }
 
 .itemLabel {
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-base-content);
   letter-spacing: -0.01em;
 }
 
 .itemDesc {
   font-size: 11px;
-  color: var(--text-muted);
+  color: color-mix(in oklab, var(--color-base-content) 48%, transparent);
   margin-top: 1px;
 }
 
 .chevron {
-  color: var(--text-muted);
-  opacity: 0.4;
+  color: color-mix(in oklab, var(--color-base-content) 42%, transparent);
+  opacity: 0.55;
+  flex-shrink: 0;
 }
 
 .footer {
-  padding: 20px 16px;
-  border-top: 1px solid var(--border);
-}
-
-.logoutBtn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  background: var(--error);
-  color: #fff;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.logoutBtn:active {
-  transform: scale(0.98);
+  padding: 16px 16px 8px;
+  border-top: 1px solid var(--color-base-300);
 }
 
 .appInfo {
   font-size: 10px;
-  color: var(--text-muted);
+  color: color-mix(in oklab, var(--color-base-content) 42%, transparent);
   text-align: center;
-  margin-top: 16px;
-  opacity: 0.5;
+  margin-top: 14px;
+  opacity: 0.75;
   letter-spacing: 0.02em;
-}
-
-/* Dark mode overrides if needed */
-[data-theme='dark'] .drawer {
-  background: var(--bg-primary);
-  border-right-color: rgba(255, 255, 255, 0.05);
 }

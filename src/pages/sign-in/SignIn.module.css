@@ -5,6 +5,7 @@
   flex-direction: column;
   padding: 40px 16px 24px;
   box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .inner {
@@ -14,6 +15,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .lottieWrapper {
@@ -33,21 +35,45 @@
   font-size: 1.8rem;
   font-weight: 700;
   text-align: center;
-  color: var(--text-primary);
+  color: rgb(15 23 42);
   margin-bottom: 6px;
+}
+
+:global(html.dark) .title {
+  color: rgb(248 250 252);
 }
 
 .subtitle {
   text-align: center;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--text-secondary);
+  color: rgba(15, 23, 42, 0.62);
   margin-bottom: 32px;
+}
+
+:global(html.dark) .subtitle {
+  color: rgba(248, 250, 252, 0.65);
 }
 
 .formSection {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+/* Side-by-side name fields: flex children must shrink or the row overflows narrow viewports */
+.nameRowMotion {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.nameField {
+  flex: 1;
+  min-width: 0;
 }
 
 .actionsRow {
@@ -70,7 +96,7 @@
 .switch {
   width: 44px;
   height: 24px;
-  background-color: var(--border);
+  background-color: rgb(226 232 240);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -79,8 +105,24 @@
   transition: background-color 0.3s;
 }
 
+:global(html.dark) .switch {
+  background-color: rgb(51 65 85);
+}
+
 .switchActive {
-  background-color: var(--accent);
+  background-color: rgb(21 128 61);
+}
+
+:global(html.accent-purple) .switchActive {
+  background-color: rgb(147 51 234);
+}
+
+:global(html.dark) .switchActive {
+  background-color: rgb(74 222 128);
+}
+
+:global(html.dark.accent-purple) .switchActive {
+  background-color: rgb(192 132 252);
 }
 
 .switchHandle {
@@ -88,7 +130,7 @@
   height: 20px;
   background-color: white;
   border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .hiddenCheckbox {
@@ -97,17 +139,33 @@
 
 .switchText {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: rgba(15, 23, 42, 0.62);
   font-weight: 500;
+}
+
+:global(html.dark) .switchText {
+  color: rgba(248, 250, 252, 0.65);
 }
 
 .forgotLink {
   font-size: 13px;
-  color: var(--accent);
+  color: rgb(21 128 61);
   background: transparent;
   border: none;
   font-weight: 600;
   cursor: pointer;
+}
+
+:global(html.accent-purple) .forgotLink {
+  color: rgb(147 51 234);
+}
+
+:global(html.dark) .forgotLink {
+  color: rgb(74 222 128);
+}
+
+:global(html.dark.accent-purple) .forgotLink {
+  color: rgb(192 132 252);
 }
 
 .primaryBtn {
@@ -119,13 +177,29 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.2s ease;
-  background: var(--accent);
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
+  background: rgb(21 128 61);
   color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
+}
+
+:global(html.accent-purple) .primaryBtn {
+  background: rgb(147 51 234);
+}
+
+:global(html.dark) .primaryBtn {
+  background: rgb(74 222 128);
+  color: rgb(15 23 42);
+}
+
+:global(html.dark.accent-purple) .primaryBtn {
+  background: rgb(192 132 252);
+  color: rgb(15 23 42);
 }
 
 .primaryBtn:active:not(:disabled) {
@@ -141,13 +215,13 @@
   width: 100%;
   margin-bottom: 12px;
   padding: 14px;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid rgb(21 128 61);
   border-radius: 16px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   background: transparent;
-  color: var(--accent);
+  color: rgb(21 128 61);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -155,8 +229,27 @@
   transition: background 0.15s ease;
 }
 
+:global(html.accent-purple) .outlinedBtn {
+  border-color: rgb(147 51 234);
+  color: rgb(147 51 234);
+}
+
+:global(html.dark) .outlinedBtn {
+  border-color: rgb(74 222 128);
+  color: rgb(74 222 128);
+}
+
+:global(html.dark.accent-purple) .outlinedBtn {
+  border-color: rgb(192 132 252);
+  color: rgb(192 132 252);
+}
+
 .outlinedBtn:active:not(:disabled) {
-  background: var(--accent-subtle);
+  background: rgba(21, 128, 61, 0.12);
+}
+
+:global(html.accent-purple) .outlinedBtn:active:not(:disabled) {
+  background: rgba(147, 51, 234, 0.12);
 }
 
 .secondaryBtn {
@@ -168,13 +261,19 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  background-color: rgba(120, 120, 125, 0.12); /* smooth greyish bg across generic themes */
-  color: var(--text-primary);
+  background-color: rgba(120, 120, 125, 0.12);
+  color: rgb(15 23 42);
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  transition: transform 0.15s ease, background-color 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    background-color 0.2s ease;
+}
+
+:global(html.dark) .secondaryBtn {
+  color: rgb(248 250 252);
 }
 
 .secondaryBtn:active:not(:disabled) {
@@ -187,11 +286,15 @@
   align-items: center;
   gap: 12px;
   margin: 16px 0;
-  color: var(--text-muted);
+  color: rgb(100 116 139);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+:global(html.dark) .divider {
+  color: rgb(148 163 184);
 }
 
 .divider::before,
@@ -199,7 +302,12 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--border);
+  background: rgb(226 232 240);
+}
+
+:global(html.dark) .divider::before,
+:global(html.dark) .divider::after {
+  background: rgb(51 65 85);
 }
 
 .socialRow {
@@ -216,18 +324,34 @@
   justify-content: center;
   gap: 8px;
   border-radius: 16px;
-  border: 1.5px solid var(--border);
-  background: var(--card-bg);
-  color: var(--text-primary);
+  border: 1.5px solid rgb(226 232 240);
+  background: rgb(255 255 255);
+  color: rgb(15 23 42);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+:global(html.dark) .socialBtn {
+  border-color: rgb(51 65 85);
+  background: rgb(15 23 42);
+  color: rgb(248 250 252);
 }
 
 .socialBtn:hover:not(:disabled) {
-  border-color: var(--accent);
-  background: var(--bg-tertiary);
+  border-color: rgb(21 128 61);
+  background: rgb(241 245 249);
+}
+
+:global(html.accent-purple) .socialBtn:hover:not(:disabled) {
+  border-color: rgb(147 51 234);
+}
+
+:global(html.dark) .socialBtn:hover:not(:disabled) {
+  background: rgb(30 41 59);
 }
 
 .socialBtn:active:not(:disabled) {
@@ -239,17 +363,33 @@
   padding-top: 32px;
   text-align: center;
   font-size: 14px;
-  color: var(--text-secondary);
+  color: rgba(15, 23, 42, 0.62);
+}
+
+:global(html.dark) .registerRow {
+  color: rgba(248, 250, 252, 0.65);
 }
 
 .registerToggle {
   margin-left: 6px;
-  color: var(--accent);
+  color: rgb(21 128 61);
   font-weight: 700;
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
+}
+
+:global(html.accent-purple) .registerToggle {
+  color: rgb(147 51 234);
+}
+
+:global(html.dark) .registerToggle {
+  color: rgb(74 222 128);
+}
+
+:global(html.dark.accent-purple) .registerToggle {
+  color: rgb(192 132 252);
 }
 
 .registerToggle:hover {
@@ -266,18 +406,26 @@
   font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--text-primary);
+  color: rgb(15 23 42);
+}
+
+:global(html.dark) .stateTitle {
+  color: rgb(248 250 252);
 }
 
 .hint {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: rgba(15, 23, 42, 0.62);
   line-height: 1.5;
+}
+
+:global(html.dark) .hint {
+  color: rgba(248, 250, 252, 0.65);
 }
 
 .hintOk {
   font-size: 13px;
-  color: var(--success);
+  color: rgb(34 197 94);
   text-align: center;
   margin-bottom: 12px;
 }

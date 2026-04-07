@@ -1,4 +1,13 @@
 import { Route, Routes } from "react-router-dom";
+import { lazy, Suspense } from "react";
+
+const IS_DEV = import.meta.env.DEV;
+const DesignLab = IS_DEV ? lazy(() => import("@/dev/DesignLab")) : null;
+const FoundationsScreen = IS_DEV ? lazy(() => import("@/dev/screens/FoundationsScreen")) : null;
+const ComponentsScreen = IS_DEV ? lazy(() => import("@/dev/screens/ComponentsScreen")) : null;
+const PatternsScreen = IS_DEV ? lazy(() => import("@/dev/screens/PatternsScreen")) : null;
+const ExperimentsScreen = IS_DEV ? lazy(() => import("@/dev/screens/ExperimentsScreen")) : null;
+
 import { useScreenTracking } from "@/services/analytics";
 import { AppLayout } from "@/app/layout/AppLayout";
 import AddTasbeeh from "@/pages/AddTasbeeh";
@@ -26,6 +35,21 @@ export function AppRouter() {
 
   return (
     <Routes>
+      {IS_DEV && DesignLab && (
+        <Route path="/design-lab" element={<Suspense fallback={null}><DesignLab /></Suspense>} />
+      )}
+      {IS_DEV && FoundationsScreen && (
+        <Route path="/design-lab/foundations" element={<Suspense fallback={null}><FoundationsScreen /></Suspense>} />
+      )}
+      {IS_DEV && ComponentsScreen && (
+        <Route path="/design-lab/components" element={<Suspense fallback={null}><ComponentsScreen /></Suspense>} />
+      )}
+      {IS_DEV && PatternsScreen && (
+        <Route path="/design-lab/patterns" element={<Suspense fallback={null}><PatternsScreen /></Suspense>} />
+      )}
+      {IS_DEV && ExperimentsScreen && (
+        <Route path="/design-lab/experiments" element={<Suspense fallback={null}><ExperimentsScreen /></Suspense>} />
+      )}
       <Route path="/" element={<SplashScreen />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/sign-in" element={<SignIn />} />

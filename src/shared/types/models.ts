@@ -1,8 +1,14 @@
 export interface TasbeehItem {
+  /** Stable id when synced from catalog / Firestore */
+  id?: string;
   text: string;
   transliteration: string;
   urdu: string;
   target: number;
+  /** Short English meaning (spiritual context). */
+  meaningEn?: string;
+  /** One-line “why this matters” for reflection. */
+  benefitEn?: string;
 }
 
 export interface AppState {

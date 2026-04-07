@@ -1,8 +1,8 @@
-import { recordError } from "./report";
+import { logErrorToAnalytics } from "./report";
 
 function safeRecord(error: unknown, context: Record<string, string>): void {
   try {
-    recordError(error, context);
+    logErrorToAnalytics(error, context);
   } catch {
     /* avoid recursive reporting */
   }

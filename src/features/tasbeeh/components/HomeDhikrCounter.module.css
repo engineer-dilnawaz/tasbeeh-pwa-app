@@ -1,0 +1,39 @@
+/* Lightweight celebration: zero extra deps vs canvas-confetti (adds weight). */
+.celebration {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+}
+
+.spark {
+  position: absolute;
+  left: 50%;
+  top: 36%;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--color-primary) 85%, white);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--color-primary) 55%, transparent);
+  opacity: 0;
+  animation: home-spark 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes home-spark {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.35);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0.1);
+    opacity: 0;
+  }
+}
+
+.tapGlow {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-primary) 25%, transparent),
+    0 16px 48px -16px color-mix(in oklab, var(--color-primary) 40%, transparent),
+    0 0 80px -20px color-mix(in oklab, var(--color-primary) 25%, transparent);
+}

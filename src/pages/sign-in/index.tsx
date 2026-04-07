@@ -18,6 +18,7 @@ import {
   emailOnlySchema,
   type RegisterFormData,
 } from "@/shared/components/forms";
+import { twUi } from "@/shared/lib/twUi";
 
 import styles from "./SignIn.module.css";
 import formStyles from "@/shared/components/forms/Form.module.css";
@@ -75,7 +76,7 @@ export default function SignIn() {
     },
   });
 
-  if (user || !firebaseReady || status === "unconfigured") {
+  if (!firebaseReady || status === "unconfigured") {
     return (
       <motion.main
         initial={{ opacity: 0.6 }}
@@ -90,7 +91,7 @@ export default function SignIn() {
           <h1 className={styles.title}>{t("auth.unavailableTitle")}</h1>
           <p className={styles.subtitle}>{t("auth.unavailableHint")}</p>
           <p className={styles.registerRow}>
-            <Link to="/settings" style={{ color: "var(--accent)" }}>
+            <Link to="/settings" className={twUi.accentText}>
               {t("nav.settings")}
             </Link>
           </p>
@@ -196,22 +197,22 @@ export default function SignIn() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                style={{ overflow: "hidden", display: "flex", gap: "12px", width: "100%" }}
+                className={styles.nameRowMotion}
               >
-                <div style={{ flex: 1 }}>
-                  <Input 
-                    name="firstName" 
-                    type="text" 
-                    placeholder="First name" 
-                    autoComplete="given-name" 
+                <div className={styles.nameField}>
+                  <Input
+                    name="firstName"
+                    type="text"
+                    placeholder="First name"
+                    autoComplete="given-name"
                   />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <Input 
-                    name="lastName" 
-                    type="text" 
-                    placeholder="Last name" 
-                    autoComplete="family-name" 
+                <div className={styles.nameField}>
+                  <Input
+                    name="lastName"
+                    type="text"
+                    placeholder="Last name"
+                    autoComplete="family-name"
                   />
                 </div>
               </motion.div>

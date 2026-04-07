@@ -1,7 +1,9 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, User } from "lucide-react";
-import styles from "./LogoutSheet.module.css";
+import { User } from "lucide-react";
 import { useAuth } from "@/services/auth/useAuth";
+import { SquircleSheet } from "@/shared/components/SquircleSheet";
+import { SmoothSquircle } from "@/shared/components/ui/SmoothSquircle";
+import { useResolvedPalette } from "@/shared/components/ui/palette";
+import { UiButton } from "@/shared/components/ui/UiButton";
 
 interface LogoutSheetProps {
   isOpen: boolean;
@@ -9,6 +11,7 @@ interface LogoutSheetProps {
 }
 
 export function LogoutSheet({ isOpen, onClose }: LogoutSheetProps) {
+  const palette = useResolvedPalette();
   const { user, signOut } = useAuth();
   const isGuest = user?.isAnonymous;
 
@@ -17,72 +20,106 @@ export function LogoutSheet({ isOpen, onClose }: LogoutSheetProps) {
     onClose();
   };
 
+  const title = isGuest ? "Delete guest data?" : "Sign out?";
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className={styles.overlay}>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className={styles.backdrop}
-          />
-
-          {/* Sheet */}
-          <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className={styles.sheet}
-          >
-            {/* Handle */}
-            <div className={styles.handle} />
-
-            {/* Account Info Profile (Settings Style) */}
-            <div className={styles.accountCard}>
-              <div className={styles.avatar}>
-                {user?.photoURL ? (
-                  <img src={user.photoURL} alt="User Profile" />
-                ) : (
-                  <User size={24} />
-                )}
-              </div>
-              <div className={styles.info}>
-                <div className={styles.displayName}>
-                  {user?.displayName || (isGuest ? "Guest User" : "Anonymous")}
-                </div>
-                {user?.email && <div className={styles.email}>{user.email}</div>}
-              </div>
-            </div>
-
-            <div className={styles.content}>
-              <h3 className={styles.title}>Sign Out?</h3>
-              <p className={styles.message}>
-                {isGuest 
-                  ? "You are logged in as a Guest. Signing out will permanently delete your progress and preferences unless you link your account." 
-                  : "Are you sure you want to sign out of your account? Your progress will be saved for next time."}
-              </p>
-            </div>
-
-            <div className={styles.actions}>
-              <button 
-                className={styles.confirmBtn} 
-                onClick={handleSignOut}
-              >
-                <LogOut size={18} />
-                <span>{isGuest ? "Delete & Sign Out" : "Sign Out"}</span>
-              </button>
-              
-              <button className={styles.cancelBtn} onClick={onClose}>
-                Cancel
-              </button>
-            </div>
-          </motion.div>
+    <SquircleSheet isOpen={isOpen} onClose={onClose} title={title}>
+      <SmoothSquircle
+        cornerRadius={18}
+        cornerSmoothing={1}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          padding: 16,
+          marginBottom: 20,
+          background: palette.surface,
+          border: `1px solid ${palette.border}`,
+          boxSizing: "border-box",
+        }}
+      >
+        <div
+          style={{
+            width: 54,
+            height: 54,
+            borderRadius: 16,
+            background: palette.surfaceRaised,
+            border: `1px solid ${palette.border}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: palette.textPrimary,
+            overflow: "hidden",
+            flexShrink: 0,
+          }}
+        >
+          {user?.photoURL ? (
+            <img
+              src={user.photoURL}
+              alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <User size={24} />
+          )}
         </div>
-      )}
-    </AnimatePresence>
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              fontFamily: "var(--font-primary)",
+              fontSize: 17,
+              fontWeight: 800,
+              color: palette.textPrimary,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {user?.displayName || (isGuest ? "Guest" : "Account")}
+          </div>
+          {user?.email ? (
+            <div
+              style={{
+                fontSize: 13,
+                color: palette.textMuted,
+                fontWeight: 600,
+                marginTop: 2,
+              }}
+            >
+              {user.email}
+            </div>
+          ) : null}
+        </div>
+      </SmoothSquircle>
+
+      <p
+        style={{
+          fontSize: 14,
+          color: palette.textMuted,
+          lineHeight: 1.6,
+          margin: "0 0 24px",
+          textAlign: "center",
+          fontWeight: 600,
+        }}
+      >
+        {isGuest
+          ? "Signing out will permanently delete your progress and preferences unless you link your account."
+          : "Your progress stays saved on your account. Sign in again anytime."}
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+        }}
+      >
+        <UiButton
+          label={isGuest ? "Delete & sign out" : "Sign out"}
+          variant="danger"
+          fullWidth
+          onClick={() => void handleSignOut()}
+        />
+        <UiButton label="Cancel" variant="secondary" fullWidth onClick={onClose} />
+      </div>
+    </SquircleSheet>
   );
 }
