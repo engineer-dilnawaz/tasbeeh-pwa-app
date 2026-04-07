@@ -13,18 +13,47 @@ import App from "@/App.tsx";
 import { AppProviders } from "@/app/providers.tsx";
 import { registerServiceWorker } from "@/pwa/register";
 
-initSentry();
-installGlobalErrorHandlers();
-applyThemeToDocument(readStoredDaisyTheme());
-initAppFont();
+// 🏆 Early Guard: Log errors as early as humanly possible
+window.onerror = (message, source, lineno, colno, error) => {
+  console.error("🏁 CRITICAL_EARLY_BOOT_ERROR:", {
+    message,
+    source,
+    lineno,
+    colno,
+    error,
+  });
+  return false;
+};
 
-const rootEl = document.getElementById("root")!;
-createRoot(rootEl, getSentryReactRootOptions()).render(
-  <StrictMode>
-    <AppProviders>
-      <App />
-    </AppProviders>
-  </StrictMode>,
-);
+try {
+  // Sentry must be first, but it must NOT crash the app
+  initSentry();
+} catch (e) {
+  console.error("🚨 SENTRY_INIT_FAILED:", e);
+}
 
-registerServiceWorker();
+try {
+  installGlobalErrorHandlers();
+  applyThemeToDocument(readStoredDaisyTheme());
+  initAppFont();
+
+  const rootEl = document.getElementById("root")!;
+  const root = createRoot(rootEl, getSentryReactRootOptions());
+
+  root.render(
+    <StrictMode>
+      <AppProviders>
+        <App />
+      </AppProviders>
+    </StrictMode>,
+  );
+} catch (e) {
+  console.error("🆘 APP_BOOT_FAILED:", e);
+}
+
+// Service worker is optional, keep it at the end
+try {
+  registerServiceWorker();
+} catch (e) {
+  console.warn("⚠️ SW_REGISTRATION_FAILED (ignoring):", e);
+}
