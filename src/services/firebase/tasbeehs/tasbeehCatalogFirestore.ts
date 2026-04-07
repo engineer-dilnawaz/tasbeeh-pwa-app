@@ -5,7 +5,7 @@ import {
   doc,
   type DocumentData,
 } from "firebase/firestore";
-import type { TasbeehCatalogDoc } from "@/shared/types/tasbeehCatalog";
+import type { TasbeehSequenceDoc, Tasbeeh } from "@/shared/types/tasbeehCatalog";
 import { FIRESTORE_COLLECTIONS } from "@/shared/config/firestoreCollections";
 import { TASBEEH_CATALOG_SEED } from "@/shared/config/tasbeehCatalogSeed";
 import { getFirestoreDb } from "@/services/firebase/firestore/instance";
@@ -18,73 +18,49 @@ function nn(v: unknown): string | null {
   return String(v);
 }
 
-function normalizeReference(
-  raw: DocumentData | undefined,
-): TasbeehCatalogDoc["reference"] {
-  if (!raw || typeof raw !== "object") return null;
-  const o = raw as Record<string, unknown>;
-  const hadith = nn(o.hadith);
-  const grade = nn(o.grade);
-  const description = nn(o.description);
-  if (!hadith && !grade && !description) return null;
-  return { hadith, grade, description };
-}
+function normalizeTasbeeh(raw: any): Tasbeeh {
+    return {
+      id: String(raw.id || ""),
+      text: String(raw.text || ""),
+      transliteration: String(raw.transliteration || ""),
+      urdu: raw.urdu || null,
+      meaningEn: raw.meaningEn || null,
+      target: typeof raw.target === "number" ? raw.target : Number(raw.target) || 100,
+      category: Array.isArray(raw.category) ? raw.category : [],
+      benefitEn: raw.benefitEn || null,
+      reference: raw.reference || null,
+    };
+  }
 
-/** Map Firestore document → app catalog row */
-export function firestoreDocToCatalogDoc(
+/** Map Firestore document → TasbeehSequenceDoc */
+export function firestoreDocToSequenceDoc(
   id: string,
   data: DocumentData,
-): TasbeehCatalogDoc {
+): TasbeehSequenceDoc {
   const d = data as Record<string, unknown>;
-  const cats = d.category;
-  const category = Array.isArray(cats)
-    ? cats.map((c) => String(c))
-    : cats
-      ? [String(cats)]
-      : [];
+  const rawItems = Array.isArray(d.items) ? d.items : [];
 
   return {
     id: nn(d.id) ?? id,
-    text: String(d.text ?? ""),
-    transliteration: String(d.transliteration ?? ""),
-    meaningEn: nn(d.meaningEn),
-    urdu: d.urdu !== undefined ? nn(d.urdu) : null,
-    category,
-    target: typeof d.target === "number" ? d.target : Number(d.target) || 100,
-    reference: normalizeReference(d.reference as DocumentData | undefined),
-    isDefault: Boolean(d.isDefault),
+    title: String(d.title ?? "Untitled Sequence"),
+    items: rawItems.map(normalizeTasbeeh),
     createdBy: String(d.createdBy ?? "unknown"),
-    priority:
-      d.priority === undefined || d.priority === null
-        ? null
-        : Number(d.priority),
+    isDefault: Boolean(d.isDefault),
+    synced: true,
   };
 }
 
-function serializeCatalogForFirestore(row: TasbeehCatalogDoc): DocumentData {
-  const ref = row.reference;
+function serializeSequenceForFirestore(row: TasbeehSequenceDoc): DocumentData {
   return {
     id: row.id,
-    text: row.text,
-    transliteration: row.transliteration,
-    meaningEn: row.meaningEn ?? null,
-    urdu: row.urdu ?? null,
-    category: row.category ?? [],
-    target: row.target,
-    reference: ref
-      ? {
-          hadith: ref.hadith ?? null,
-          grade: ref.grade ?? null,
-          description: ref.description ?? null,
-        }
-      : null,
-    isDefault: row.isDefault,
-    createdBy: row.createdBy,
-    priority: row.priority ?? null,
+    title: row.title,
+    items: row.items,
+    isDefault: row.isDefault || false,
+    createdBy: row.createdBy || "system",
   };
 }
 
-/** Dev/admin: write seed documents to `tasbeehs/{id}` (merge: full replace per doc). */
+/** Dev/admin: write seed sequences to Firestore. */
 export async function seedTasbeehCatalogFromLocal(): Promise<void> {
   const db = getFirestoreDb();
   if (!db) throw new Error("Firestore not available");
@@ -92,26 +68,23 @@ export async function seedTasbeehCatalogFromLocal(): Promise<void> {
   const col = collection(db, FIRESTORE_COLLECTIONS.tasbeehs);
   let batch = writeBatch(db);
   let n = 0;
-  const commitChunks = async () => {
-    await batch.commit();
-    batch = writeBatch(db);
-    n = 0;
-  };
-
-  for (const row of TASBEEH_CATALOG_SEED) {
-    const docRef = doc(col, row.id);
-    batch.set(docRef, serializeCatalogForFirestore(row));
+  
+  for (const seq of TASBEEH_CATALOG_SEED) {
+    const docRef = doc(col, seq.id);
+    batch.set(docRef, serializeSequenceForFirestore(seq), { merge: true });
     n++;
     if (n >= 400) {
-      await commitChunks();
+      await batch.commit();
+      batch = writeBatch(db);
+      n = 0;
     }
   }
-  if (n > 0) await commitChunks();
+  if (n > 0) await batch.commit();
 }
 
 export function attachTasbeehCatalogListener(
   uid: string,
-  onDocs: (docs: TasbeehCatalogDoc[]) => void,
+  onDocs: (docs: TasbeehSequenceDoc[]) => void,
 ): void {
   const db = getFirestoreDb();
   if (!db) return;
@@ -126,7 +99,7 @@ export function attachTasbeehCatalogListener(
     col,
     (snap) => {
       const docs = snap.docs.map((d) =>
-        firestoreDocToCatalogDoc(d.id, d.data()),
+        firestoreDocToSequenceDoc(d.id, d.data()),
       );
       onDocs(docs);
     },

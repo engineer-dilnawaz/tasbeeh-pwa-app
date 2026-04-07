@@ -2,5 +2,5 @@ export {
   attachTasbeehCatalogListener,
   stopTasbeehCatalogListener,
   seedTasbeehCatalogFromLocal,
-  firestoreDocToCatalogDoc,
+  firestoreDocToSequenceDoc,
 } from "./tasbeehCatalogFirestore";

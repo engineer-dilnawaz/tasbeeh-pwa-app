@@ -1,11 +1,9 @@
 import { motion } from "framer-motion";
 import { Sparkles, ScrollText, Library, Compass, ArrowRight, BookCheck } from "lucide-react";
 import { useTasbeehCatalog } from "@/features/tasbeeh/hooks/useTasbeeh";
-import { useResolvedPalette } from "@/shared/components/ui/palette";
 import { CornerSquircle } from "@/shared/components/CornerSquircle";
 
 export default function Collections() {
-  const palette = useResolvedPalette();
   const { sequences = [], isLoading } = useTasbeehCatalog();
 
   if (isLoading) {
