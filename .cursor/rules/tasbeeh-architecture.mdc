@@ -6,6 +6,8 @@ alwaysApply: true
 
 This document defines the architectural decisions, module boundaries, and structural patterns for the Tasbeeh PWA. The architecture serves two masters: developer clarity (Dilnawaz should always know where code lives) and app quality (the structure should make it easy to build features that feel polished and calm).
 
+**UI surfaces, layout, and reuse:** daisyUI tokens, `AppLayout` full-bleed rules, shared primitives, and anti-patterns live in **`tasbeeh-ui-consistency.mdc`** — read it alongside this file for any visual or UX work.
+
 ## The Existing Structure — Know It, Respect It
 
 ```

@@ -1,7 +1,6 @@
 import * as Sentry from "@sentry/react";
 import type { FallbackRender } from "@sentry/react";
 import { AppRouter } from "@/app/router";
-import { DevLabButton } from "@/dev/DevLabButton";
 import { twUi } from "@/shared/lib/twUi";
 
 const sentryErrorFallback: FallbackRender = ({
@@ -47,7 +46,6 @@ export default function App() {
   return (
     <Sentry.ErrorBoundary fallback={sentryErrorFallback} showDialog={false}>
       <AppRouter />
-      {import.meta.env.DEV && <DevLabButton />}
     </Sentry.ErrorBoundary>
   );
 }

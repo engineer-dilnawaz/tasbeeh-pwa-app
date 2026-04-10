@@ -14,6 +14,7 @@ import {
   Mail,
   AlertCircle,
   Clock as ClockIcon,
+  FlaskConical,
 } from "lucide-react";
 import { DaisyThemeSwatch } from "@/features/settings/components/DaisyThemeSwatch";
 import { FontOptionCards } from "@/features/settings/components/FontOptionCards";
@@ -419,6 +420,25 @@ export default function Settings() {
             </>
           ) : null}
         </SettingsSection>
+
+        {import.meta.env.DEV ? (
+          <SettingsSection title="Experiments">
+            <SettingsRowLink
+              icon={
+                <SettingsIconTile
+                  background="var(--color-accent)"
+                  color="var(--color-accent-content)"
+                >
+                  <FlaskConical size={22} strokeWidth={2.25} />
+                </SettingsIconTile>
+              }
+              title="Design Lab"
+              hint="Dev-only UI experiments"
+              to="/design-lab"
+              trailing={<ChevronRight size={20} className={CHEVRON_CLASS} />}
+            />
+          </SettingsSection>
+        ) : null}
 
         <div className="h-10" />
 

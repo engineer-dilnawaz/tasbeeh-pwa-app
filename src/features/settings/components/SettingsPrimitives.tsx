@@ -25,8 +25,8 @@ export function SettingsPageCanvas({
   return (
     <div
       className={clsx(
-        "w-[calc(100%+1.5rem)] -mx-3 -mt-4 flex min-h-full flex-1 flex-col",
-        "bg-base-200/70 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]",
+        "flex min-h-full w-full flex-1 flex-col",
+        "bg-base-200/70 pl-[max(12px,env(safe-area-inset-left))] pr-[max(12px,env(safe-area-inset-right))]",
         className,
       )}
       style={style}

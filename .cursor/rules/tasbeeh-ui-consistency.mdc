@@ -1,0 +1,49 @@
+---
+alwaysApply: true
+---
+
+# Tasbeeh PWA — UI consistency & UX guardrails
+
+This app’s feel depends on **one calm visual language**. Multiple contributors (including agents) must not introduce a third card style, a fourth page background, or raw one-off colors without reason.
+
+## Default language: daisyUI semantic tokens
+
+For **new or refactored UI**, prefer daisy’s theme-aware tokens so every `data-theme` stays coherent:
+
+- **Page / full-bleed shell behind content:** `bg-base-100` (match `AppLayout` — do not fight the shell with a different page-level grey).
+- **Grouped / inset areas (sparingly):** `bg-base-200`, `bg-base-300`, borders `border-base-300` (or `border-base-content/10` when subtle).
+- **Text:** `text-base-content`; muted: `text-base-content/60`–`/70`, not ad-hoc `text-slate-500` for body hierarchy unless migrating legacy.
+- **Accent / brand:** `primary`, `primary-content`, `text-primary` — not arbitrary greens/purples for CTAs.
+
+Avoid **new** arbitrary hex, `bg-slate-*` / `text-slate-*` **for page chrome** (large surfaces, shell, screen backgrounds). Legacy screens may still use `twUi` or slate; when touching them, **narrow the diff** or migrate toward tokens above.
+
+## Shell & layout (`AppLayout`)
+
+- **`#app` (`AppLayout`)** owns bottom padding for the floating nav — **no horizontal padding on the shell**; pages are full width. Horizontal inset lives **inside** each page (`px-*` + safe areas on inner columns).
+- Page roots should use **`min-h-dvh`**, **`w-full`**, and **`pt-[env(safe-area-inset-top,0px)]`** when there is no `NavHeader`, so notches and the shell stay consistent.
+
+## Reuse before inventing
+
+- **Shared primitives:** `Button`, `NavHeader`, `Drawer`, forms (`Input`, `Switch`, `Form`), `Squircle` / `SquircleCard`, `shared/components/ui/*`, `features/settings/components/SettingsPrimitives.tsx` for settings-shaped screens.
+- **DEV showroom:** ` /design-lab` — when adding a **reusable** pattern, mirror or document it there; new screens should **compose** existing primitives, not clone styling ad hoc.
+
+## Spacing & type rhythm
+
+- Prefer a **small set** of gaps/padding: `12`, `16`, `24` (and safe-area `max(12px, env(safe-area-inset-…))` where the app already does).
+- Screen titles: one convention — either `text-xl font-bold` + `text-base-content` / existing `twUi.screenTitle` on legacy pages; do not add a new title size per screen.
+
+## Motion & density
+
+- Calm, short transitions; respect `prefers-reduced-motion` where motion is non-trivial (existing app patterns).
+- This is a dhikr companion: **avoid loud gradients, busy dashboards, or decorative animation** that competes with the counter or text.
+
+## Anti-patterns (reject in review)
+
+- A **new** full-page background that is not `base-*` without explicit product reason.
+- **Double gutter:** padding on `AppLayout` **and** a full-bleed page that only fills the inner box (shows a strip of another color).
+- **Three different card treatments** on the same route type (pick one primitive or one Tailwind + daisy recipe).
+- **Copy-paste hero sections** from other apps (heavy blur orbs + marketing type) when a simpler `base-*` + card list matches the rest of the app.
+
+## When migrating legacy
+
+Touching a file that already uses `twUi` or `slate-*` is fine; **do not expand** those patterns to new files. Prefer **incremental** alignment to `base-*` / shared components in the same PR if the change is already UI-focused.

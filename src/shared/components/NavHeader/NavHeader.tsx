@@ -8,14 +8,14 @@ interface NavHeaderProps {
 }
 
 /**
- * Standard navigation header: flush to top (cancels AppLayout `pt-4` / `px-3`), safe-area aware.
+ * Standard navigation header: full-bleed width edge-to-edge, safe-area aware.
  */
 export function NavHeader(props: NavHeaderProps) {
   const navigate = useNavigate();
   const { title, rightElement } = props;
 
   return (
-    <header className="sticky top-0 z-100 -mx-3 box-border w-[calc(100%+1.5rem)] shrink-0 bg-base-200 pt-[env(safe-area-inset-top,0px)] font-sans">
+    <header className="sticky top-0 z-100 box-border w-full shrink-0 bg-base-200 pt-[env(safe-area-inset-top,0px)] font-sans">
       <div className="flex h-[54px] items-center justify-between px-4">
         <button
           type="button"

@@ -1,81 +1,94 @@
-import { BarChart2, Home, Plus, Settings, Library } from "lucide-react";
+import {
+  ChartLineIcon,
+  HouseIcon,
+  GearIcon,
+  BooksIcon,
+} from "@phosphor-icons/react";
 import { NavLink, useLocation } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
-import { CornerSquircle } from "@/shared/components/CornerSquircle";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+} from "framer-motion";
+import {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type CSSProperties,
+  type Ref,
+} from "react";
 import { useRemoteConfig } from "@/shared/hooks/useRemoteConfig";
+import { SmoothSquircle } from "@/shared/components/ui/SmoothSquircle";
 import styles from "./BottomNav.module.css";
 
 const ICON_SIZE = 24;
-const DOCK_SMOOTHING = 1;
-const FAB_CORNER_RADIUS = 30;
-/** Per side: outer halo 6px (total +12) so the squircle curve reads on base-300 */
-const FAB_HALO_PX = 6;
-const FAB_OUTER_SIZE = 60 + FAB_HALO_PX * 2;
-const FAB_BACKPLATE_RADIUS = Math.round(
-  (FAB_CORNER_RADIUS * FAB_OUTER_SIZE) / 60,
-);
+const DOT = 6;
+/** Rounded-rectangle dock (not a pill); corner-smoothing uses this as the corner radius */
+const BAR_SQUIRCLE_RADIUS = 24;
 
-function tabSpring(prefersReduced: boolean | null) {
-  if (prefersReduced) {
-    return { type: "tween" as const, duration: 0.16, ease: "easeOut" as const };
-  }
-  return {
-    type: "spring" as const,
-    stiffness: 480,
-    damping: 34,
-    mass: 0.48,
-  };
+/** Bottom row order: home, collections, stats, settings */
+function slotIndexFromPath(pathname: string): number | null {
+  if (pathname === "/home") return 0;
+  if (pathname === "/collections") return 1;
+  if (pathname === "/stats") return 2;
+  if (pathname === "/settings") return 3;
+  return null;
 }
 
-type TabProps = {
-  to: string;
+function measureCenters(
+  track: HTMLElement,
+  slots: readonly (HTMLElement | null)[],
+): number[] {
+  const tr = track.getBoundingClientRect();
+  return slots.map((el) => {
+    if (!el) return NaN;
+    const r = el.getBoundingClientRect();
+    return r.left + r.width / 2 - tr.left;
+  });
+}
+
+type NavGlyph = typeof HouseIcon;
+
+type TabConfig = {
+  toNav: string;
   end?: boolean;
-  icon: typeof Home;
-  label: string;
-  transition: ReturnType<typeof tabSpring>;
+  icon: NavGlyph;
+  ariaLabel: string;
 };
 
-function BottomNavTab({ to, end, icon: Icon, label, transition }: TabProps) {
+type BottomNavTabProps = TabConfig & {
+  linkRef: Ref<HTMLAnchorElement>;
+};
+
+/** Phosphor: `regular` = outline, `fill` = solid — same glyph, calm premium read */
+function BottomNavTab({
+  toNav,
+  end,
+  icon: Icon,
+  ariaLabel,
+  linkRef,
+}: BottomNavTabProps) {
   return (
-    <NavLink to={to} end={end} className={styles.link}>
+    <NavLink
+      ref={linkRef}
+      to={toNav}
+      end={end}
+      className={styles.link}
+      aria-label={ariaLabel}
+    >
       {({ isActive }) => (
-        <>
-          {isActive ? (
-            <motion.div
-              layoutId="bottomNavCornerPill"
-              className={styles.pillMotion}
-              transition={transition}
-            >
-              <div className={styles.pillFill} />
-            </motion.div>
-          ) : null}
-          <div className={styles.linkContent}>
-            <motion.div
-              className={`${styles.glyph} ${isActive ? "text-primary" : "text-base-content/45"}`}
-              animate={{
-                y: isActive ? -2 : 0,
-                scale: isActive ? 1.1 : 1,
-              }}
-              transition={transition}
-            >
-              <Icon
-                size={ICON_SIZE}
-                strokeWidth={isActive ? 2.5 : 2}
-                aria-hidden
-              />
-            </motion.div>
-            <motion.span
-              className={`${styles.label} ${isActive ? "text-primary" : "text-base-content/45"}`}
-              animate={{
-                opacity: isActive ? 1 : 0.48,
-                scale: isActive ? 1 : 0.88,
-              }}
-              transition={transition}
-            >
-              {label}
-            </motion.span>
-          </div>
-        </>
+        <span className={styles.iconMount}>
+          <Icon
+            size={ICON_SIZE}
+            width={ICON_SIZE}
+            height={ICON_SIZE}
+            weight={isActive ? "fill" : "regular"}
+            className={isActive ? styles.iconActive : styles.iconIdle}
+            aria-hidden
+          />
+        </span>
       )}
     </NavLink>
   );
@@ -84,78 +97,208 @@ function BottomNavTab({ to, end, icon: Icon, label, transition }: TabProps) {
 export function BottomNav() {
   const { t } = useRemoteConfig();
   const location = useLocation();
-  const prefersReduced = useReducedMotion();
-  const transition = tabSpring(prefersReduced);
-  const isAddActive = location.pathname === "/add";
+  const prefersReducedMotion = useReducedMotion();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const slotRefs = useRef<(HTMLElement | null)[]>([null, null, null, null]);
+  const prevSlotRef = useRef<number | null>(null);
+  /** Prevents ResizeObserver sync from resetting prev/position while morph runs. */
+  const isMorphingRef = useRef(false);
+
+  const leftMv = useMotionValue(0);
+  const widthMv = useMotionValue(DOT);
+  const opacityMv = useMotionValue(1);
+
+  const slotLinkRefs = useMemo(
+    () =>
+      [0, 1, 2, 3].map((i) => (el: HTMLElement | null) => {
+        slotRefs.current[i] = el;
+      }),
+    [],
+  );
+
+  const runIndicatorAnimation = useCallback(
+    async (nextSlot: number | null, centers: number[]) => {
+      const c1 = nextSlot === null ? NaN : centers[nextSlot];
+      if (nextSlot === null) {
+        await animate(opacityMv, 0, { duration: 0.18, ease: "easeOut" });
+        prevSlotRef.current = null;
+        return;
+      }
+
+      if (!Number.isFinite(c1)) return;
+
+      void animate(opacityMv, 1, { duration: 0.12, ease: "easeOut" });
+
+      const reduced = !!prefersReducedMotion;
+      const prev = prevSlotRef.current;
+
+      if (prev === null || prev === nextSlot || reduced) {
+        widthMv.set(DOT);
+        await Promise.all([
+          animate(leftMv, c1 - DOT / 2, { duration: reduced ? 0 : 0.2 }),
+          animate(widthMv, DOT, { duration: reduced ? 0 : 0.14 }),
+        ]);
+        prevSlotRef.current = nextSlot;
+        return;
+      }
+
+      const c0 = centers[prev];
+      if (!Number.isFinite(c0)) {
+        widthMv.set(DOT);
+        await Promise.all([
+          animate(leftMv, c1 - DOT / 2, { duration: 0.2 }),
+          animate(widthMv, DOT, { duration: 0.14 }),
+        ]);
+        prevSlotRef.current = nextSlot;
+        return;
+      }
+
+      isMorphingRef.current = true;
+      try {
+        if (c1 > c0) {
+          const lineW = c1 - c0 + DOT;
+          await Promise.all([
+            animate(leftMv, c0 - DOT / 2, { duration: 0 }),
+            animate(widthMv, DOT, { duration: 0 }),
+          ]);
+          await animate(widthMv, lineW, {
+            duration: 0.28,
+            ease: [0.33, 0, 0.2, 1],
+          });
+          await Promise.all([
+            animate(leftMv, c1 - DOT / 2, {
+              duration: 0.32,
+              ease: [0.34, 1.15, 0.64, 1],
+            }),
+            animate(widthMv, DOT, {
+              duration: 0.32,
+              ease: [0.34, 1.15, 0.64, 1],
+            }),
+          ]);
+        } else if (c1 < c0) {
+          const lineW = c0 - c1 + DOT;
+          await Promise.all([
+            animate(leftMv, c0 - DOT / 2, { duration: 0 }),
+            animate(widthMv, DOT, { duration: 0 }),
+          ]);
+          await Promise.all([
+            animate(widthMv, lineW, {
+              duration: 0.28,
+              ease: [0.33, 0, 0.2, 1],
+            }),
+            animate(leftMv, c1 - DOT / 2, {
+              duration: 0.28,
+              ease: [0.33, 0, 0.2, 1],
+            }),
+          ]);
+          await animate(widthMv, DOT, {
+            duration: 0.32,
+            ease: [0.34, 1.15, 0.64, 1],
+          });
+        } else {
+          widthMv.set(DOT);
+          await animate(leftMv, c1 - DOT / 2, { duration: 0.16 });
+        }
+        prevSlotRef.current = nextSlot;
+      } finally {
+        isMorphingRef.current = false;
+      }
+    },
+    [leftMv, widthMv, opacityMv, prefersReducedMotion],
+  );
+
+  const measureAndSync = useCallback(() => {
+    if (isMorphingRef.current) return;
+    const track = trackRef.current;
+    if (!track) return;
+    const centers = measureCenters(track, slotRefs.current);
+    if (centers.some((x) => !Number.isFinite(x))) return;
+
+    const slot = slotIndexFromPath(location.pathname);
+    if (slot === null) {
+      void animate(opacityMv, 0, { duration: 0.1 });
+      prevSlotRef.current = null;
+      return;
+    }
+
+    void animate(opacityMv, 1, { duration: 0.1 });
+    const c = centers[slot];
+    leftMv.set(c - DOT / 2);
+    widthMv.set(DOT);
+    prevSlotRef.current = slot;
+  }, [location.pathname, leftMv, widthMv, opacityMv]);
+
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const centers = measureCenters(track, slotRefs.current);
+    if (centers.some((x) => !Number.isFinite(x))) return;
+    const nextSlot = slotIndexFromPath(location.pathname);
+    void runIndicatorAnimation(nextSlot, centers);
+  }, [location.pathname, runIndicatorAnimation]);
+
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const ro = new ResizeObserver(() => {
+      requestAnimationFrame(() => measureAndSync());
+    });
+    ro.observe(track);
+    return () => ro.disconnect();
+  }, [measureAndSync]);
+
+  const tabs: TabConfig[] = [
+    {
+      toNav: "/home",
+      end: true,
+      icon: HouseIcon,
+      ariaLabel: t("nav.home"),
+    },
+    { toNav: "/collections", icon: BooksIcon, ariaLabel: "Collections" },
+    { toNav: "/stats", icon: ChartLineIcon, ariaLabel: t("nav.stats") },
+    { toNav: "/settings", icon: GearIcon, ariaLabel: t("nav.settings") },
+  ];
 
   return (
-    <div className={styles.shell}>
-      <div className={styles.island}>
-        <NavLink to="/add" className={styles.fab} aria-label={t("nav.add")}>
-          <CornerSquircle
-            cornerRadius={FAB_BACKPLATE_RADIUS}
-            cornerSmoothing={DOCK_SMOOTHING}
-            aria-hidden
-            className={styles.fabBackplate}
+    <nav className={styles.shell} aria-label="Main">
+      <div className={styles.dockStack}>
+        <div className={styles.bottomScrim} aria-hidden />
+        <div
+          className={styles.barOuter}
+          style={
+            {
+              "--bn-squircle-r": `${BAR_SQUIRCLE_RADIUS}px`,
+            } as CSSProperties
+          }
+        >
+          <SmoothSquircle
+            className={styles.bar}
+            cornerRadius={BAR_SQUIRCLE_RADIUS}
+            cornerSmoothing={1}
           >
-            {/* decorative backplate only; gradient + icon is .fabSquircle */}
-            <span className="sr-only" />
-          </CornerSquircle>
-          <motion.div
-            className={styles.fabMotion}
-            animate={
-              isAddActive
-                ? { scale: 1.08, y: -2 }
-                : { scale: 1, y: 0 }
-            }
-            transition={transition}
-            whileHover={
-              prefersReduced ? undefined : { y: -4, transition: { duration: 0.18 } }
-            }
-            whileTap={{ scale: 0.88, y: 3 }}
-          >
-            <CornerSquircle
-              cornerRadius={FAB_CORNER_RADIUS}
-              cornerSmoothing={DOCK_SMOOTHING}
-              className={styles.fabSquircle}
-            >
-              <Plus size={30} strokeWidth={2.75} aria-hidden />
-            </CornerSquircle>
-          </motion.div>
-        </NavLink>
+            <div className={styles.glassSheen} aria-hidden />
+            <div className={styles.rowBlock}>
+              <div className={styles.row}>
+                <BottomNavTab {...tabs[0]} linkRef={slotLinkRefs[0]} />
+                <BottomNavTab {...tabs[1]} linkRef={slotLinkRefs[1]} />
+                <BottomNavTab {...tabs[2]} linkRef={slotLinkRefs[2]} />
+                <BottomNavTab {...tabs[3]} linkRef={slotLinkRefs[3]} />
+              </div>
 
-        {/* Rounded card like settings `.theme-btn`, not full-width squircle capsule */}
-        <div className={styles.dock}>
-          <div className={styles.row}>
-            <BottomNavTab
-              to="/home"
-              end
-              icon={Home}
-              label={t("nav.home")}
-              transition={transition}
-            />
-            <BottomNavTab
-              to="/collections"
-              icon={Library}
-              label="Collections"
-              transition={transition}
-            />
-            <div className={styles.spacer} aria-hidden />
-            <BottomNavTab
-              to="/stats"
-              icon={BarChart2}
-              label={t("nav.stats")}
-              transition={transition}
-            />
-            <BottomNavTab
-              to="/settings"
-              icon={Settings}
-              label={t("nav.settings")}
-              transition={transition}
-            />
-          </div>
+              <div ref={trackRef} className={styles.track}>
+                <motion.div
+                  className={styles.indicator}
+                  style={{
+                    left: leftMv,
+                    width: widthMv,
+                    opacity: opacityMv,
+                  }}
+                />
+              </div>
+            </div>
+          </SmoothSquircle>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

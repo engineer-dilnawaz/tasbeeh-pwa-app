@@ -1,0 +1,53 @@
+.wrapper {
+  flex-shrink: 0;
+  width: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: var(--color-base-100);
+  color: var(--color-base-content);
+  border-bottom: 1px solid var(--color-base-300);
+  box-shadow: 0 6px 14px -8px
+    color-mix(in oklab, var(--color-base-content) 22%, transparent);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  height: 54px;
+  width: 100%;
+  padding-inline: max(12px, env(safe-area-inset-left))
+    max(12px, env(safe-area-inset-right));
+}
+
+.title {
+  font-family: var(--font-primary);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-base-content);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--color-base-200);
+  border: 1px solid var(--color-base-300);
+  color: var(--color-base-content);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.iconBtn:active {
+  transform: scale(0.92);
+  background: var(--color-base-300);
+}

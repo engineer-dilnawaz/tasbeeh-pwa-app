@@ -1,8 +1,26 @@
 .container {
-  padding: 0 max(16px, env(safe-area-inset-left)) 180px
+  flex: 1;
+  min-height: 0;
+  padding: 0 max(16px, env(safe-area-inset-left)) 11rem
     max(16px, env(safe-area-inset-right));
   width: 100%;
   box-sizing: border-box;
   max-width: 620px;
   margin: 0 auto;
+}
+
+/* `SmoothSquircle` as native `button` — reset defaults (squircle borders use borderWidth + ::before) */
+.squircleBtn {
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  border: 0 solid transparent;
+  font: inherit;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.personalEmptyFrame {
+  border-radius: 1.25rem;
+  padding: 3px;
 }

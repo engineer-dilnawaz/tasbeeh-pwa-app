@@ -1,168 +1,387 @@
-import { motion } from "framer-motion";
-import { Sparkles, ScrollText, Library, Compass, ArrowRight, BookCheck } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  CalendarDays,
+  FolderOpen,
+  Play,
+  Plus,
+  Sparkles,
+  ChevronRight,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import clsx from "clsx";
 import { useTasbeehCatalog } from "@/features/tasbeeh/hooks/useTasbeeh";
-import { CornerSquircle } from "@/shared/components/CornerSquircle";
+import { useTasbeehStore } from "@/features/tasbeeh/store/tasbeehStore";
+import { useUserTasbeehStore } from "@/features/customTasbeeh";
+import { SquircleSheet } from "@/shared/components/SquircleSheet";
+import { SmoothSquircle } from "@/shared/components/ui/SmoothSquircle";
+import { UiButton } from "@/shared/components/ui/UiButton";
+import type { Tasbeeh } from "@/shared/types/tasbeehCatalog";
+import styles from "./Collections.module.css";
+
+const RECOMMENDED_MAX = 6;
+const SQUIRCLE_PILL = 22;
+const SQUIRCLE_CARD = 18;
+const SQUIRCLE_PANEL = 20;
+
+function mergeSessionList(catalog: Tasbeeh[], user: Tasbeeh[]): Tasbeeh[] {
+  const ids = new Set(catalog.map((t) => t.id));
+  return [...catalog, ...user.filter((u) => !ids.has(u.id))];
+}
+
+function primaryCategory(item: Tasbeeh): string {
+  const c = item.category?.[0];
+  return c?.trim() ? c : "Dhikr";
+}
 
 export default function Collections() {
-  const { sequences = [], isLoading } = useTasbeehCatalog();
+  const navigate = useNavigate();
+  const prefersReduced = useReducedMotion();
+  const { data: catalog = [], isLoading } = useTasbeehCatalog();
+  const userItems = useUserTasbeehStore((s) => s.items);
+  const setActiveTasbeeh = useTasbeehStore((s) => s.setActiveTasbeeh);
+
+  const sessionList = useMemo(
+    () => mergeSessionList(catalog, userItems),
+    [catalog, userItems],
+  );
+
+  const recommended = useMemo(
+    () => catalog.slice(0, RECOMMENDED_MAX),
+    [catalog],
+  );
+
+  const [sheetItem, setSheetItem] = useState<Tasbeeh | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const closeSheet = useCallback(() => {
+    setSheetItem(null);
+    setShowDetails(false);
+  }, []);
+
+  const openSheet = useCallback((item: Tasbeeh) => {
+    setShowDetails(false);
+    setSheetItem(item);
+  }, []);
+
+  const startTasbeeh = useCallback(
+    (item: Tasbeeh) => {
+      const idx = sessionList.findIndex((t) => t.id === item.id);
+      if (idx < 0) return;
+      setActiveTasbeeh(item.id, idx);
+      closeSheet();
+      navigate("/home");
+    },
+    [sessionList, setActiveTasbeeh, closeSheet, navigate],
+  );
+
+  const handleContinueLast = useCallback(() => {
+    navigate("/home");
+  }, [navigate]);
+
+  const handleDailySet = useCallback(() => {
+    const first = sessionList[0];
+    if (!first) return;
+    setActiveTasbeeh(first.id, 0);
+    navigate("/home");
+  }, [sessionList, setActiveTasbeeh, navigate]);
+
+  const pressable = prefersReduced
+    ? ""
+    : "transition-transform duration-150 active:scale-[0.98]";
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <motion.div 
-          animate={{ rotate: [0, 90, 180, 270, 360] }} 
-          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+      <div className="flex min-h-[min(320px,50dvh)] w-full flex-1 flex-col items-center justify-center bg-base-100">
+        <motion.div
+          animate={{ opacity: [0.35, 0.85, 0.35] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
         >
-          <Compass size={42} className="text-primary/30" />
+          <Sparkles className="size-10 text-primary/40" aria-hidden />
         </motion.div>
-        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 text-slate-500">
-           Reading Divine Library...
-        </p>
+        <p className="mt-6 text-sm text-base-content/50">Loading collection…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] pb-40">
-      {/* Immersive Background Elements */}
-      <div className="fixed top-0 left-0 w-full h-[60vh] pointer-events-none overflow-hidden opacity-40 dark:opacity-20">
-        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary blur-[160px] rounded-full opacity-30" />
-        <div className="absolute top-[20%] -right-[10%] w-[40%] h-[40%] bg-purple-600 blur-[140px] rounded-full opacity-20" />
-      </div>
-
+    <div className="flex min-h-0 flex-1 flex-col bg-base-100">
       <motion.main
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="relative z-10 px-5 pt-12 max-w-2xl mx-auto"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className={clsx(styles.container, "text-base-content")}
       >
-        {/* Modern Minimal Header */}
-        <header className="mb-14 flex items-end justify-between px-1">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="size-2 rounded-full bg-primary shadow-[0_0_12px_rgba(var(--color-primary-rgb),0.5)]" />
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                Official Repository
-              </span>
-            </div>
-            <h1 className="text-4xl font-black tracking-tightest text-slate-900 dark:text-white">
-              Collections
-            </h1>
-          </div>
-          <div className="size-14 rounded-3xl bg-white dark:bg-slate-900 shadow-xl border border-slate-100 dark:border-slate-800 flex items-center justify-center text-primary">
-            <Library size={24} />
-          </div>
-        </header>
+        <p className="mb-0 text-base text-base-content/60">
+          Choose your dhikr for today
+        </p>
 
-        <div className="space-y-24">
-          {sequences.map((seq, seqIdx) => (
-            <section key={seq.id} className="relative">
-              {/* Sequence Hero - Large typography, very modern separation */}
-              <div className="mb-8 px-2 flex items-baseline justify-between">
-                <div>
-                  <h2 className="text-2xl font-black tracking-tight italic text-slate-800 dark:text-slate-100 mb-1">
-                    {seq.title}
-                  </h2>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black italic text-primary/60">
-                      V.{idxToRoman(seqIdx + 1)}
+        {/* Quick actions */}
+        <section className="mt-5" aria-label="Quick actions">
+          <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <SmoothSquircle
+              as="button"
+              type="button"
+              cornerRadius={SQUIRCLE_PILL}
+              cornerSmoothing={1}
+              borderWidth={1}
+              onClick={handleContinueLast}
+              className={clsx(
+                styles.squircleBtn,
+                "flex min-w-[148px] shrink-0 items-center gap-2 bg-base-300 px-4 py-3 text-left text-sm font-semibold text-base-content [&::before]:bg-primary/10 [&:hover::before]:bg-primary/15",
+                pressable,
+              )}
+            >
+              <Play className="size-4 shrink-0 text-primary" aria-hidden />
+              Continue last
+            </SmoothSquircle>
+            <SmoothSquircle
+              as="button"
+              type="button"
+              cornerRadius={SQUIRCLE_PILL}
+              cornerSmoothing={1}
+              borderWidth={1}
+              onClick={handleDailySet}
+              disabled={!sessionList.length}
+              className={clsx(
+                styles.squircleBtn,
+                "flex min-w-[148px] shrink-0 items-center gap-2 bg-base-300 px-4 py-3 text-left text-sm font-semibold text-base-content [&::before]:bg-primary/10 [&:hover::before]:bg-primary/15 disabled:pointer-events-none disabled:opacity-40",
+                pressable,
+              )}
+            >
+              <CalendarDays className="size-4 shrink-0 text-primary" aria-hidden />
+              Daily set
+            </SmoothSquircle>
+          </div>
+        </section>
+
+        {/* Recommended */}
+        <section className="mt-6" aria-labelledby="collections-recommended">
+          <h2
+            id="collections-recommended"
+            className="mb-3 flex items-center gap-2 text-lg font-bold"
+          >
+            <Sparkles className="size-5 text-primary/80" aria-hidden />
+            Recommended
+          </h2>
+          {recommended.length === 0 ? (
+            <SmoothSquircle
+              cornerRadius={SQUIRCLE_CARD}
+              cornerSmoothing={1}
+              borderWidth={1}
+              className="bg-base-300 px-4 py-6 text-center text-sm text-base-content/60 [&::before]:bg-base-200/50"
+            >
+              No suggestions yet. Pull to refresh when you&apos;re online.
+            </SmoothSquircle>
+          ) : (
+            <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {recommended.map((item) => (
+                <SmoothSquircle
+                  key={item.id}
+                  as="button"
+                  type="button"
+                  cornerRadius={SQUIRCLE_CARD}
+                  cornerSmoothing={1}
+                  borderWidth={1}
+                  onClick={() => openSheet(item)}
+                  className={clsx(
+                    styles.squircleBtn,
+                    "w-[min(280px,calc(100vw-3rem))] shrink-0 snap-start bg-base-300 p-4 text-left shadow-sm hover:shadow-md [&::before]:bg-base-200",
+                    pressable,
+                  )}
+                >
+                  <p className="font-semibold leading-snug text-base-content">
+                    {item.transliteration}
+                  </p>
+                  <p
+                    className="Arabic-font mt-2 line-clamp-2 text-lg leading-relaxed text-base-content/90"
+                    dir="rtl"
+                  >
+                    {item.text}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2 text-xs text-base-content/60">
+                    <span className="rounded-full bg-base-100/90 px-2.5 py-1">
+                      Target: {item.target}
                     </span>
-                    <div className="h-px w-8 bg-slate-200 dark:bg-slate-800" />
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                       {seq.items.length} Recitations
+                    <span className="rounded-full bg-base-100/90 px-2.5 py-1">
+                      {primaryCategory(item)}
                     </span>
                   </div>
-                </div>
-                <div className="opacity-10 text-primary">
-                  {seq.id === "legacy-collection" ? <Sparkles size={48} /> : <ScrollText size={48} />}
-                </div>
-              </div>
+                </SmoothSquircle>
+              ))}
+            </div>
+          )}
+        </section>
 
-              {/* Phrase Cards - Modern, spaced out layout */}
-              <div className="space-y-6">
-                {seq.items.map((item, idx) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.05 }}
-                  >
-                    <CornerSquircle 
-                      cornerRadius={32}
-                      cornerSmoothing={1}
-                      className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-white dark:border-slate-800/50 shadow-xl shadow-slate-200/20 dark:shadow-none p-1 group cursor-pointer active:scale-[0.98] transition-all"
+        {/* Your tasbeeh */}
+        <section className="mt-6" aria-labelledby="collections-yours">
+          <h2
+            id="collections-yours"
+            className="mb-3 flex items-center gap-2 text-lg font-bold"
+          >
+            <FolderOpen className="size-5 text-primary/80" aria-hidden />
+            Your Tasbeeh
+          </h2>
+          {userItems.length === 0 ? (
+            <div
+              className={clsx(
+                styles.personalEmptyFrame,
+                "border border-dashed border-primary/35 bg-base-100",
+              )}
+            >
+              <SmoothSquircle
+                cornerRadius={SQUIRCLE_PANEL}
+                cornerSmoothing={1}
+                className="bg-primary/5 px-4 py-10 text-center"
+              >
+                <p className="text-base font-medium text-base-content/70">
+                  No personal tasbeeh yet
+                </p>
+                <Link
+                  to="/add"
+                  className="btn btn-primary btn-sm mt-5 gap-2 rounded-full"
+                >
+                  <Plus className="size-4" aria-hidden />
+                  Add Tasbeeh
+                </Link>
+              </SmoothSquircle>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {userItems.map((item) => (
+                <SmoothSquircle
+                  key={item.id}
+                  as="button"
+                  type="button"
+                  cornerRadius={SQUIRCLE_CARD}
+                  cornerSmoothing={1}
+                  borderWidth={1}
+                  onClick={() => openSheet(item)}
+                  className={clsx(
+                    styles.squircleBtn,
+                    "flex w-full items-start gap-3 bg-base-300 p-4 text-left shadow-sm hover:shadow-md [&::before]:bg-primary/5 [&:hover::before]:bg-primary/10",
+                    pressable,
+                  )}
+                >
+                  <span className="badge badge-sm badge-primary shrink-0">
+                    You
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold leading-snug">{item.transliteration}</p>
+                    <p
+                      className="Arabic-font mt-1 line-clamp-2 text-base leading-relaxed"
+                      dir="rtl"
                     >
-                      <div className="p-7 flex flex-col gap-8 relative overflow-hidden">
-                        {/* Background subtle number */}
-                        <div className="absolute -top-4 -right-2 text-[80px] font-black opacity-[0.03] italic pointer-events-none select-none">
-                          {idx + 1}
-                        </div>
-
-                        {/* Top Badge Meta */}
-                        <div className="flex items-center justify-between">
-                           <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 shadow-inner">
-                              <span className="text-[9px] font-black tracking-[0.1em] text-slate-400 uppercase">
-                                Cycle Target
-                              </span>
-                              <div className="w-px h-3 mx-3 bg-slate-200 dark:bg-slate-700" />
-                              <span className="text-[11px] font-black text-primary italic">
-                                {item.target}
-                              </span>
-                           </div>
-                           <div className="size-8 rounded-full border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 group-hover:text-primary transition-colors">
-                              <ArrowRight size={14} />
-                           </div>
-                        </div>
-
-                        {/* Primary Calligraphy Stack */}
-                        <div className="flex flex-col items-center gap-4 text-center">
-                          <h3 
-                            className="text-4xl font-bold leading-relaxed Arabic-font text-slate-900 dark:text-slate-100 transition-transform group-hover:scale-105 duration-500" 
-                            dir="rtl"
-                          >
-                            {item.text}
-                          </h3>
-                          <div className="space-y-1">
-                            <p className="text-[12px] font-black uppercase tracking-[0.15em] text-primary/50 group-hover:text-primary transition-colors italic">
-                              {item.transliteration}
-                            </p>
-                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest max-w-[200px] line-clamp-1 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
-                               Recitation Mode Active
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </CornerSquircle>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-
-        {/* High-End Design Footer */}
-        <footer className="mt-40 pt-12 border-t border-slate-100 dark:border-slate-900 flex flex-col items-center gap-6">
-           <div className="relative">
-              <div className="absolute inset-0 bg-primary blur-2xl opacity-20" />
-              <div className="relative size-12 rounded-3xl bg-white dark:bg-slate-900 shadow-xl flex items-center justify-center text-slate-400">
-                <BookCheck size={20} />
-              </div>
-           </div>
-           <div className="text-center space-y-1">
-              <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em]">
-                Authenticity Guaranteed
-              </p>
-              <p className="text-[8px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest opacity-60">
-                 Source: Sahih-Verified Manuscripts
-              </p>
-           </div>
-        </footer>
+                      {item.text}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-base-content/60">
+                      <span className="rounded-full bg-base-100/80 px-2.5 py-1">
+                        Target: {item.target}
+                      </span>
+                      <span className="rounded-full bg-base-100/80 px-2.5 py-1">
+                        {primaryCategory(item)}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight
+                    className="size-5 shrink-0 text-base-content/30"
+                    aria-hidden
+                  />
+                </SmoothSquircle>
+              ))}
+            </div>
+          )}
+        </section>
       </motion.main>
+
+      {userItems.length > 0 ? (
+        <Link
+          to="/add"
+          aria-label="Add custom tasbeeh"
+          className="fixed z-960 flex size-14 items-center justify-center rounded-full bg-primary text-primary-content shadow-lg shadow-primary/25 transition-transform hover:scale-105 active:scale-95"
+          style={{
+            right: "max(16px, env(safe-area-inset-right, 0px))",
+            bottom: "calc(108px + env(safe-area-inset-bottom, 0px))",
+          }}
+        >
+          <Plus className="size-7" strokeWidth={2} aria-hidden />
+        </Link>
+      ) : null}
+
+      <SquircleSheet
+        isOpen={sheetItem !== null}
+        onClose={closeSheet}
+        title={sheetItem?.transliteration ?? ""}
+      >
+        {sheetItem ? (
+          <div className="flex flex-col gap-4">
+            <p
+              className="Arabic-font text-center text-2xl leading-relaxed text-base-content"
+              dir="rtl"
+            >
+              {sheetItem.text}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 text-sm text-base-content/70">
+              <span className="rounded-full bg-base-200 px-3 py-1">
+                Target: {sheetItem.target}
+              </span>
+              <span className="rounded-full bg-base-200 px-3 py-1">
+                {primaryCategory(sheetItem)}
+              </span>
+            </div>
+
+            <div className="mt-2 flex flex-col gap-2">
+              <UiButton
+                variant="primary"
+                fullWidth
+                label="Start Tasbeeh"
+                icon={<Play className="size-4" aria-hidden />}
+                onClick={() => startTasbeeh(sheetItem)}
+              />
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm rounded-xl border border-base-300 font-semibold"
+                onClick={() => setShowDetails((v) => !v)}
+              >
+                {showDetails ? "Hide details" : "View details"}
+              </button>
+            </div>
+
+            {showDetails ? (
+              <SmoothSquircle
+                cornerRadius={SQUIRCLE_CARD}
+                cornerSmoothing={1}
+                borderWidth={1}
+                className="mt-2 max-h-[42dvh] space-y-3 overflow-y-auto bg-base-300 p-4 text-sm leading-relaxed text-base-content/80 [&::before]:bg-base-200/45"
+              >
+                {sheetItem.meaningEn ? (
+                  <p>
+                    <span className="font-semibold text-base-content">Meaning: </span>
+                    {sheetItem.meaningEn}
+                  </p>
+                ) : null}
+                {sheetItem.benefitEn ? (
+                  <p>
+                    <span className="font-semibold text-base-content">Benefit: </span>
+                    {sheetItem.benefitEn}
+                  </p>
+                ) : null}
+                {sheetItem.reference?.hadith ? (
+                  <p className="text-xs text-base-content/60">
+                    {sheetItem.reference.grade ? `[${sheetItem.reference.grade}] ` : null}
+                    {sheetItem.reference.hadith}
+                  </p>
+                ) : null}
+                {!sheetItem.meaningEn &&
+                !sheetItem.benefitEn &&
+                !sheetItem.reference?.hadith ? (
+                  <p className="text-base-content/50">No extra details for this phrase.</p>
+                ) : null}
+              </SmoothSquircle>
+            ) : null}
+          </div>
+        ) : null}
+      </SquircleSheet>
     </div>
   );
-}
-
-function idxToRoman(idx: number): string {
-  const romans = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-  return romans[idx - 1] || idx.toString();
 }

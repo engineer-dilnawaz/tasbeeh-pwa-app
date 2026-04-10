@@ -1,76 +1,12 @@
 .container {
   box-sizing: border-box;
-  /* Covers full scroll height; tab-bar padding is painted with this background too */
-  min-height: 100dvh;
-  /**
-   * Top gap: `AppLayout` uses `pt-4` on `#app`, so `<Outlet />` content starts
-   * 1rem below the screen — not from `.header`. Cancel it like `NavHeader` (`-mt-4`).
-   */
-  margin-top: -1rem;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px));
-  padding-left: 0;
-  padding-right: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  /* Shell: one surface under header + scroll + bottom inset (was base-200 below fold) */
-  background: var(--color-base-300);
-  /**
-   * Full-bleed horizontal: `AppLayout` wraps `<Outlet />` with Tailwind `px-3`
-   * (0.75rem). Without this, the home background is inset with the body still
-   * showing at the sides. Horizontal padding stays on the header and main column in `Home.tsx`.
-   */
-  margin-inline: -0.75rem;
-  width: calc(100% + 1.5rem);
-  min-width: 0;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  height: 54px;
-  flex-shrink: 0;
+  min-height: 0;
   width: 100%;
-  padding-inline: max(12px, env(safe-area-inset-left))
-    max(12px, env(safe-area-inset-right));
+  min-width: 0;
+  padding-left: 0;
+  padding-right: 0;
   background: var(--color-base-100);
-  color: var(--color-base-content);
-  border-bottom: 1px solid var(--color-base-300);
-  box-shadow: 0 6px 14px -8px
-    color-mix(in oklab, var(--color-base-content) 22%, transparent);
-}
-
-.title {
-  font-family: var(--font-primary);
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: var(--color-base-content);
-  margin: 0;
-  flex: 1;
-  text-align: center;
-}
-
-.iconBtn {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: var(--color-base-200);
-  border: 1px solid var(--color-base-300);
-  color: var(--color-base-content);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-.iconBtn:active {
-  transform: scale(0.92);
-  background: var(--color-base-300);
 }

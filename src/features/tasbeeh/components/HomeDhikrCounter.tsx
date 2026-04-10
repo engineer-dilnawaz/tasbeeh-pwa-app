@@ -9,6 +9,7 @@ import {
   type CSSProperties,
   type PointerEvent,
 } from "react";
+import { useUserTasbeehStore } from "@/features/customTasbeeh";
 import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -53,7 +54,13 @@ export function HomeDhikrCounter() {
   const countBtnHadPointerDownRef = useRef(false);
   const sparkGroupId = useId();
 
-  const { data: tasbeehList = [], isLoading } = useTasbeehCatalog();
+  const { data: catalogList = [], isLoading } = useTasbeehCatalog();
+  const userItems = useUserTasbeehStore((s) => s.items);
+  const tasbeehList = useMemo(() => {
+    const ids = new Set(catalogList.map((t) => t.id));
+    const extra = userItems.filter((u) => !ids.has(u.id));
+    return [...catalogList, ...extra];
+  }, [catalogList, userItems]);
 
   const count = useTasbeehStore((s) => s.count);
   const currentIndex = useTasbeehStore((s) => s.currentIndex);
