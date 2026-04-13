@@ -1,65 +1,81 @@
 @import "tailwindcss";
 
-/* https://daisyui.com/docs/themes/ — all built-in themes */
 @plugin "daisyui" {
-  themes: all;
+  themes: light, dark;
   logs: false;
 }
 
-/**
- * `html.dark` synced from `color-scheme` after `data-theme` (see `applyThemeToDocument`).
- * `accent-purple` / `accent-green` variants remain for older screens until migrated to daisy tokens.
- */
 @custom-variant dark (&:where(.dark, .dark *));
-@custom-variant accent-purple (&:where(.accent-purple, .accent-purple *));
-@custom-variant accent-green (&:where(.accent-green, .accent-green *));
 
-/* Synced from JS: `applyAppFontToDocument` → `--font-primary` on `<html>` */
+/* Theme Customization (DaisyUI 4.0 Standards) */
+[data-theme="light"] {
+  --color-base-100: #F6EDDD; /* Creamy spiritual light background */
+  --color-base-content: #2C2C2C;
+}
+
+[data-theme="dark"] {
+  --color-base-100: #1C1E21; /* Deep focused dark background */
+  --color-base-content: #EDEDED;
+}
+
 :root {
   --font-primary: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --radius-squircle: 22px;
 }
 
 @theme {
   --font-sans: var(--font-primary);
   --font-arabic: "Amiri", ui-serif, Georgia, serif;
   --font-urdu: "Noto Nastaliq Urdu", serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
-  *,
-  ::before,
-  ::after {
+  *, ::before, ::after {
     -webkit-tap-highlight-color: transparent;
-  }
-
-  html.no-overscroll,
-  html.no-overscroll body {
-    overscroll-behavior-y: none;
-    overscroll-behavior: none;
   }
 
   html {
     font-family: var(--font-primary);
-    transition: font-family 0.35s ease;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    @apply bg-base-100 text-base-content;
   }
 
   body {
     margin: 0;
     min-height: 100dvh;
-    font-family: inherit;
-    -webkit-font-smoothing: antialiased;
-    user-select: none;
-    -webkit-user-select: none;
-    @apply bg-base-100 text-base-content;
+    overflow-x: hidden;
   }
 }
 
 @layer components {
-  .squircle-card {
-    @apply rounded-[22px] border border-base-300 bg-base-100 px-[18px] py-4;
+  .text-display-arabic {
+    font-family: var(--font-arabic);
+    @apply text-4xl md:text-6xl leading-[1.8] font-normal;
   }
 
-  .Arabic-font {
-    font-family: var(--font-arabic, serif);
+  .text-display-urdu {
+    font-family: var(--font-urdu);
+    @apply text-3xl md:text-5xl leading-[2.2] font-normal;
+  }
+
+  .text-counter {
+    font-family: var(--font-display);
+    @apply font-black tracking-tighter tabular-nums;
+  }
+
+  .text-heading {
+    @apply font-semibold tracking-tight;
+    font-family: var(--font-sans);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

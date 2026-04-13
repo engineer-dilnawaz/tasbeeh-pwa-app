@@ -1,1 +1,0 @@
-export { syncUserDocument } from "./syncUserDocument";
