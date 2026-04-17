@@ -43,8 +43,8 @@ export const Onboarding: React.FC = () => {
   // Swipe-to-Start Slider Logic
   const x = useMotionValue(0);
   const swipeWidth = 260; // Max distance for the slider
-  const opacity = useTransform(x, [0, swipeWidth], [1, 0]);
-  const scale = useTransform(x, [0, swipeWidth], [1, 0.9]);
+  useTransform(x, [0, swipeWidth], [1, 0]);
+  useTransform(x, [0, swipeWidth], [1, 0.9]);
   const backgroundAlpha = useTransform(x, [0, swipeWidth], [0.1, 1]);
 
   // Hoist mask transforms to top level to avoid Rules of Hooks violation

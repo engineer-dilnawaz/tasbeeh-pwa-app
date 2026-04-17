@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: 
+alwaysApply: false
 ---
 
 # Tasbeeh PWA — Architecture & Patterns
@@ -103,7 +104,7 @@ Not every feature needs every file. `customTasbeeh` might just have a component 
 ## State Architecture — Three Layers, Clear Boundaries
 
 | Layer              | Tool        | What lives here                             | Example                                    |
-| ------------------ | ----------- | ------------------------------------------- | ------------------------------------------ |
+| --- | ----- | ---- | --- |
 | **Local UI state** | `useState`  | Toggle states, form inputs, animation flags | `isMenuOpen`, `inputValue`                 |
 | **Domain state**   | Zustand     | Business data that persists across screens  | `count`, `currentIndex`, `streak`, `theme` |
 | **Server state**   | React Query | Data from Firebase / external APIs          | Asma-ul-Husna list, synced user data       |

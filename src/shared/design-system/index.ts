@@ -28,6 +28,8 @@ export * from "./ui/Dialog";
 export * from "./ui/Toast";
 export * from "./ui/useToast";
 export * from "./ui/EmptyState";
+export * from "./ui/ErrorState";
+export * from "./ui/ZeroState";
 export * from "./ui/Accordion";
 export * from "./ui/PullToRefresh";
 export * from "./ui/Form";

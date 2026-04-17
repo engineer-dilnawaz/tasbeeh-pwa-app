@@ -342,11 +342,13 @@ function CalendarGallery() {
   const [system, setSystem] = useState<CalendarSystem>("gregorian");
 
   const dateKey = selected ? format(selected, "yyyy-MM-dd") : "";
+  const twoDaysAgo = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
   // Mock intensity data
   const intensityData = {
     [format(new Date(), "yyyy-MM-dd")]: 0.8,
-    [format(new Date(Date.now() - 172800000), "yyyy-MM-dd")]: 1.0,
+    [format(twoDaysAgo, "yyyy-MM-dd")]: 1.0,
   };
 
   const mockActivities: Record<string, ZikrRecord[]> = {

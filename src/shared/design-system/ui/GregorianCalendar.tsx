@@ -7,7 +7,6 @@ export type GregorianCalendarProps = DayPickerProps & {
 };
 
 export const GregorianCalendar: React.FC<GregorianCalendarProps> = ({
-  activeVariant = "monthly",
   ...props
 }) => {
   return (

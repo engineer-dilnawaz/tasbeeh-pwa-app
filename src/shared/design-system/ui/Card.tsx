@@ -59,6 +59,7 @@ export const Card: React.FC<CardProps> = ({
   ...rest
 }) => {
   const cornerRadius = radiusMap[radius];
+  const { style, ...restProps } = rest;
 
   return (
     <motion.div
@@ -77,9 +78,9 @@ export const Card: React.FC<CardProps> = ({
         borderRadius: cornerRadius,
         overflow: "hidden",
         cursor: pressable ? "pointer" : undefined,
-        ...((rest as any).style ?? {}),
+        ...(style ?? {}),
       }}
-      {...rest}
+      {...restProps}
     >
       {children}
     </motion.div>

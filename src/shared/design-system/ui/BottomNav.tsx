@@ -5,7 +5,13 @@ import React, {
   useCallback,
   type CSSProperties,
 } from "react";
-import { motion, useMotionValue, animate, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  animate,
+  useReducedMotion,
+} from "framer-motion";
+import clsx from "clsx";
 import { Squircle } from "./Squircle";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -79,8 +85,8 @@ function BarNav({
 }: Omit<BottomNavProps, "variant">) {
   const hasFab = !!fab;
   const half = hasFab ? Math.floor(tabs.length / 2) : 0;
-  const leftTabs  = hasFab ? tabs.slice(0, half) : tabs;
-  const rightTabs = hasFab ? tabs.slice(half)    : [];
+  const leftTabs = hasFab ? tabs.slice(0, half) : tabs;
+  const rightTabs = hasFab ? tabs.slice(half) : [];
 
   const renderTab = (tab: TabItem) => {
     const isActive = tab.id === activeTab;
@@ -92,39 +98,33 @@ function BarNav({
         aria-label={tab.label ?? tab.id}
         aria-current={isActive ? "page" : undefined}
       >
-        {isActive && (
-          <motion.div
-            layoutId="bottomnav-bar-indicator"
-            transition={SPRING}
-            className="absolute inset-x-2 top-1 rounded-xl bg-primary/10"
-            style={{ height: "calc(100% - 4px)" }}
-          />
-        )}
-
-        {tab.badge != null && tab.badge > 0 && (
-          <span className="absolute top-1.5 right-1/2 translate-x-3 z-20 min-w-[16px] h-4 px-1 rounded-full bg-error text-white text-[9px] font-bold flex items-center justify-center">
-            {tab.badge > 99 ? "99+" : tab.badge}
-          </span>
-        )}
-
         <motion.span
           animate={{
-            color: isActive ? "var(--color-primary)" : "var(--color-base-content)",
-            opacity: isActive ? 1 : 0.45,
-            scale:   isActive ? 1.1 : 1,
+            color: isActive
+              ? "var(--color-primary)"
+              : "var(--color-base-content)",
+            opacity: isActive ? 1 : 0.8,
+            scale: isActive ? 1.1 : 1,
           }}
           transition={SPRING}
           className="relative z-10 flex items-center justify-center"
         >
+          {tab.badge != null && tab.badge > 0 && (
+            <span className="absolute -right-2 -top-2 z-20 min-w-[16px] h-4 px-1 rounded-full bg-error text-white text-[9px] font-bold flex items-center justify-center">
+              {tab.badge > 99 ? "99+" : tab.badge}
+            </span>
+          )}
           {isActive ? (tab.activeIcon ?? tab.icon) : tab.icon}
         </motion.span>
 
         {tab.label && (
           <motion.span
             animate={{
-              opacity:    isActive ? 1 : 0.45,
+              opacity: isActive ? 1 : 0.8,
               fontWeight: isActive ? 600 : 400,
-              color: isActive ? "var(--color-primary)" : "var(--color-base-content)",
+              color: isActive
+                ? "var(--color-primary)"
+                : "var(--color-base-content)",
             }}
             transition={SPRING}
             className="relative z-10 text-[10px] mt-0.5 leading-none tracking-tight"
@@ -138,27 +138,31 @@ function BarNav({
 
   return (
     <nav
-      className={[
+      className={clsx(
         "fixed bottom-0 left-1/2 -translate-x-1/2",
+        "flex flex-col justify-end pt-12",
         "w-full max-w-[480px]",
-        "flex items-stretch",
-        "bg-base-100/90 backdrop-blur-xl",
-        "border-t border-base-content/[0.07]",
-        "h-16",
+        "bg-[linear-gradient(to_bottom,rgba(0,0,0,0.00)_0%,rgba(0,0,0,0.05)_28%,rgba(0,0,0,0.12)_62%,rgba(0,0,0,0.24)_100%)]",
         className,
-      ].filter(Boolean).join(" ")}
+      )}
       style={{
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))",
         zIndex: 60,
       }}
     >
-      {leftTabs.map(renderTab)}
-      {hasFab && (
-        <div className="flex-none w-16 flex items-center justify-center relative">
-          <div className="absolute -top-5">{fab}</div>
+      <Squircle cornerRadius={30} cornerSmoothing={0.95} asChild>
+        <div className="mx-2 h-[84px] w-[calc(100%-16px)] overflow-hidden bg-white dark:bg-[#111214]">
+          <div className="flex h-full items-stretch">
+            {leftTabs.map(renderTab)}
+            {hasFab && (
+              <div className="relative flex w-16 flex-none items-center justify-center">
+                <div className="absolute -top-5">{fab}</div>
+              </div>
+            )}
+            {rightTabs.map(renderTab)}
+          </div>
         </div>
-      )}
-      {rightTabs.map(renderTab)}
+      </Squircle>
     </nav>
   );
 }
@@ -174,13 +178,13 @@ function GlassDockNav({
   className = "",
 }: Omit<BottomNavProps, "variant" | "fab">) {
   const prefersReducedMotion = useReducedMotion();
-  const trackRef   = useRef<HTMLDivElement>(null);
-  const slotRefs   = useRef<(HTMLElement | null)[]>(tabs.map(() => null));
-  const prevSlotRef    = useRef<number | null>(null);
-  const isMorphingRef  = useRef(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const slotRefs = useRef<(HTMLElement | null)[]>(tabs.map(() => null));
+  const prevSlotRef = useRef<number | null>(null);
+  const isMorphingRef = useRef(false);
 
-  const leftMv    = useMotionValue(0);
-  const widthMv   = useMotionValue(DOT);
+  const leftMv = useMotionValue(0);
+  const widthMv = useMotionValue(DOT);
   const opacityMv = useMotionValue(0);
 
   // Stable callback refs for each slot
@@ -213,8 +217,8 @@ function GlassDockNav({
       if (prev === null || prev === nextSlot || reduced) {
         widthMv.set(DOT);
         await Promise.all([
-          animate(leftMv,  c1 - DOT / 2, { duration: reduced ? 0 : 0.2 }),
-          animate(widthMv, DOT,           { duration: reduced ? 0 : 0.14 }),
+          animate(leftMv, c1 - DOT / 2, { duration: reduced ? 0 : 0.2 }),
+          animate(widthMv, DOT, { duration: reduced ? 0 : 0.14 }),
         ]);
         prevSlotRef.current = nextSlot;
         return;
@@ -224,8 +228,8 @@ function GlassDockNav({
       if (!Number.isFinite(c0)) {
         widthMv.set(DOT);
         await Promise.all([
-          animate(leftMv,  c1 - DOT / 2, { duration: 0.2  }),
-          animate(widthMv, DOT,           { duration: 0.14 }),
+          animate(leftMv, c1 - DOT / 2, { duration: 0.2 }),
+          animate(widthMv, DOT, { duration: 0.14 }),
         ]);
         prevSlotRef.current = nextSlot;
         return;
@@ -237,26 +241,44 @@ function GlassDockNav({
           // Moving right: expand right edge → slide left edge
           const lineW = c1 - c0 + DOT;
           await Promise.all([
-            animate(leftMv,  c0 - DOT / 2, { duration: 0 }),
-            animate(widthMv, DOT,           { duration: 0 }),
+            animate(leftMv, c0 - DOT / 2, { duration: 0 }),
+            animate(widthMv, DOT, { duration: 0 }),
           ]);
-          await animate(widthMv, lineW, { duration: 0.28, ease: [0.33, 0, 0.2, 1] });
+          await animate(widthMv, lineW, {
+            duration: 0.28,
+            ease: [0.33, 0, 0.2, 1],
+          });
           await Promise.all([
-            animate(leftMv,  c1 - DOT / 2, { duration: 0.32, ease: [0.34, 1.15, 0.64, 1] }),
-            animate(widthMv, DOT,           { duration: 0.32, ease: [0.34, 1.15, 0.64, 1] }),
+            animate(leftMv, c1 - DOT / 2, {
+              duration: 0.32,
+              ease: [0.34, 1.15, 0.64, 1],
+            }),
+            animate(widthMv, DOT, {
+              duration: 0.32,
+              ease: [0.34, 1.15, 0.64, 1],
+            }),
           ]);
         } else if (c1 < c0) {
           // Moving left: stretch left + expand simultaneously → collapse
           const lineW = c0 - c1 + DOT;
           await Promise.all([
-            animate(leftMv,  c0 - DOT / 2, { duration: 0 }),
-            animate(widthMv, DOT,           { duration: 0 }),
+            animate(leftMv, c0 - DOT / 2, { duration: 0 }),
+            animate(widthMv, DOT, { duration: 0 }),
           ]);
           await Promise.all([
-            animate(widthMv, lineW,         { duration: 0.28, ease: [0.33, 0, 0.2, 1] }),
-            animate(leftMv,  c1 - DOT / 2, { duration: 0.28, ease: [0.33, 0, 0.2, 1] }),
+            animate(widthMv, lineW, {
+              duration: 0.28,
+              ease: [0.33, 0, 0.2, 1],
+            }),
+            animate(leftMv, c1 - DOT / 2, {
+              duration: 0.28,
+              ease: [0.33, 0, 0.2, 1],
+            }),
           ]);
-          await animate(widthMv, DOT, { duration: 0.32, ease: [0.34, 1.15, 0.64, 1] });
+          await animate(widthMv, DOT, {
+            duration: 0.32,
+            ease: [0.34, 1.15, 0.64, 1],
+          });
         } else {
           widthMv.set(DOT);
           await animate(leftMv, c1 - DOT / 2, { duration: 0.16 });
@@ -305,7 +327,9 @@ function GlassDockNav({
   useLayoutEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    const ro = new ResizeObserver(() => requestAnimationFrame(() => measureAndSync()));
+    const ro = new ResizeObserver(() =>
+      requestAnimationFrame(() => measureAndSync()),
+    );
     ro.observe(track);
     return () => ro.disconnect();
   }, [measureAndSync]);
@@ -313,110 +337,93 @@ function GlassDockNav({
   return (
     <nav
       aria-label="Main navigation"
-      className={["fixed bottom-0 left-0 right-0 z-60 flex flex-col justify-end items-stretch pointer-events-none", className].join(" ")}
+      className={clsx(
+        "fixed bottom-0 left-1/2 -translate-x-1/2",
+        "z-60 flex flex-col justify-end items-stretch pointer-events-none",
+        "w-full max-w-[480px] pt-12",
+        "bg-[linear-gradient(to_bottom,rgba(0,0,0,0.00)_0%,rgba(0,0,0,0.05)_28%,rgba(0,0,0,0.12)_62%,rgba(0,0,0,0.24)_100%)]",
+        className,
+      )}
       style={{
-        padding: `0 max(12px, env(safe-area-inset-left, 0px)) max(14px, env(safe-area-inset-bottom, 12px)) max(12px, env(safe-area-inset-right, 0px))`,
+        paddingLeft: "max(12px, env(safe-area-inset-left, 0px))",
+        paddingRight: "max(12px, env(safe-area-inset-right, 0px))",
+        paddingBottom: "calc(20px + env(safe-area-inset-bottom, 12px))",
       }}
     >
-      <div className="relative w-full pointer-events-none">
-        {/* Bottom scrim — gradient that dims content behind the dock */}
-        <div
-          aria-hidden
-          className="absolute pointer-events-none"
-          style={{
-            top: 0,
-            bottom: "calc(-1 * max(14px, env(safe-area-inset-bottom, 12px)))",
-            left:  "calc(-1 * max(12px, env(safe-area-inset-left, 0px)))",
-            right: "calc(-1 * max(12px, env(safe-area-inset-right, 0px)))",
-            zIndex: 0,
-            background: `linear-gradient(to bottom,
-              transparent 0px,
-              color-mix(in oklab, black 18%, transparent) 52px,
-              color-mix(in oklab, black 36%, transparent) 100%
-            )`,
-          }}
-        />
-
-        {/* Glow outer wrapper — box-shadow here since squircle clip-path eats shadows */}
-        <div
-          className="relative z-10 w-full pointer-events-auto"
-          style={{
-            borderRadius: BAR_SQUIRCLE_RADIUS,
-            boxShadow: `
-              0 -8px 40px -16px color-mix(in oklab, var(--color-base-content) 28%, transparent),
-              0 16px 48px -20px color-mix(in oklab, var(--color-primary) 22%, transparent)
-            `,
-          } as CSSProperties}
-        >
-          <Squircle
-            cornerRadius={BAR_SQUIRCLE_RADIUS}
-            cornerSmoothing={1}
-            style={{
+      <div className="relative w-full pointer-events-auto">
+        <Squircle
+          cornerRadius={BAR_SQUIRCLE_RADIUS}
+          cornerSmoothing={0.95}
+          style={
+            {
               width: "100%",
               position: "relative",
               overflow: "visible",
               padding: "14px 16px 14px",
               boxSizing: "border-box",
-              background: "color-mix(in oklab, var(--color-base-100) 82%, white 18%)",
-              backdropFilter: "blur(24px) saturate(1.25)",
-              WebkitBackdropFilter: "blur(24px) saturate(1.25)",
-              border: "1px solid color-mix(in oklab, var(--color-base-content) 10%, white 8%)",
-            } as CSSProperties}
-          >
-            <div className="flex flex-col items-stretch gap-0.5 w-full">
-              {/* Tab buttons row */}
-              <div className="relative z-10 flex w-full items-center justify-between gap-1">
-                {tabs.map((tab, i) => {
-                  const isActive = tab.id === activeTab;
-                  return (
-                    <button
-                      key={tab.id}
-                      ref={slotCallbackRefs[i] as React.RefCallback<HTMLButtonElement>}
-                      onClick={() => onTabChange(tab.id)}
-                      aria-label={tab.label ?? tab.id}
-                      aria-current={isActive ? "page" : undefined}
-                      className="flex-1 flex items-center justify-center min-h-[44px] py-2.5 px-0.5 border-none bg-transparent cursor-pointer rounded-xl"
-                      style={{ WebkitTapHighlightColor: "transparent" }}
+              background: "var(--color-surface-card)",
+              border:
+                "1px solid color-mix(in oklab, var(--color-base-content) 10%, white 8%)",
+            } as CSSProperties
+          }
+        >
+          <div className="flex flex-col items-stretch gap-0.5 w-full">
+            {/* Tab buttons row */}
+            <div className="relative z-10 flex w-full items-center justify-between gap-1">
+              {tabs.map((tab, i) => {
+                const isActive = tab.id === activeTab;
+                return (
+                  <button
+                    key={tab.id}
+                    ref={
+                      slotCallbackRefs[
+                        i
+                      ] as React.RefCallback<HTMLButtonElement>
+                    }
+                    onClick={() => onTabChange(tab.id)}
+                    aria-label={tab.label ?? tab.id}
+                    aria-current={isActive ? "page" : undefined}
+                    className="flex-1 flex items-center justify-center min-h-[44px] py-2.5 px-0.5 border-none bg-transparent cursor-pointer rounded-xl"
+                    style={{ WebkitTapHighlightColor: "transparent" }}
+                  >
+                    <span
+                      className="inline-flex items-center justify-center w-6 h-6 pointer-events-none transition-colors duration-300"
+                      style={{
+                        color: isActive
+                          ? "var(--color-primary)"
+                          : "color-mix(in oklab, var(--color-base-content) 78%, transparent)",
+                      }}
                     >
-                      <span
-                        className="inline-flex items-center justify-center w-6 h-6 pointer-events-none transition-colors duration-300"
-                        style={{
-                          color: isActive
-                            ? "var(--color-primary)"
-                            : "color-mix(in oklab, var(--color-base-content) 46%, transparent)",
-                        }}
-                      >
-                        {isActive ? (tab.activeIcon ?? tab.icon) : tab.icon}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Indicator track */}
-              <div
-                ref={trackRef}
-                className="relative w-full pointer-events-none"
-                style={{ height: 8, marginTop: -1 }}
-              >
-                <motion.div
-                  style={{
-                    position: "absolute",
-                    top: 1,
-                    height: DOT,
-                    borderRadius: 9999,
-                    background: "var(--color-primary)",
-                    boxShadow: `0 0 14px color-mix(in oklab, var(--color-primary) 55%, transparent)`,
-                    willChange: "left, width, opacity",
-                    left:    leftMv,
-                    width:   widthMv,
-                    opacity: opacityMv,
-                  }}
-                />
-              </div>
+                      {isActive ? (tab.activeIcon ?? tab.icon) : tab.icon}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          </Squircle>
-        </div>
+
+            {/* Indicator track */}
+            <div
+              ref={trackRef}
+              className="relative w-full pointer-events-none"
+              style={{ height: 8, marginTop: -1 }}
+            >
+              <motion.div
+                style={{
+                  position: "absolute",
+                  top: 1,
+                  height: DOT,
+                  borderRadius: 9999,
+                  background: "var(--color-primary)",
+                  boxShadow: `0 0 14px color-mix(in oklab, var(--color-primary) 55%, transparent)`,
+                  willChange: "left, width, opacity",
+                  left: leftMv,
+                  width: widthMv,
+                  opacity: opacityMv,
+                }}
+              />
+            </div>
+          </div>
+        </Squircle>
       </div>
     </nav>
   );
@@ -431,8 +438,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ...props
 }) => {
   if (variant === "glass-dock") {
-    const { fab: _fab, ...rest } = props;
-    return <GlassDockNav {...rest} />;
+    return (
+      <GlassDockNav
+        tabs={props.tabs}
+        activeTab={props.activeTab}
+        onTabChange={props.onTabChange}
+        className={props.className}
+      />
+    );
   }
   return <BarNav {...props} />;
 };

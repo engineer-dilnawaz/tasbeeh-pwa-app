@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: 
+alwaysApply: false
 ---
 
 # Tasbeeh PWA — Workspace Rules

@@ -45,13 +45,6 @@ export const Dialog: React.FC<DialogProps> = ({
   secondaryActionLabel = "Cancel",
   closeOnBackdrop = true,
 }) => {
-  const [mounted, setMounted] = useState(false);
-
-  // Sync portal mount state
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // Isolate scroll-locking behind the open state hook
   useEffect(() => {
     if (isOpen) {
@@ -63,7 +56,7 @@ export const Dialog: React.FC<DialogProps> = ({
     }
   }, [isOpen]);
 
-  if (!mounted) return null;
+  if (typeof document === "undefined") return null;
 
   const modal = (
     <AnimatePresence>

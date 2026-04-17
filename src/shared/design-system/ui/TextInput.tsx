@@ -1,20 +1,11 @@
 import React from "react";
 
 type InputSize = "xs" | "sm" | "md" | "lg" | "xl";
-type InputColor =
-  | "primary"
-  | "secondary"
-  | "accent"
-  | "success"
-  | "warning"
-  | "error"
-  | "neutral";
 type InputVariant = "bordered" | "ghost";
 
 interface TextInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
   size?: InputSize;
-  color?: InputColor;
   variant?: InputVariant;
   label?: string;
   hint?: string;
@@ -41,16 +32,6 @@ const sizeRadius: Record<InputSize, number> = {
   xl: 16,
 };
 
-const colorClass: Record<InputColor, string> = {
-  primary: "input-primary",
-  secondary: "input-secondary",
-  accent: "input-accent",
-  success: "input-success",
-  warning: "input-warning",
-  error: "input-error",
-  neutral: "input-neutral",
-};
-
 const labelSizeClass: Record<InputSize, string> = {
   xs: "text-xs",
   sm: "text-xs",
@@ -68,7 +49,6 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
   (
     {
       size = "md",
-      color,
       variant = "bordered",
       label,
       hint,
@@ -82,18 +62,28 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
     ref
   ) => {
     const isInvalid = error || inputProps["aria-invalid"] === true;
-    const resolvedColor = isInvalid ? "error" : color;
     const variantClass =
-      variant === "ghost" ? "input-ghost" : "input-bordered";
+      // Borderless inputs — rely on background color for affordance.
+      // (We still keep daisy's input sizing/padding classes.)
+      variant === "ghost" ? "input-ghost border-none" : "border-none";
     const radius = sizeRadius[size];
+    const errorBgClass = isInvalid ? "bg-error/10" : "";
 
+    // Ensure error color classes win over consumer-provided classes.
+    // (If a consumer sets `border-*`, we still want `input-error` to take precedence.)
     const baseClasses = [
       "input",
       "w-full",
       "outline-none",
+      "transition-colors",
+      "focus-visible:outline-none",
+      "focus-visible:ring-0",
       sizeClass[size],
       variantClass,
-      resolvedColor ? colorClass[resolvedColor] : "",
+      className,
+      // Prefer soft-error background over border color changes.
+      // Keep border styling stable; let background communicate the error state.
+      errorBgClass,
     ]
       .filter(Boolean)
       .join(" ");
@@ -120,7 +110,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
         <input
           ref={ref}
           {...inputProps}
-          className={`${baseClasses} ${className}`}
+          className={baseClasses}
           style={{ borderRadius: radius }}
         />
       );
@@ -128,7 +118,9 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
     return (
       <fieldset className={`fieldset w-full ${containerClassName}`}>
         {label && (
-          <legend className={`fieldset-legend ${labelSizeClass[size]}`}>
+          <legend
+            className={`fieldset-legend ${labelSizeClass[size]} bg-transparent px-0`}
+          >
             {label}
           </legend>
         )}

@@ -73,7 +73,6 @@ export const Calendar: React.FC<CalendarProps> = ({
       {/* ── Header Controls ─────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3 px-1">
         <SegmentedControl
-          layoutId="variant-bg"
           value={activeVariant}
           onChange={(v) =>
             onVariantChange ? onVariantChange(v) : setInternalVariant(v)
@@ -84,7 +83,6 @@ export const Calendar: React.FC<CalendarProps> = ({
           ]}
         />
         <SegmentedControl
-          layoutId="system-bg"
           value={activeSystem}
           onChange={(s) =>
             onSystemChange ? onSystemChange(s) : setInternalSystem(s)

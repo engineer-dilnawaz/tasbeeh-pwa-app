@@ -11,11 +11,13 @@
 [data-theme="light"] {
   --color-base-100: #F6EDDD; /* Creamy spiritual light background */
   --color-base-content: #2C2C2C;
+  --color-surface-card: #FFFFFF;
 }
 
 [data-theme="dark"] {
   --color-base-100: #1C1E21; /* Deep focused dark background */
   --color-base-content: #EDEDED;
+  --color-surface-card: #111214;
 }
 
 :root {
@@ -46,6 +48,33 @@
     margin: 0;
     min-height: 100dvh;
     overflow-x: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .theme-transitioning,
+  .theme-transitioning *,
+  .theme-transitioning *::before,
+  .theme-transitioning *::after {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 240ms;
+    transition-timing-function: ease-in-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-transitioning,
+    .theme-transitioning *,
+    .theme-transitioning *::before,
+    .theme-transitioning *::after {
+      transition: none !important;
+    }
   }
 }
 
@@ -77,5 +106,9 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .surface-card {
+    background-color: var(--color-surface-card);
   }
 }

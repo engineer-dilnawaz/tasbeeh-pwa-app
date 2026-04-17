@@ -88,7 +88,7 @@ export const Button: React.FC<ButtonProps> = ({
           transition={TOKENS.motion.spring}
           className={classes}
           disabled={isLoading || props.disabled}
-          {...(props as any)}
+          {...props}
         >
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-base-content/5 backdrop-blur-[1px]">

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Text } from "@/shared/design-system/ui/Text";
 import { useOnboardingStore } from "@/features/onboarding/onboardingStore";
 

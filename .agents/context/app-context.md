@@ -1,244 +1,366 @@
 ---
 generated: true
-lastScanned: "2026-04-09"
+lastScanned: "2026-04-17"
 ---
 
-# Tasbeeh Flow — project context (generated)
+# Tasbeeh Flow - project context (generated)
 
-Single snapshot of the repo for agents. Authoritative philosophy and boundaries: `.cursor/rules/tasbeeh-architecture.mdc`, `tasbeeh-guardian.mdc`, `Tasbeeh-PWA-Workspace-Rules.mdc`, `Coding-Craft-Standards.mdc`.
+Current, factual snapshot of this repository. Architecture intent and guardrails are defined in `.cursor/rules/*.mdc`.
 
 ## 1. Project metadata
 
 | Field | Value |
 |--------|--------|
-| **package.json `name`** | `tasbeeh-flow` |
-| **PWA manifest** (vite-plugin-pwa) | name **Tasbeeh Flow**, short_name **Tasbeeh**, description *A calm and minimal tasbeeh app for daily dhikr* (`vite.config.ts` → `VitePWA.manifest`) |
-| **HTML `<title>`** | Tasbeeh Flow (`index.html`) |
-| **`public/manifest.json`** | Static copy may exist; build-time manifest comes from **vite-plugin-pwa** |
+| Package name | `tasbeeh-flow` |
+| Version | `1.0.0` |
+| Framework | React `^19.2.4` + React DOM `^19.2.4` |
+| Build tool | Vite `^8.0.3` |
+| TypeScript | `^6.0.2` (`strict: true`, target `ES2023`) |
+| Router | `react-router-dom` `^7.13.2` |
+| State (domain/client) | `zustand` `^5.0.12` |
+| State (server cache) | `@tanstack/react-query` `^5.96.1` |
+| UI + styling | Tailwind v4 (`@tailwindcss/vite`), daisyUI `^5.5.19` (themes: light, dark) |
+| Animation | `framer-motion` `^12.38.0`, `motion` `^12.38.0`, `@react-spring/web` `9.5.5` |
+| Backend SDK | Firebase `^12.11.0` |
+| Local storage | `dexie` `^4.4.2` (IndexedDB wrapper) |
+| PWA | `vite-plugin-pwa` `^1.2.0` |
+| Observability | `@sentry/react` `^10.47.0` |
 
-| Tool | Version (from `package.json`) |
-|------|-------------------------------|
-| React / React DOM | ^19.2.4 |
-| Vite | ^8.0.3 |
-| TypeScript | ^6.0.2 (target ES2023, `erasableSyntaxOnly`, strict) |
-| Tailwind CSS | ^4.2.2 (`@tailwindcss/vite` plugin in `vite.config.ts`) |
-| daisyUI | ^5.5.19 (devDependency; loaded via `@plugin "daisyui"` in `shared/styles/global.css`) |
-| React Router DOM | ^7.13.2 |
-| TanStack React Query | ^5.96.1 |
-| Zustand | ^5.0.12 |
-| Firebase | ^12.11.0 |
-| Framer Motion / `motion` | ^12.38.0 |
-| Sentry React | ^10.47.0 (`VITE_SENTRY_DSN`, optional dev reporting) |
-| Dexie + dexie-react-hooks | ^4.x (IndexedDB for local tasbeeh sequences) |
-| Lottie | `lottie-react` ^2.4.1 |
-| Forms | `react-hook-form`, `@hookform/resolvers`, `zod` ^4.3.6 |
-| HTTP | `axios` ^1.14.0 |
-| Onboarding | `react-tinder-card` ^1.6.4 (`@react-spring/web` 9.5.5) |
-| Shapes UI | `@squircle-js/react`, `corner-smoothing` |
-| Sheet UI | `react-modal-sheet` ^5.6.0 |
-| Icons | `lucide-react` ^1.7.0 |
-| Misc UI | `clsx`, `react-animated-numbers` |
-| vite-plugin-pwa | ^1.2.0 |
+### Scripts
 
-**Scripts:** `dev` (Vite `--host`), `build` (`tsc -b && vite build`), `icons` (`node scripts/generate-app-icons.mjs` — Lottie → favicon/PWA PNGs; devDeps: canvas, jsdom, sharp, lottie-web), `lint`, `preview`.
+- `dev`: `vite --host`
+- `build`: `tsc -b && vite build`
+- `icons`: `node scripts/generate-app-icons.mjs`
+- `lint`: `eslint .`
+- `typecheck`: `tsc --noEmit`
+- `preview`: `vite preview`
 
-**Path alias:** `@/*` → `./src/*` (`tsconfig.app.json`, `vite.config.ts` `resolve.alias`).
+### Aliases and compile-time config
 
-**Build define:** `__APP_VERSION__` from `package.json` version (used e.g. Sentry release fallback).
+- Path alias: `@/*` → `./src/*` (`tsconfig.app.json`, `vite.config.ts`)
+- Build-time define: `__APP_VERSION__` from `package.json`
 
-## 2. Architecture overview (`src/`)
+### Key dependencies by role
 
-| Area | Role |
-|------|------|
-| `app/` | `providers.tsx`, `router.tsx`, `layout/AppLayout.tsx`, `layout/BottomNav.tsx` |
-| `pages/` | Splash, onboarding, sign-in, home, collections, ayat/hadith/asma/community, prayer/qibla, add, stats, settings, privacy, terms, data-deletion, email-link fallback |
-| `dev/` | **DEV-only:** `DesignLab` + screens (foundations, components, patterns, **experiments**); lazy routes in `router.tsx` when `import.meta.env.DEV` |
-| `features/` | `tasbeeh/` (store, hooks, `api/`, **Dexie** `services/tasbeeh.local.ts`), `settings/` (`settingsStore`, theme/font UI), `stats/`, `customTasbeeh/` |
-| `services/` | Firebase, auth, Firestore, `api/islamicApiInstance.ts`, remote config, analytics, crashlytics, **Sentry** `sentry/initSentry.ts`, `queryClient` |
-| `shared/` | Theme helpers (`shared/lib/theme.ts` — **daisyUI** document theme), legacy palette modules (`shared/theme/`), `twUi` Tailwind class bundles, constants, hooks, `global.css` + `dubai-font.css`, components, utils |
-| `assets/` | `lottie/`, `videos/` (onboarding MP4s referenced by splash/onboarding) |
-| `pwa/` | `register.ts` — `virtual:pwa-register` |
+- Routing: `react-router-dom`
+- UI primitives/icons: daisyUI, Tailwind CSS, `lucide-react`, `@phosphor-icons/react`, `@squircle-js/react`, `corner-smoothing`, `clsx`
+- Sheets / cards: `react-modal-sheet`, `react-tinder-card`
+- Animation/motion: `framer-motion`, `motion`, `@react-spring/web`, `react-animated-numbers`, `lottie-react` (+ dev `lottie-web`)
+- Forms/validation: `react-hook-form`, `@hookform/resolvers`, `zod`
+- Charts/calendar: `chart.js`, `react-chartjs-2`, `react-day-picker`, `date-fns`
+- Data/storage: `zustand`, `dexie`, `dexie-react-hooks`, `axios`
+- Backend/infra: `firebase`, `@sentry/react`
 
-**PWA:** `vite-plugin-pwa` with `registerType: "autoUpdate"`, dev SW off; Workbox precache glob; runtime **NetworkOnly** for `mp4|webm`; `navigateFallbackDenylist` avoids treating `/assets/`, `/src/`, and static extensions as SPA fallbacks. Registration: `pwa/register.ts`.
+## 2. Architecture overview (directory tree summary)
 
-**Entry:** `main.tsx` — `initSentry()` (guarded), `installGlobalErrorHandlers()` (crashlytics), `applyThemeToDocument(readStoredDaisyTheme())`, `initAppFont()`, Dubai + global CSS, `App` in `AppProviders` with `createRoot(..., getSentryReactRootOptions())`, `registerServiceWorker()` at end.
+Current `src/` map (depth ~3):
 
-**Root app:** `App.tsx` wraps `AppRouter` in `Sentry.ErrorBoundary`; DEV-only `DevLabButton`.
+```
+src/
+├── main.tsx, App.tsx
+├── app/
+│   ├── router.tsx
+│   └── layout/
+│       ├── AppShell.tsx
+│       └── ScreenWrapper.tsx
+├── pages/
+│   ├── SplashScreen.tsx
+│   ├── Onboarding.tsx
+│   ├── Home.tsx
+│   ├── Stats.tsx
+│   ├── Collections.tsx
+│   ├── CollectionsNew.tsx
+│   ├── Saved.tsx          ← present; not registered in router.tsx
+│   ├── Settings.tsx
+│   ├── SettingsFeedback.tsx
+│   ├── SettingsAbout.tsx
+│   ├── SettingsProfile.tsx
+│   └── TestScreen.tsx
+├── features/
+│   ├── onboarding/
+│   │   └── onboardingStore.ts
+│   ├── settings/
+│   │   ├── components/ (SettingsHub, SettingRow, SettingsActionSheet)
+│   │   ├── services/appConfigRepository.ts
+│   │   └── store/settingsStore.ts
+│   └── tasbeeh/
+│       ├── components/ (HomeStreakStrip, HomeCurrentTasbeehCard, HomeActionRow)
+│       ├── collections/
+│       │   ├── components/ (5)
+│       │   ├── hooks/ (usePhrasesQuery, usePhraseMutations, useCollections)
+│       │   ├── store/collectionComposerStore.ts
+│       │   ├── types.ts
+│       │   ├── queryKeys.ts
+│       │   └── index.ts
+│       ├── services/ (tasbeehDb.ts, tasbeehRepository.ts, collectionsRepository.ts)
+│       └── store/tasbeehStore.ts
+├── services/
+│   ├── firebase/config.ts
+│   ├── queryClient.ts
+│   └── sync/              ← collections sync API (placeholder + types)
+├── shared/
+│   ├── design-system/
+│   │   ├── index.ts (partial barrel — not every UI file re-exported)
+│   │   ├── tokens/index.ts
+│   │   ├── hooks/ (useTheme.ts, useLongPressTooltip.ts)
+│   │   └── ui/ (36 TSX primitives)
+│   ├── styles/global.css
+│   └── utils/date.ts
+└── assets/
+    └── images/ (slide1.jpg, slide2.jpg, slide3.jpg)
+```
 
 ## 3. Router, providers, layout
 
-**Provider order** (`app/providers.tsx`): `QueryClientProvider` → `BrowserRouter` → `RemoteConfigProvider` → `AuthProvider`.
+### Entry and app shell
 
-**Routes** (`app/router.tsx`):
+- Entry `main.tsx` imports global styles and renders `<App />` in `StrictMode`.
+- `App.tsx`: `QueryClientProvider` → `ScreenWrapper` → `RouterProvider`.
+- `ScreenWrapper` centers a mobile-width viewport (`max-w-[480px]`) on a full-screen neutral background.
 
-| Path | Screen |
-|------|--------|
-| `/` | Splash |
-| `/onboarding` | Onboarding |
-| `/sign-in` | Sign in |
-| `/privacy`, `/terms`, `/data-deletion` | Legal / policy |
-| `/auth/email-link` | Email link fallback |
-| **DEV only** | `/design-lab`, `/design-lab/foundations`, `/design-lab/components`, `/design-lab/patterns`, `/design-lab/experiments` (lazy + `Suspense`) |
-| **Inside `AppLayout`** | `/home`, `/collections`, `/ayat`, `/hadith`, `/asma-ul-husna`, `/asma-ul-husna/favorites`, `/community`, `/prayer-times`, `/qibla`, `/add`, `/stats`, `/settings` |
+### Provider stack (`App.tsx`)
 
-**Layout:** `AppLayout` — while auth `loading`, centered loader; when ready and **no user**, `Navigate` to `/sign-in`; else column shell (`bg-base-300`, bottom padding for nav) + `Outlet` + `BottomNav`.
+1. `QueryClientProvider` (`services/queryClient.ts`)
+2. `ScreenWrapper`
+3. `RouterProvider`
 
-**Splash routing:** After min duration + auth resolved, session flag set: **signed-in → `/home`**; else **onboarding completed** → `/sign-in`; else **`/onboarding`**. Keys/helpers: `SPLASH_SESSION_STORAGE_KEY`, `ONBOARDING_COMPLETED_STORAGE_KEY`, `hasCompletedOnboarding()` in `shared/utils/onboardingCompletion.ts`.
+### Router structure
 
-## 4. State and data-fetching
+`src/app/router.tsx` — `createBrowserRouter`:
 
-| Layer | Usage |
-|-------|--------|
-| **Zustand** | `features/tasbeeh/store/tasbeehStore.ts`; `features/settings/store/settingsStore.ts` |
-| **TanStack Query** | `services/queryClient.ts` (staleTime 60s, retry 1, `refetchOnWindowFocus: false`); hooks e.g. `useTasbeehQuery`, `usePrayerTimes`, `useAsmaUlHusna`, Firestore tests |
-| **IndexedDB (Dexie)** | `features/tasbeeh/services/tasbeeh.local.ts` — local tasbeeh sequences / sync metadata |
-| **Remote config** | `RemoteConfigProvider` + `useRemoteConfig` |
-| **Theme / font persistence** | `localStorage` `tasbeehSettings` (`daisyUiTheme`, legacy `theme`), `app_font` key via `shared/lib/font.ts` |
+**Public**
 
-Keep Zustand (domain) separate from React Query (server cache) per project rules.
+- `/` → `SplashScreen`
+- `/onboarding` → `Onboarding`
+
+**App shell** (`AppShell` layout children)
+
+- `/home` → `Home`
+- `/stats` → `Stats`
+- `/settings` → `Settings`
+- `/collections` → `Collections`
+- `/collections/new` → `CollectionsNew`
+- `/settings/feedback` → `SettingsFeedback`
+- `/settings/about` → `SettingsAbout`
+- `/settings/profile` → `SettingsProfile`
+
+**Dev / fallback**
+
+- `/test` → `TestScreen`
+- `*` → `Navigate` to `/`
+
+### AppShell layout
+
+`AppShell.tsx`: `Header` (dynamic title, back on sub-screens), `Outlet`, `Toaster`, `BottomNav` (hidden on feedback/about/profile and `/collections/new`). Hydrates settings from IndexedDB once; syncs DOM theme via `useTheme` from store `appearance.theme`. Bottom nav variant from settings: `bar` | `glass-dock`.
+
+## 4. State and data-fetching patterns
+
+### Domain/client state (Zustand)
+
+| Store | Path | Persistence | Purpose |
+|-------|------|-------------|---------|
+| `useTasbeehStore` | `features/tasbeeh/store/tasbeehStore.ts` | IndexedDB | Library, count, streak, etc. |
+| `useSettingsStore` | `features/settings/store/settingsStore.ts` | IndexedDB via `appConfigRepository` | Appearance, interaction, accessibility, notifications |
+| `useOnboardingStore` | `features/onboarding/onboardingStore.ts` | localStorage key `onboarding-storage` | Completion flag |
+| `useCollectionComposerStore` | `features/tasbeeh/collections/store/collectionComposerStore.ts` | Ephemeral | Draft collection / phrase UI |
+| `useToastStore` | `shared/design-system/ui/useToast.ts` | Ephemeral | Toast queue |
+
+### Server cache (React Query)
+
+- `QueryClient` defaults: `staleTime` 60s, `gcTime` 5m, `networkMode: 'offlineFirst'`, `retry: 1` (queries and mutations).
+
+**React Query hooks (phrases)**
+
+- `usePhrasesQuery()` — `listPhrases()` from Dexie; key `tasbeehQueryKeys.phrases()`; `staleTime: Infinity`.
+- `useCreatePhraseMutation` / `useUpdatePhraseMutation` — invalidate phrases query on settle.
+
+**Non-Query data loading**
+
+- `useCollections()` — `useState` + `useEffect` calling `listCollections` / `getCollectionDetails` (not TanStack Query).
 
 ## 5. Services and external integrations
 
-| Service | Location | Notes |
-|---------|----------|--------|
-| Firebase app | `services/firebase/app.ts` | Auth + init |
-| Firestore | `services/firebase/firestore/`, `firebase/tasbeehs/`, `firebase/users/` | Catalog sync helpers, user doc sync |
-| Auth | `services/auth/` | `AuthProvider`, `useAuth`, email/password, Google, email link; `actions/` (anonymous, facebook, etc.) |
-| IslamicAPI | `features/tasbeeh/api/` + `services/api/islamicApiInstance.ts` | Shared Axios; key via env / config |
-| Remote Config | `services/remoteConfig/` | Defaults, parse/merge, provider |
-| Analytics | `services/analytics/` | Screen tracking, `track` |
-| Crashlytics | `services/crashlytics/` | Global handlers, reporting |
-| Sentry | `services/sentry/initSentry.ts` | Browser tracing, replay, optional React Router integration; DSN via `VITE_SENTRY_DSN` |
+### IndexedDB (Dexie)
 
-UI should consume Firebase/auth/HTTP through these layers, not raw SDK scatter.
+`features/tasbeeh/services/tasbeehDb.ts` — DB name `tasbeehFlowDb`.
+
+| Table | Purpose |
+|-------|---------|
+| `tasbeehCollection` | Legacy single-phrase tasbeehs |
+| `userProgress` | Active tasbeeh, count, streak |
+| `progressEvents` | Tap/reset/complete log |
+| `appConfig` | Serialized app settings |
+| `tasbeehCollections` | Collection groups (schedule, priority, …) |
+| `tasbeehPhrases` | Phrase library |
+| `collectionItems` | Phrase ↔ collection links |
+
+**Schema version:** Dexie `version(4)` (latest store definitions include collections/phrases/items).
+
+Row types include `syncStatus` (`local` \| `pending` \| `synced` \| `error`) for future cloud sync.
+
+### Repository layer
+
+- `tasbeehRepository.ts` — progress, streak, cycles
+- `collectionsRepository.ts` — phrases and collections CRUD
+- `appConfigRepository.ts` — read/patch app config
+
+### Firebase
+
+`services/firebase/config.ts` — `initializeApp` from `VITE_FIREBASE_*`; exports `auth`, `db` (Firestore). Feature usage remains thin vs local Dexie.
+
+### Sync module
+
+`services/sync/` — re-exports from `collectionsSync.ts`: `syncCollections`, `syncPendingCollections`, `pullCollectionsFromRemote`, pending counts, labels, `FIRESTORE_PATHS`. **Implementation is largely placeholder** (console + no-op success); intended local-first → Firestore direction is documented in file comments.
 
 ## 6. Theme and color system
 
-**Primary theming:** **daisyUI** with `data-theme` on `<html>` — all built-in themes enabled in `global.css` (`themes: all`). Names and normalization: `shared/config/daisyUiThemes.ts`. Persisted field: `tasbeehSettings.daisyUiTheme` in `localStorage`; `readStoredDaisyTheme()` / `applyThemeToDocument()` in `shared/lib/theme.ts` also sync `html.dark` from computed `color-scheme` and `meta[name="theme-color"]` via legacy `ThemeId` mapping (`THEME_COLOR_META` in `shared/config/constants.ts`).
+### Activation
 
-**Tailwind v4:** `@import "tailwindcss"` + `@theme` font tokens (`--font-sans` → `--font-primary`, `--font-arabic`, `--font-urdu`). Body uses `@apply bg-base-100 text-base-content`.
+- `data-theme` on `document.documentElement` (`light` \| `dark`)
+- `useTheme` toggles `.dark` for Tailwind dark variants; `.theme-transitioning` ~280ms on changes
+- AppShell applies `setTheme` from hydrated settings
 
-**Legacy / parallel styling:** `twUi` (`shared/lib/twUi.ts`) — slate/green Tailwind recipes with `accent-purple` / `accent-green` custom variants for older screens. `shared/theme/` (default/dark colors, pine green, `cssVars`) remains for palette helpers not necessarily wired to every screen.
+### Semantic roles (compact)
 
-**Custom variants** (`global.css`): `dark` (`.dark`), `accent-purple`, `accent-green`.
+| Role | Notes |
+|------|--------|
+| Surfaces | daisyUI `base-100`, `base-200`, `base-content` |
+| Brand | `primary`, semantic tokens in CSS vars |
+| Cards | e.g. `--color-surface-card` (see `global.css`) |
+
+### Token module
+
+`shared/design-system/tokens/index.ts` — `TOKENS`: primary/accent OKLCH, content class names, status colors, shadow/radius CSS var refs, Framer-style motion presets.
 
 ## 7. Typography and spacing
 
-- **UI font:** `initAppFont` (`shared/lib/font.ts`) — selectable app fonts from `shared/config/appFonts.ts`, Google Fonts link injection; `--font-primary` on `:root`.
-- **Arabic / Urdu:** Amiri + Noto Nastaliq Urdu from `index.html`; utilities `.Arabic-font`, `font-arabic` / `font-urdu` in Tailwind theme.
-- **Dubai font CSS:** `shared/styles/dubai-font.css` still loaded from `main.tsx`.
-- **Responsive scale:** `shared/utils/responsiveness.ts` — `wp`, `hp`, `fp` vs baseline **375×812**.
-- **Design constants:** `shared/constants/design.constants.ts` — spacing via `hp`/`wp` where used.
+From `shared/styles/global.css`:
+
+- Font stacks: `--font-primary` (Inter), `--font-arabic` (Amiri), `--font-urdu` (Noto Nastaliq Urdu), `--font-display` (Outfit), `--font-sans` → primary
+- Utilities: `.text-display-arabic`, `.text-display-urdu`, `.text-counter`, `.text-heading`
+- Spacing: Tailwind scale only (no shared spacing token module)
 
 ## 8. Assets
 
-| Location | Contents |
-|----------|----------|
-| `public/` | `_redirects`, `manifest.json`, `icons.svg`; generated PNGs (favicon-32, icons, apple-touch) via `yarn icons` when script run |
-| `src/assets/lottie/` | e.g. `app-logo.json` (splash) |
-| `src/assets/videos/` | Onboarding MP4s (`onboarding-1` … `onboarding-4` imported in splash) |
-| **Icons in UI** | `lucide-react` |
+### `public/`
 
-## 9. Responsiveness and layout utilities
+`favicon.svg`, `favicon-32.png`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, `icons.svg`, `manifest.json`, `_redirects`
 
-- Prefer `shared/utils/responsiveness.ts` when matching scaled mobile layouts; much new chrome uses Tailwind + daisy tokens directly.
-- App shell: full-width column with safe-area padding; bottom nav clearance in `AppLayout`.
+### `src/assets/`
 
-## 10. Folder and export conventions
+`images/slide{1,2,3}.jpg` — onboarding
 
-- Path alias **`@/`** for `src` imports.
-- **Features:** public API via `features/*/index.ts` where present; **no cross-feature internal imports** (see architecture rules).
-- **Pages:** route-level composition; colocated `*.module.css` where used.
-- **Services:** single integration surface per domain; IslamicAPI instance under `services/api/`; feature-specific API under `features/tasbeeh/api/`.
+### Icons
 
-## 11. Component inventory (grouped)
+- Primary: `lucide-react`
+- Secondary: `@phosphor-icons/react`
 
-### Shared — forms & misc
+### Script
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| Form | `shared/components/forms/Form.tsx` | Form wrapper |
-| Input | `shared/components/forms/Input.tsx` | Text input |
-| Switch | `shared/components/forms/Switch.tsx` | Toggle |
-| schemas | `shared/components/forms/schemas.ts` | Shared zod bits |
+- `yarn icons` → `scripts/generate-app-icons.mjs`
 
-### Shared — navigation & shells
+## 9. Responsiveness / layout utilities
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| NavHeader | `shared/components/NavHeader/NavHeader.tsx` | Screen header |
-| Drawer | `shared/components/Drawer/Drawer.tsx` | Slide-out panel |
-| LogoutSheet | `shared/components/LogoutSheet/LogoutSheet.tsx` | Logout sheet UI |
-| SquircleSheet | `shared/components/SquircleSheet/` | Sheet built on squircle styling |
+- Mobile-first Tailwind
+- `ScreenWrapper` max width 480px
+- No dedicated breakpoint helper module
 
-### Shared — buttons & shapes
+## 10. PWA and offline
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| Button | `shared/components/Button/index.tsx` | Motion button variants + CSS module |
-| Squircle | `shared/components/Squircle/index.tsx` | `@squircle-js/react` wrapper |
-| SquircleCard | `shared/components/SquircleCard.tsx` | Card shell (`.squircle-card` / squircle styles) |
-| CornerSquircle | `shared/components/CornerSquircle.tsx` | Corner smoothing helper |
-| SmoothSquircle | `shared/components/ui/SmoothSquircle.tsx` | Alternative squircle UI |
+- `vite-plugin-pwa`: `registerType: "autoUpdate"`, SW **disabled in dev** (`devOptions.enabled: false`)
+- Workbox: precache `**/*.{js,css,html,ico,png,svg,woff2}`; video `NetworkOnly`; `navigateFallbackDenylist` for `/assets/`, `/src/`, static extensions
+- Offline: Query `offlineFirst` + Dexie-backed reads for phrases/collections
 
-### Shared — daisyUI-flavored primitives
+## 11. Folder and export conventions
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| DaisyRange | `shared/components/daisy/DaisyRange.tsx` | Range input styling |
-| DaisyIndicator | `shared/components/daisy/DaisyIndicator.tsx` | Indicator dot/stepper |
-| DaisyToggle | `shared/components/daisy/DaisyToggle.tsx` | Toggle |
-| DaisyDivider | `shared/components/daisy/DaisyDivider.tsx` | Divider |
-| DaisyCountdown | `shared/components/daisy/DaisyCountdown.tsx` | Countdown UI |
-| daisy index | `shared/components/daisy/index.ts` | Barrel |
+- Import alias `@/` for `src/`
+- `shared/design-system/index.ts` exports a **subset** of UI; deep imports allowed for pieces not in the barrel (e.g. `Tooltip`, calendar subcomponents)
+- Features: own `components/`, `services/`, `store/`; avoid cross-feature internal imports
+- Pages compose routes and feature hooks/components
 
-### Shared — UI kit (`ui/`)
+## 12. Component inventory (grouped)
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| UiButton | `shared/components/ui/UiButton.tsx` | Button primitive |
-| UiTextField | `shared/components/ui/UiTextField.tsx` | Text field |
-| UiCard | `shared/components/ui/UiCard.tsx` | Card |
-| UiBadge | `shared/components/ui/UiBadge.tsx` | Badge |
-| UiAvatar | `shared/components/ui/UiAvatar.tsx` | Avatar |
-| UiSpinner | `shared/components/ui/UiSpinner.tsx` | Loading |
-| UiToast | `shared/components/ui/UiToast.tsx` | Toast |
-| UiListRow | `shared/components/ui/UiListRow.tsx` | List row |
-| UiToggle | `shared/components/ui/UiToggle.tsx` | Toggle |
-| UiSelect | `shared/components/ui/UiSelect.tsx` | Select |
-| palette | `shared/components/ui/palette.ts` | UI palette tokens |
-| ZikrCounterTapDemo | `shared/components/ui/ZikrCounterTapDemo.tsx` | Dev/demo tap feedback |
-| ui index | `shared/components/ui/index.ts` | Barrel |
+### Shared design-system UI (`shared/design-system/ui`) — 36 files
 
-### Shared — other
+| Component | Role / notes |
+|-----------|----------------|
+| `Accordion` | Grouped disclosure |
+| `Avatar`, `AvatarGroup` | Avatars / stacks |
+| `Badge` | Labels / status chips |
+| `BottomNav` | Tabs; variants `bar` \| `glass-dock`; optional FAB slot (bar) |
+| `Button` | Primary actions |
+| `Calendar` | Shell + variants |
+| `CalendarActivityList` | Day activity list |
+| `CalendarDay` | Day cell |
+| `Card` | Surfaces |
+| `ChatBubble` | Message bubbles |
+| `Checkbox` | Controlled checkbox |
+| `Counter` | Numeric / tasbeeh display |
+| `Dialog` | Modal |
+| `Drawer` | Bottom sheet |
+| `EmptyState` | Empty views |
+| `FAB` | Floating action |
+| `Form` | RHF-friendly pieces |
+| `GregorianCalendar`, `HijriCalendar` | Calendar systems |
+| `Header` | Top bar |
+| `Indicator` | Dots / pulses |
+| `List` | List layout |
+| `ProgressRing` | Circular progress |
+| `PullToRefresh` | Pull gesture |
+| `SegmentedControl` | Segmented switching |
+| `Select` | Mobile-style select |
+| `Skeleton` | Loading placeholders |
+| `Squircle` | Smoothed corners |
+| `StatsBarChart` | Chart wrapper |
+| `Switch` | Toggle |
+| `Text` | Typography primitive |
+| `TextInput` | Text field |
+| `TimePicker` | Time wheels |
+| `Toast`, `Toaster` | Toasts |
+| `Tooltip` | Tooltip / overlay |
+| `useDrawer` | Drawer state (co-located in `ui/`) |
+| `useToast` | Toast store + helpers |
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| AnimatedDhikrCount | `shared/components/AnimatedDhikrCount.tsx` | Animated digit display |
+### Shared hooks (`shared/design-system/hooks`)
 
-### Features — settings
+| Hook | Purpose |
+|------|---------|
+| `useTheme` | `data-theme` + `.dark` sync |
+| `useLongPressTooltip` | Long-press tooltip trigger |
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| ThemePicker | `features/settings/components/ThemePicker.tsx` | Theme selection |
-| DaisyThemeSwatch | `features/settings/components/DaisyThemeSwatch.tsx` | daisyUI theme swatch |
-| FontOptionCards | `features/settings/components/FontOptionCards.tsx` | Font picker cards |
-| SettingsPrimitives | `features/settings/components/SettingsPrimitives.tsx` | Settings UI building blocks |
+### Feature — `tasbeeh`
 
-### Features — tasbeeh
+| Component | Role |
+|-----------|------|
+| `HomeStreakStrip` | Streak UI |
+| `HomeCurrentTasbeehCard` | Active dhikr card |
+| `HomeActionRow` | Home actions |
 
-| Component | Path | Role / notes |
-|-----------|------|----------------|
-| ProgressRing | `features/tasbeeh/components/ProgressRing.tsx` | Progress ring |
-| HomeDhikrCounter | `features/tasbeeh/components/HomeDhikrCounter.tsx` | Home counter |
-| HomeDhikrCounterSkeleton | `features/tasbeeh/components/HomeDhikrCounterSkeleton.tsx` | Loading skeleton |
+### Feature — `tasbeeh/collections`
 
-## 12. Codegen / reuse rules (mandatory)
+| Component | Role |
+|-----------|------|
+| `CollectionComposerForm` | New/edit collection |
+| `CollectionsCard` | Collection summary card |
+| `AddTasbeehItemDrawer` | Add phrase/item drawer |
+| `DraftTasbeehItemsSection` | Draft list |
+| `PhraseLibraryDrawer` | Phrase picker |
 
-- Reuse **shared/components** and `twUi` / daisy semantic classes before one-off styling.
-- Prefer **daisyUI semantic tokens** (`bg-base-*`, `text-base-content`, etc.) for new surfaces; keep chrome **accessible** when mixing `twUi` (slate/green) with daisy themes.
-- Respect **boundaries:** services for Firebase/auth/HTTP; features do not import other features’ internals; pages compose.
-- **Remote copy:** Prefer `useRemoteConfig` / keys in `services/remoteConfig/defaults.ts` for user-visible strings where the pipeline supports it.
+### Feature — `settings`
+
+| Component | Role |
+|-----------|------|
+| `SettingsHub` | Settings home |
+| `SettingRow` | Row primitive |
+| `SettingsActionSheet` | Action sheet |
+
+## 13. Codegen / reuse rules
+
+- Prefer `shared/design-system` primitives and existing patterns before new one-off UI
+- Use semantic daisyUI / CSS variables / `TOKENS` — avoid arbitrary hex unless aligning with tokens
+- Separate Zustand (domain/UI) from React Query (cache/invalidation for query-shaped data)
+- Firebase and sync: consume through `services/` and repositories, not scattered SDK calls in components
+- Pages compose; do not import another feature’s internals
 
 ## Session log
 

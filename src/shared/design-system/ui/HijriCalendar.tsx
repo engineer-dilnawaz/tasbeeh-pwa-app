@@ -8,12 +8,11 @@ export type HijriCalendarProps = DayPickerProps & {
 };
 
 export const HijriCalendar: React.FC<HijriCalendarProps> = ({
-  activeVariant = "monthly",
   ...props
 }) => {
   return (
     <HijriDayPicker
-      locale={enUSHijri as any}
+      locale={enUSHijri as unknown as NonNullable<React.ComponentProps<typeof HijriDayPicker>["locale"]>}
       numerals="latn"
       dir="ltr"
       hideNavigation

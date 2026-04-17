@@ -198,14 +198,14 @@ const FormMessage = React.forwardRef<
             animate={{ y: 0 }}
             exit={{ y: -10 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="flex items-center gap-1 pt-0.5"
+            className="flex items-start gap-1 pt-0.5"
           >
-            <AlertCircle size={12} className="shrink-0 text-error" />
+            <AlertCircle size={12} className="shrink-0 text-error mt-px" />
             <Text
               ref={ref}
               id={formMessageId}
               variant="caption"
-              className={`text-error font-semibold text-[11px] ${className || ""}`}
+              className={`text-error font-semibold text-[11px] leading-snug ${className || ""}`}
               {...props}
             >
               {body}
