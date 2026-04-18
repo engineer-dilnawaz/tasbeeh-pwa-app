@@ -23,6 +23,7 @@ import { Text } from "@/shared/design-system/ui/Text";
 import { TimePicker } from "@/shared/design-system/ui/TimePicker";
 import { toast } from "@/shared/design-system/ui/useToast";
 import { useTheme } from "@/shared/design-system/hooks/useTheme";
+import { hapticService } from "@/shared/services/hapticService";
 import {
   DEVICE_USER_ID,
   tasbeehDb,
@@ -131,20 +132,17 @@ export function SettingsHub() {
   const bottomNavVariant = appearance.bottomNavVariant ?? "bar";
 
   const previewHaptics = (intensity: "light" | "medium" | "strong") => {
-    if (
-      typeof navigator === "undefined" ||
-      typeof navigator.vibrate !== "function"
-    ) {
-      return;
+    switch (intensity) {
+      case "light":
+        hapticService.light();
+        break;
+      case "medium":
+        hapticService.medium();
+        break;
+      case "strong":
+        hapticService.heavy();
+        break;
     }
-
-    const pattern =
-      intensity === "light"
-        ? [12]
-        : intensity === "medium"
-          ? [18, 18, 18]
-          : [26, 24, 26];
-    navigator.vibrate(pattern);
   };
 
   return (

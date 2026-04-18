@@ -5,8 +5,10 @@ import {
   completeRoundProgress,
   cycleTasbeehProgress,
   incrementProgress,
+  decrementProgress,
   readTasbeehSnapshot,
   resetProgress,
+  selectTasbeehProgress,
   setDefaultTasbeehProgress,
   type TasbeehSnapshot,
 } from "@/features/tasbeeh/services/tasbeehRepository";
@@ -15,6 +17,7 @@ export interface TasbeehItem {
   id: string;
   arabic: string;
   transliteration: string;
+  translation: string;
   target: number;
 }
 
@@ -27,6 +30,8 @@ interface TasbeehState {
   isHydrated: boolean;
   hydrateFromDb: () => Promise<void>;
   incrementCount: () => Promise<void>;
+  decrementCount: () => Promise<void>;
+  setCurrentTasbeeh: (id: string) => Promise<void>;
   resetCount: () => Promise<void>;
   cycleTasbeeh: () => Promise<void>;
   completeRound: () => Promise<void>;
@@ -38,18 +43,21 @@ const DEFAULT_TASBEEHS: TasbeehItem[] = [
     id: "subhanallah",
     arabic: "سُبْحَانَ ٱللَّٰهِ",
     transliteration: "SubhanAllah",
+    translation: "Glory be to Allah",
     target: 33,
   },
   {
     id: "alhamdulillah",
     arabic: "ٱلْحَمْدُ لِلَّٰهِ",
     transliteration: "Alhamdulillah",
+    translation: "Praise be to Allah",
     target: 33,
   },
   {
     id: "allahuakbar",
     arabic: "ٱللَّٰهُ أَكْبَرُ",
     transliteration: "Allahu Akbar",
+    translation: "Allah is the Greatest",
     target: 34,
   },
 ];
@@ -86,6 +94,18 @@ export const useTasbeehStore = create<TasbeehState>()(
 
       incrementCount: async () => {
         await incrementProgress();
+        const snapshot = await readTasbeehSnapshot();
+        applySnapshotToState(set, snapshot);
+      },
+
+      decrementCount: async () => {
+        await decrementProgress();
+        const snapshot = await readTasbeehSnapshot();
+        applySnapshotToState(set, snapshot);
+      },
+
+      setCurrentTasbeeh: async (id: string) => {
+        await selectTasbeehProgress(id);
         const snapshot = await readTasbeehSnapshot();
         applySnapshotToState(set, snapshot);
       },

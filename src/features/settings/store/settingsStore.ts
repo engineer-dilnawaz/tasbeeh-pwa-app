@@ -80,7 +80,7 @@ export const useSettingsStore = create<SettingsState>()(
     interaction: {
       hapticsEnabled: true,
       hapticsIntensity: "medium",
-      beadSoundEnabled: false,
+      beadSoundEnabled: true,
       beadSoundType: "click",
     },
     language: "english",

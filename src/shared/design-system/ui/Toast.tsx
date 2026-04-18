@@ -61,7 +61,7 @@ const ToastItem: React.FC<{
           <Icon className="w-4 h-4 shadow-sm" />
         </div>
         <div className="flex flex-col flex-1 mr-2">
-          <span className="text-[14px] font-semibold leading-tight text-base-content relative top-[1px]">
+          <span className="text-[14px] font-semibold leading-tight text-base-content relative top-px">
             {toast.message}
           </span>
           {toast.description && (
@@ -98,7 +98,7 @@ export const Toaster: React.FC = () => {
   if (!mounted || typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed top-0 left-0 right-0 z-[200] flex flex-col items-center gap-3 p-4 sm:p-6 pointer-events-none overscroll-none pt-[calc(env(safe-area-inset-top)+1rem)]">
+    <div className="fixed top-0 left-0 right-0 z-1000 flex flex-col items-center gap-3 p-4 sm:p-6 pointer-events-none overscroll-none pt-[calc(env(safe-area-inset-top)+1rem)]">
       {/* Dynamic Top-Edge Overlay */}
       {/* Sweeps a soft gradient down behind the Toasts to artificially distance them from busy background content */}
       <AnimatePresence>

@@ -3,90 +3,83 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Text } from "@/shared/design-system/ui/Text";
 import { useOnboardingStore } from "@/features/onboarding/onboardingStore";
+import { AppLogo } from "@/shared/components/AppLogo";
 
 export const SplashScreen: React.FC = () => {
   const navigate = useNavigate();
-  const hasCompleted = useOnboardingStore((state) => state.hasCompletedOnboarding);
+  const hasCompleted = useOnboardingStore(
+    (state) => state.hasCompletedOnboarding,
+  );
 
   useEffect(() => {
-    // Artificial delay for branding presence
     const timer = setTimeout(() => {
       if (hasCompleted) {
         navigate("/home", { replace: true });
       } else {
         navigate("/onboarding", { replace: true });
       }
-    }, 2500);
-
+    }, 3000);
     return () => clearTimeout(timer);
   }, [hasCompleted, navigate]);
 
   return (
-    <div className="fixed inset-0 bg-base-100 flex flex-col items-center justify-center z-50 p-6 overflow-hidden">
-      {/* Background Ambient Glow */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.05 }}
-        transition={{ duration: 2 }}
-        className="absolute inset-0 bg-primary pointer-events-none"
-      />
+    <div className="fixed inset-0 bg-[#F6EDDD] flex flex-col items-center justify-between z-50 p-6 overflow-hidden">
+      {/* Background Decorative Circles - Exactly matching Onboarding */}
+      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
+      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
 
-      <div className="relative flex flex-col items-center gap-6">
-        {/* Logo Icon Mockup */}
+      {/* Center Content */}
+      <div className="flex-1 flex flex-col items-center justify-center gap-8">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ 
-            duration: 1.2, 
-            ease: [0.23, 1, 0.32, 1],
-            delay: 0.2 
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 260,
+            damping: 20,
+            delay: 0.2,
           }}
-          className="w-24 h-24 bg-primary/10 rounded-[32px] flex items-center justify-center border border-primary/20 shadow-2xl shadow-primary/20"
         >
-          <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-             <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
-          </div>
+          <AppLogo size={120} text="ذِكْر" />
         </motion.div>
 
-        <div className="flex flex-col items-center gap-1 overflow-hidden">
+        <div className="flex flex-col items-center gap-3">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <Text variant="heading" weight="black" className="text-4xl tracking-tight text-primary">
-              Tasbeeh
+            <Text
+              variant="heading"
+              className="text-[32px] font-bold text-[#2C2C2C] tracking-tight"
+            >
+              Tasbeeh <span className="text-[#5B6BF0]">Flow</span>
             </Text>
           </motion.div>
-          
+
           <motion.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
           >
-            <Text variant="caption" weight="medium" color="subtle" className="tracking-widest uppercase opacity-40">
-              Spiritual Companion
+            <Text className="text-[#8A8A8A] text-[16px] font-medium tracking-wide">
+              Elevate your Zikr, find your focus.
             </Text>
           </motion.div>
         </div>
       </div>
 
-      {/* Footer Branding */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.2 }}
-        className="absolute bottom-12 flex flex-col items-center gap-2"
-      >
-        <div className="h-1 w-12 bg-primary/20 rounded-full overflow-hidden">
-           <motion.div 
-             initial={{ x: -100 }}
-             animate={{ x: 100 }}
-             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-             className="h-full w-12 bg-primary"
-           />
+      {/* Modern Horizontal Loader */}
+      <div className="w-full max-w-[140px] pb-12">
+        <div className="h-1.5 w-full bg-[#E8DFD0] rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 3, ease: "easeInOut" }}
+            className="h-full bg-[#5B6BF0]"
+          />
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

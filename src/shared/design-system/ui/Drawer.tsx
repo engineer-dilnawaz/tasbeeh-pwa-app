@@ -33,8 +33,8 @@ interface DrawerProps {
   snapPoints?: SnapPoint[];
   /** Which snap index to start at (0-indexed). Defaults to 0. */
   initialSnap?: number;
-  title?: string;
-  description?: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
   scrollable?: boolean;
@@ -235,7 +235,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         <motion.div
           role="dialog"
           aria-modal="true"
-          aria-label={title ?? "Bottom sheet"}
+          aria-label={typeof title === "string" ? title : "Bottom sheet"}
           drag="y"
           dragControls={dragControls}
           dragListener={false}

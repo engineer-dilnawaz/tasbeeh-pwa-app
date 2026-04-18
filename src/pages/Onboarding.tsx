@@ -1,37 +1,61 @@
-import { useOnboardingStore } from "@/features/onboarding/onboardingStore";
-import { Text } from "@/shared/design-system/ui/Text";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { useOnboardingStore } from "@/features/onboarding/onboardingStore";
+import { Text } from "@/shared/design-system/ui/Text";
+import { Button } from "@/shared/design-system/ui/Button";
+import { Squircle } from "@/shared/design-system/ui/Squircle";
+import { OnboardingIllustration } from "@/features/onboarding/components/OnboardingIllustration";
+import { FeaturePill } from "@/features/onboarding/components/FeaturePill";
 
-import slide1 from "@/assets/images/slide1.jpg";
-import slide2 from "@/assets/images/slide2.jpg";
-import slide3 from "@/assets/images/slide3.jpg";
+interface Slide {
+  id: number;
+  welcomeText: string;
+  brandText: string;
+  description: string;
+  illustrationChar: string;
+  pills: { icon: string; label: string; color: string }[];
+}
 
-const slides = [
+const slides: Slide[] = [
   {
-    title: "Find Your Calm",
-    message:
-      "A minimalist space for your daily Zikr. Focus on the remembrance of Allah with every tap.",
-    image: slide1,
+    id: 0,
+    welcomeText: "Welcome to",
+    brandText: "Tasbeeh Flow",
+    description: "A calm, minimal space for your daily dhikr and remembrance.",
+    illustrationChar: "ذِ",
+    pills: [
+      { icon: "📿", label: "Count", color: "#5B6BF0" },
+      { icon: "🔥", label: "Streaks", color: "#3DB88A" },
+      { icon: "📚", label: "Collect", color: "#5B6BF0" },
+    ],
   },
   {
-    title: "Track Your Journey",
-    message:
-      "Maintain consistency with daily streaks and spiritual insights designed to help you grow.",
-    image: slide2,
+    id: 1,
+    welcomeText: "Track Progress",
+    brandText: "Build Habits",
+    description:
+      "Build consistency with meaningful insights and daily streaks.",
+    illustrationChar: "كْ",
+    pills: [
+      { icon: "🎯", label: "Goals", color: "#3DB88A" },
+      { icon: "📈", label: "Growth", color: "#5B6BF0" },
+      { icon: "⭐", label: "Milestones", color: "#3DB88A" },
+    ],
   },
   {
-    title: "Begin Your Path",
-    message:
-      "Experience the tactile feedback of physical prayer beads, right in the palm of your hand.",
-    image: slide3,
+    id: 2,
+    welcomeText: "Your Companion",
+    brandText: "Pure & Peace",
+    description:
+      "No distractions, just you and your dhikr. Simple and focused.",
+    illustrationChar: "ر",
+    pills: [
+      { icon: "☁️", label: "Offline", color: "#5B6BF0" },
+      { icon: "✨", label: "Minimal", color: "#3DB88A" },
+      { icon: "🤍", label: "Peace", color: "#5B6BF0" },
+    ],
   },
 ];
 
@@ -40,186 +64,162 @@ export const Onboarding: React.FC = () => {
   const navigate = useNavigate();
   const complete = useOnboardingStore((state) => state.completeOnboarding);
 
-  // Swipe-to-Start Slider Logic
-  const x = useMotionValue(0);
-  const swipeWidth = 260; // Max distance for the slider
-  useTransform(x, [0, swipeWidth], [1, 0]);
-  useTransform(x, [0, swipeWidth], [1, 0.9]);
-  const backgroundAlpha = useTransform(x, [0, swipeWidth], [0.1, 1]);
-
-  // Hoist mask transforms to top level to avoid Rules of Hooks violation
-  const maskImage = useTransform(
-    x,
-    (val) =>
-      `linear-gradient(to right, transparent ${val}px, black ${val + 40}px)`,
-  );
-  const webkitMaskImage = useTransform(
-    x,
-    (val) =>
-      `linear-gradient(to right, transparent ${val}px, black ${val + 40}px)`,
-  );
-
-  const handleDragEnd = () => {
-    if (x.get() >= swipeWidth * 0.8) {
+  const handleNext = () => {
+    if (currentSlide < slides.length - 1) {
+      setCurrentSlide(currentSlide + 1);
+    } else {
       complete();
       navigate("/home", { replace: true });
     }
   };
 
-  const next = () => {
-    if (currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1);
-    }
-  };
-
-  const prev = () => {
+  const handlePrev = () => {
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
     }
   };
 
+  const onDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
+    const threshold = 50;
+    if (info.offset.x < -threshold) {
+      handleNext();
+    } else if (info.offset.x > threshold) {
+      handlePrev();
+    }
+  };
+
+  const current = slides[currentSlide];
+
   return (
-    <div className="fixed inset-0 bg-black flex flex-col overflow-hidden">
-      {/* ── Background Image Transition (Smooth Cross-fade) ──────────────── */}
-      <AnimatePresence>
-        <motion.div
-          key={currentSlide}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="absolute inset-0 z-0"
+    <div className="fixed inset-0 bg-[#F6EDDD] flex flex-col items-center justify-between overflow-hidden">
+      {/* Background Decorative Circles - Pushed Much Higher */}
+      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
+      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
+
+      {/* Top Bar */}
+      <div className="relative w-full px-6 pt-14 flex justify-end z-30">
+        <button
+          onClick={() => {
+            complete();
+            navigate("/home", { replace: true });
+          }}
+          className="text-[#8A8A8A] text-sm font-medium hover:text-[#2C2C2C] transition-colors"
         >
-          <img 
-            src={slides[currentSlide].image} 
-            alt="" 
-            className="w-full h-full object-cover"
-          />
-          {/* Subtle Accent Overlays (Lightened since images have black edges) */}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/60 to-transparent" />
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-[0.5px]" />
-        </motion.div>
-      </AnimatePresence>
+          Skip
+        </button>
+      </div>
 
-      <div className="relative z-10 flex-1 flex flex-col p-8 pt-20">
-        {/* ── Progress Indicators ────────────────────────────────────────── */}
-        <div className="flex gap-2 mb-12">
-          {slides.map((_, i) => (
-            <motion.div
-              key={i}
-              initial={false}
-              animate={{
-                width: i === currentSlide ? 40 : 10,
-                backgroundColor:
-                  i === currentSlide ? "#A855F7" : "rgba(255,255,255,0.4)",
-              }}
-              className="h-2.5 rounded-full transition-colors shadow-lg"
-            />
-          ))}
-        </div>
-
-        {/* ── Content Slider ─────────────────────────────────────────────── */}
-        <div className="flex-1 relative">
-          <AnimatePresence mode="wait" custom={currentSlide}>
+      {/* Main Content with Swipe Gesture */}
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.4}
+        onDragEnd={onDragEnd}
+        className="relative z-10 flex-1 w-full flex flex-col items-center justify-center gap-10 px-6 max-w-md cursor-grab active:cursor-grabbing touch-none"
+      >
+        {/* Illustration Section */}
+        <div className="relative">
+          <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ x: 300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative flex flex-col gap-8 p-8 -m-8 rounded-[40px] bg-white/5 backdrop-blur-2xl border border-white/10"
+              initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.8, rotate: 10 }}
+              transition={{ duration: 0.5, ease: "backOut" }}
+            >
+              <OnboardingIllustration centerChar={current.illustrationChar} />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Peek Slide Decoration */}
+          <div className="absolute top-1/2 -right-24 w-48 h-48 bg-[#5B6BF0] opacity-[0.06] rounded-full blur-2xl pointer-events-none" />
+        </div>
+
+        {/* Text Content Section */}
+        <div className="flex flex-col items-center text-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center"
             >
               <Text
                 variant="heading"
-                weight="black"
-                className="text-6xl tracking-tighter leading-[0.9] text-white"
+                className="text-[28px] font-bold text-[#2C2C2C] leading-tight"
               >
-                {slides[currentSlide].title}
+                {current.welcomeText}
+              </Text>
+              <Text
+                variant="heading"
+                className="text-[28px] font-bold text-[#5B6BF0] leading-tight mb-4"
+              >
+                {current.brandText}
               </Text>
               <Text
                 variant="body"
-                className="text-2xl leading-relaxed text-white/95 font-medium"
+                className="text-[#4A4A4A] text-[16px] leading-[1.4] max-w-[280px]"
               >
-                {slides[currentSlide].message}
+                {current.description}
               </Text>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* ── Navigation ─────────────────────────────────────────────────── */}
-        <footer className="mt-auto h-32 flex items-center justify-between">
-          <AnimatePresence mode="wait">
-            {currentSlide < slides.length - 1 ? (
-              // Standard Next/Prev Navigation
+        {/* Feature Pills */}
+        <div className="flex flex-wrap justify-center gap-2 mt-2">
+          {current.pills.map((pill, idx) => (
+            <FeaturePill
+              key={`${currentSlide}-${idx}`}
+              {...pill}
+              delay={0.3 + idx * 0.1}
+            />
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Footer Navigation - Pushed to absolute bottom */}
+      <div className="w-full px-6 pb-6 flex flex-col items-center gap-10">
+        {/* Pagination Dots - Smooth Animated Selection */}
+        <div className="flex gap-2.5">
+          {slides.map((_, i) => {
+            const isActive = i === currentSlide;
+            return (
               <motion.div
-                key="nav"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="flex items-center justify-between w-full"
-              >
-                {/* Previous Circle Button */}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={prev}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center bg-transparent border border-white/20 text-white transition-all ${
-                    currentSlide === 0
-                      ? "opacity-0 pointer-events-none"
-                      : "opacity-100 hover:border-primary"
-                  }`}
-                >
-                  <ChevronLeft size={24} />
-                </motion.button>
+                key={i}
+                initial={false}
+                animate={{
+                  width: isActive ? 32 : 8,
+                  backgroundColor: isActive ? "#5B6BF0" : "#C8C0B5",
+                  opacity: isActive ? 1 : 0.6,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="h-2 rounded-full"
+              />
+            );
+          })}
+        </div>
 
-                {/* Next Circle Button */}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={next}
-                  className="w-14 h-14 rounded-full flex items-center justify-center bg-transparent border border-white/20 text-white hover:border-primary transition-all"
-                >
-                  <ChevronRight size={24} />
-                </motion.button>
-              </motion.div>
-            ) : (
-              // ── Swipe to Start Slider (Final Slide) ──────────────────────
-              <motion.div
-                key="finish"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full flex justify-center py-4"
-              >
-                <div className="relative w-full max-w-[320px] h-20 bg-base-200 rounded-full p-2 flex items-center border border-base-content/5 overflow-hidden">
-                  <motion.div
-                    style={{ maskImage, WebkitMaskImage: webkitMaskImage }}
-                    className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 italic"
-                  >
-                    <Text variant="caption">Slide to get started</Text>
-                  </motion.div>
-
-                  <motion.div
-                    drag="x"
-                    dragConstraints={{ left: 0, right: swipeWidth }}
-                    dragElastic={0.1}
-                    style={{ x }}
-                    onDragEnd={handleDragEnd}
-                    className="h-16 w-16 bg-primary rounded-full cursor-grab active:cursor-grabbing flex items-center justify-center shadow-xl z-10"
-                  >
-                    <ChevronRight
-                      size={32}
-                      strokeWidth={3}
-                      className="text-white"
-                    />
-                  </motion.div>
-
-                  <motion.div
-                    style={{ opacity: backgroundAlpha }}
-                    className="absolute left-0 top-0 bottom-0 bg-primary/10 rounded-full"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </footer>
+        {/* Action Button - Explicit Squircle Wrapper */}
+        <div className="w-full max-w-[350px]">
+          <Squircle cornerRadius={18} cornerSmoothing={0.99} asChild>
+            <Button
+              size="lg"
+              className="bg-[#5B6BF0] text-white !h-[64px] !rounded-none"
+              rightIcon={<ArrowRight size={22} className="opacity-90" />}
+              onClick={handleNext}
+            >
+              <span className="text-[17px] font-bold tracking-tight">
+                {currentSlide === slides.length - 1 ? "Get Started" : "Next"}
+              </span>
+            </Button>
+          </Squircle>
+        </div>
       </div>
     </div>
   );

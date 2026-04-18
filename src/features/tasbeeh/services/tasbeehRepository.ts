@@ -246,6 +246,35 @@ export async function incrementProgress() {
   );
 }
 
+export async function decrementProgress() {
+  await tasbeehDb.transaction(
+    "rw",
+    tasbeehDb.userProgress,
+    tasbeehDb.progressEvents,
+    async () => {
+      const progress = await tasbeehDb.userProgress.get(ACTIVE_PROGRESS_ID);
+      if (!progress || progress.currentCount <= 0) {
+        return;
+      }
+
+      const nextCount = progress.currentCount - 1;
+      await tasbeehDb.userProgress.update(progress.id, {
+        currentCount: nextCount,
+        updatedAt: isoNow(),
+        version: progress.version + 1,
+        syncStatus: "pending",
+      });
+
+      await appendProgressEvent({
+        tasbeehId: progress.activeTasbeehId!,
+        eventType: "undo",
+        delta: -1,
+        countAfter: nextCount,
+      });
+    },
+  );
+}
+
 export async function resetProgress() {
   await tasbeehDb.transaction(
     "rw",
@@ -274,6 +303,42 @@ export async function resetProgress() {
   );
 }
 
+export async function selectTasbeehProgress(tasbeehId: string) {
+  await tasbeehDb.transaction(
+    "rw",
+    tasbeehDb.userProgress,
+    tasbeehDb.progressEvents,
+    async () => {
+      const progress = await tasbeehDb.userProgress.get(ACTIVE_PROGRESS_ID);
+      if (!progress) return;
+
+      // Find last known count for this tasbeeh today
+      const lastEvent = await tasbeehDb.progressEvents
+        .where("[tasbeehId+createdAt]")
+        .between([tasbeehId, todayKey()], [tasbeehId, todayKey() + "\uffff"])
+        .reverse()
+        .first();
+
+      const restoredCount = lastEvent?.countAfter ?? 0;
+
+      await tasbeehDb.userProgress.update(progress.id, {
+        activeTasbeehId: tasbeehId,
+        currentCount: restoredCount,
+        updatedAt: isoNow(),
+        version: progress.version + 1,
+        syncStatus: "pending",
+      });
+
+      await appendProgressEvent({
+        tasbeehId,
+        eventType: "switch",
+        delta: 0,
+        countAfter: restoredCount,
+      });
+    },
+  );
+}
+
 export async function cycleTasbeehProgress() {
   await tasbeehDb.transaction(
     "rw",
@@ -293,9 +358,18 @@ export async function cycleTasbeehProgress() {
       const nextIndex = (fallbackIndex + 1) % collection.length;
       const nextTasbeehId = collection[nextIndex].id;
 
+      // Find last known count for the next tasbeeh today
+      const lastEvent = await tasbeehDb.progressEvents
+        .where("[tasbeehId+createdAt]")
+        .between([nextTasbeehId, todayKey()], [nextTasbeehId, todayKey() + "\uffff"])
+        .reverse()
+        .first();
+
+      const restoredCount = lastEvent?.countAfter ?? 0;
+
       await tasbeehDb.userProgress.update(progress.id, {
         activeTasbeehId: nextTasbeehId,
-        currentCount: 0,
+        currentCount: restoredCount,
         updatedAt: isoNow(),
         version: progress.version + 1,
         syncStatus: "pending",
@@ -305,7 +379,7 @@ export async function cycleTasbeehProgress() {
         tasbeehId: nextTasbeehId,
         eventType: "switch",
         delta: 0,
-        countAfter: 0,
+        countAfter: restoredCount,
       });
     },
   );

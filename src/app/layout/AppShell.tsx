@@ -1,18 +1,13 @@
-import {
-  ArrowLeft,
-  BookOpen,
-  ChartColumnBig,
-  House,
-  Settings as SettingsIcon,
-  SlidersHorizontal,
-} from "lucide-react";
-import React from "react";
+import { SlidersHorizontal, Menu, ArrowLeft, BookOpen, ChartColumnBig, House, Settings as SettingsIcon } from "lucide-react";
+import React, { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { BottomNav, type TabItem } from "@/shared/design-system/ui/BottomNav";
 import { Toaster } from "@/shared/design-system/ui/Toast";
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { Header } from "@/shared/design-system/ui/Header";
+import { SyncStatusIndicator, NotificationBell } from "@/features/layout/components/HeaderActions";
+import { AppSidebar } from "@/features/layout/components/AppSidebar";
 import { useTheme } from "@/shared/design-system/hooks/useTheme";
 
 const tabs: TabItem[] = [
@@ -38,6 +33,7 @@ export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const { setTheme } = useTheme();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const hydrateFromDb = useSettingsStore((state) => state.hydrateFromDb);
   const isHydrated = useSettingsStore((state) => state.isHydrated);
   const bottomNavVariant = useSettingsStore(
@@ -100,20 +96,39 @@ export default function AppShell() {
             >
               <ArrowLeft size={18} />
             </button>
-          ) : null
-        }
-        right={
-          isCollectionsList ? (
+          ) : (
             <button
               type="button"
-              onClick={() => navigate("/collections/filter")}
-              aria-label="Open collection filters"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-base-content/8 bg-transparent text-base-content/45 transition-opacity hover:opacity-80"
+              onClick={() => setIsSidebarOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-base-200/50 text-base-content/70 active:scale-90 transition-transform"
+              aria-label="Open sidebar"
             >
-              <SlidersHorizontal size={18} />
+              <Menu size={18} />
             </button>
-          ) : null
+          )
         }
+        right={
+          <div className="flex items-center gap-2">
+            <SyncStatusIndicator />
+            
+            {isCollectionsList && (
+              <button
+                type="button"
+                onClick={() => navigate("/collections/filter")}
+                aria-label="Open collection filters"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-base-content/8 bg-transparent text-base-content/45 transition-opacity hover:opacity-80"
+              >
+                <SlidersHorizontal size={18} />
+              </button>
+            )}
+
+            {activeTab === "home" && <NotificationBell />}
+          </div>
+        }
+      />
+      <AppSidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
       />
       <Outlet />
       <Toaster />
