@@ -22,6 +22,7 @@ import { hapticService } from "@/shared/services/hapticService";
 import { confettiService } from "@/shared/services/confettiService";
 import { soundService } from "@/shared/services/soundService";
 import { VictoryOverlay } from "@/features/tasbeeh/components/VictoryOverlay";
+import { ZikrDashboard } from "@/features/tasbeeh/components/ActiveZikr/ZikrDashboard";
 
 export default function Home() {
   const [showResetSheet, setShowResetSheet] = useState(false);
@@ -496,6 +497,9 @@ export default function Home() {
             </button>
           </Squircle>
         </div>
+
+        {/* Multi-Active Zikr Dashboard Section */}
+        <ZikrDashboard />
       </div>
 
       {/* Standardized Reset Confirmation Sheet */}

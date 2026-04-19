@@ -20,9 +20,20 @@ import { ZeroState } from "@/shared/design-system/ui/ZeroState";
 import { useLongPressTooltip } from "@/shared/design-system/hooks/useLongPressTooltip";
 import { Tooltip } from "@/shared/design-system/ui/Tooltip";
 import { Plus, SlidersHorizontal } from "lucide-react";
+import { useParallelZikr } from "@/features/tasbeeh/hooks/useParallelZikr";
+import { AddZikrSuccessSheet } from "@/features/tasbeeh/components/AddZikrSuccessSheet";
 
 export default function Collections() {
   const navigate = useNavigate();
+  const { 
+    handleAddToDaily, 
+    successSheetOpen, 
+    setSuccessSheetOpen, 
+    lastAddedName, 
+    activeSlots, 
+    handleGoHome 
+  } = useParallelZikr();
+  
   const { isLoading, isListError, listError, collections } = useCollections();
   const listFilters = useCollectionsFilterStore((s) => s.filters);
   const resetFilters = useCollectionsFilterStore((s) => s.resetFilters);
@@ -130,12 +141,21 @@ export default function Collections() {
                   key={c.id}
                   collection={c}
                   detailQuery={q}
+                  onAddToDaily={handleAddToDaily}
                 />
               );
             })
           )}
         </>
       )}
+
+      <AddZikrSuccessSheet
+        isOpen={successSheetOpen}
+        onClose={() => setSuccessSheetOpen(false)}
+        addedCollectionName={lastAddedName}
+        activeSlots={activeSlots}
+        onGoHome={handleGoHome}
+      />
 
       <div className="fixed inset-x-0 bottom-0 z-70 pointer-events-none">
         <div className="mx-auto flex w-full max-w-[480px] justify-end px-4 pb-[calc(112px+env(safe-area-inset-bottom,0px))] pointer-events-none">

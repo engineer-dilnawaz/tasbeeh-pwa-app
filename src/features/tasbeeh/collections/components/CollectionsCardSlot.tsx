@@ -14,6 +14,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 interface CollectionsCardSlotProps {
   collection: TasbeehCollectionGroupRow;
   detailQuery: UseQueryResult<CollectionDetails, Error>;
+  onAddToDaily: (collection: any) => void;
 }
 
 /**
@@ -26,6 +27,7 @@ interface CollectionsCardSlotProps {
 export function CollectionsCardSlot({
   collection,
   detailQuery,
+  onAddToDaily,
 }: CollectionsCardSlotProps) {
   const showSkeleton = detailQuery.isPending && detailQuery.data == null;
 
@@ -54,6 +56,7 @@ export function CollectionsCardSlot({
             <CollectionsCard
               collection={collection}
               details={detailQuery.data ?? null}
+              onAddToDaily={onAddToDaily}
             />
           </motion.div>
         )}

@@ -64,14 +64,20 @@ function tagStyle(tag: string) {
 interface CollectionsCardProps {
   collection: TasbeehCollectionGroupRow;
   details: CollectionDetails | null;
+  onAddToDaily?: (collection: any) => void;
 }
 
-export function CollectionsCard({ collection, details }: CollectionsCardProps) {
+import { useTasbeehStore } from "@/features/tasbeeh/store/tasbeehStore";
+
+export function CollectionsCard({ collection, details, onAddToDaily }: CollectionsCardProps) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [openItemId, setOpenItemId] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<"start" | "main" | "end">(
     "main",
   );
+
+  const activeSlots = useTasbeehStore((s) => s.activeSlots);
+  const isAlreadyActive = activeSlots.some((s) => s.collectionId === collection.id);
 
   const [openDetailsSection, setOpenDetailsSection] = useState<
     "reference" | "tags" | "reminders" | "meta" | "items" | null
@@ -79,9 +85,37 @@ export function CollectionsCard({ collection, details }: CollectionsCardProps) {
   const [openItemMetaId, setOpenItemMetaId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [showDeleteSheet, setShowDeleteSheet] = useState(false);
-  const [isActive, setIsActive] = useState(false);
-
+  
   const tags = collection.tags ?? [];
+
+  const handleReciteClick = () => {
+    if (isAlreadyActive) {
+        toast("Already Active", {
+            variant: "info",
+            description: "Check your Home tab to see your active sessions."
+        });
+        return;
+    }
+
+    if (!details || !onAddToDaily) return;
+
+    // Map details to the store's expected format
+    const mappedItems = details.items
+        .filter(i => i.phrase)
+        .map(i => ({
+            id: i.phrase!.id,
+            arabic: i.phrase!.arabic,
+            transliteration: i.phrase!.transliteration,
+            translation: i.phrase!.translation || "",
+            target: i.targetCount
+        }));
+
+    onAddToDaily({
+        id: collection.id,
+        name: collection.title,
+        items: mappedItems
+    });
+  };
 
   const descriptionText =
     collection.description ??
@@ -270,19 +304,20 @@ export function CollectionsCard({ collection, details }: CollectionsCardProps) {
           <Squircle cornerRadius={100} cornerSmoothing={0.92} asChild>
             <button
               type="button"
-              onClick={() => {
-                setIsActive((v) => !v);
-                toast(isActive ? "Stopped" : "Started", {
-                  variant: "info",
-                  description:
-                    "Progress wiring comes next — this is UI only for now.",
-                });
-              }}
-              className={`flex h-14 w-full items-center justify-center px-4 text-sm font-semibold text-white ${
-                isActive ? "bg-base-content/60" : "bg-neutral"
+              disabled={isAlreadyActive}
+              onClick={handleReciteClick}
+              className={`flex h-14 w-full items-center justify-center px-4 text-sm font-semibold text-white transition-all duration-300 ${
+                isAlreadyActive 
+                    ? "bg-success text-white opacity-80 cursor-default" 
+                    : "bg-neutral hover:shadow-lg active:scale-95"
               }`}
             >
-              {isActive ? "Stop Reciting" : "Start Reciting"}
+              {isAlreadyActive ? (
+                <span className="flex items-center gap-2">
+                    <Check size={18} />
+                    Active in Daily
+                </span>
+              ) : "Start Reciting"}
             </button>
           </Squircle>
 
