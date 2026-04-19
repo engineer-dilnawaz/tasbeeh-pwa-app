@@ -67,7 +67,9 @@ export function SettingsActionSheet({
 
   const isPrimaryDisabled = secondsLeft > 0;
   const primaryLabel =
-    secondsLeft > 0 ? `${primaryButtonTitle} (${secondsLeft})` : primaryButtonTitle;
+    secondsLeft > 0
+      ? `${primaryButtonTitle} (${secondsLeft})`
+      : primaryButtonTitle;
 
   return (
     <Drawer
@@ -76,6 +78,7 @@ export function SettingsActionSheet({
       snapPoints={snapPoints}
       scrollable={scrollable}
       zIndexBase={130}
+      presentation="height"
     >
       <div className={`mb-4 px-2 pb-4 ${containerClassName}`}>
         <div
