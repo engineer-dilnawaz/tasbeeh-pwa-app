@@ -25,21 +25,21 @@ export const OnboardingIllustration: React.FC<OnboardingIllustrationProps> = ({
   return (
     <div className={`relative flex items-center justify-center w-[220px] h-[220px] ${className}`}>
       {/* Outer Glow/Layer 1 */}
-      <div className="absolute inset-0 bg-white opacity-60 rounded-full" />
+      <div className="absolute inset-0 bg-base-content opacity-[0.03] rounded-full" />
       
       {/* Inner Layer 2 */}
-      <div className="absolute inset-[20px] bg-white opacity-80 rounded-full shadow-sm" />
+      <div className="absolute inset-[20px] bg-base-content opacity-[0.05] rounded-full shadow-sm" />
 
       {/* Center Character Circle */}
-      <div className="absolute inset-[64px] bg-[#5B6BF0] opacity-[0.12] rounded-full" />
-      <div className="absolute inset-[72px] bg-[#5B6BF0] opacity-[0.18] rounded-full" />
+      <div className="absolute inset-[64px] bg-primary opacity-[0.12] rounded-full" />
+      <div className="absolute inset-[72px] bg-primary opacity-[0.18] rounded-full" />
       
       <div className="absolute flex items-center justify-center">
         <motion.span 
           key={centerChar}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-[#5B6BF0] text-[42px] font-bold leading-none select-none"
+          className="text-primary text-[42px] font-bold leading-none select-none"
         >
           {centerChar}
         </motion.span>
@@ -64,7 +64,7 @@ export const OnboardingIllustration: React.FC<OnboardingIllustrationProps> = ({
                     animate={{ scale: 3, opacity: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
-                    className="absolute w-3 h-3 rounded-full bg-[#3DB88A]"
+                    className="absolute w-3 h-3 rounded-full bg-success"
                     style={{
                       left: `calc(50% + ${x}px - 6px)`,
                       top: `calc(50% + ${y}px - 6px)`,
@@ -77,8 +77,8 @@ export const OnboardingIllustration: React.FC<OnboardingIllustrationProps> = ({
                 initial={false}
                 animate={{
                   scale: isGreen ? 1.4 : 1,
-                  backgroundColor: isGreen ? "#3DB88A" : "#5B6BF0",
-                  opacity: isGreen ? 1 : 0.4,
+                  backgroundColor: isGreen ? "var(--color-success)" : "var(--color-primary)",
+                  opacity: isGreen ? 1 : 0.15,
                 }}
                 transition={{ duration: 0.8 }}
                 className="absolute w-3 h-3 rounded-full z-10"

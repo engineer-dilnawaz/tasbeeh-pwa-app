@@ -19,12 +19,12 @@ export const FeaturePill: React.FC<FeaturePillProps> = ({ icon, label, color, de
       <Squircle
         cornerRadius={12}
         cornerSmoothing={0.6}
-        className="flex items-center gap-1.5 px-4 py-2 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)]"
+        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-base-200/80 border border-base-content/5"
       >
         <span className="text-sm">{icon}</span>
         <span 
-          className="text-[12px] font-bold tracking-tight"
-          style={{ color }}
+          className="text-[11px] font-black uppercase tracking-widest"
+          style={{ color: color.includes('#') ? 'var(--color-primary)' : color }}
         >
           {label}
         </span>

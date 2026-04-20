@@ -51,8 +51,10 @@ export default function AppShell() {
 
   // Keep DOM theme in sync with hydrated store.
   React.useEffect(() => {
-    setTheme(theme);
-  }, [setTheme, theme]);
+    if (isHydrated) {
+      setTheme(theme);
+    }
+  }, [setTheme, theme, isHydrated]);
 
   const activeTab = location.pathname.startsWith("/settings")
     ? "settings"
@@ -109,7 +111,6 @@ export default function AppShell() {
         }
         right={
           <div className="flex items-center gap-2">
-            <SyncStatusIndicator />
             
             {isCollectionsList && (
               <button

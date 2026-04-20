@@ -8,6 +8,7 @@ import { Squircle } from "corner-smoothing";
 interface SyncStatusDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  zIndexBase?: number;
 }
 
 /**
@@ -19,6 +20,7 @@ interface SyncStatusDrawerProps {
 export const SyncStatusDrawer: React.FC<SyncStatusDrawerProps> = ({
   isOpen,
   onClose,
+  zIndexBase,
 }) => {
   const { status, label, description, pendingCount } = useSyncStatus();
 
@@ -39,6 +41,7 @@ export const SyncStatusDrawer: React.FC<SyncStatusDrawerProps> = ({
       onClose={onClose}
       presentation="height"
       snapPoints={["50%"]}
+      zIndexBase={zIndexBase}
     >
       <div className="flex flex-col items-center gap-6 py-6 px-4">
         {/* State Icon with Squircle background */}

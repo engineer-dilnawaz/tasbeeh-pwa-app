@@ -1,11 +1,31 @@
 <!doctype html>
-<html lang="en" class="no-overscroll" data-theme="light">
+<html lang="en" class="no-overscroll">
   <head>
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('theme') || 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          
+          // Set initial meta theme color to avoid white bars on mobile
+          const themeColors = {
+            'light': '#f8fafc',
+            'dark': '#1e293b', // Matching your dark bg-base-100/200
+            'pineGreen': '#1B4D3E'
+          };
+          const meta = document.createElement('meta');
+          meta.name = 'theme-color';
+          meta.content = themeColors[theme] || themeColors.light;
+          document.head.appendChild(meta);
+        } catch (e) {
+          console.error('Theme detection failed', e);
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Tasbeeh Flow</title>
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#f8fafc" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

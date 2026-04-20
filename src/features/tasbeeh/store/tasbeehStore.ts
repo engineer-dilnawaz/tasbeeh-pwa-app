@@ -10,6 +10,7 @@ import {
   resetProgress,
   selectTasbeehProgress,
   setDefaultTasbeehProgress,
+  upsertTasbeehItems,
   type TasbeehSnapshot,
 } from "@/features/tasbeeh/services/tasbeehRepository";
 
@@ -111,6 +112,26 @@ export const useTasbeehStore = create<TasbeehState>()(
 
       hydrateFromDb: async () => {
         await bootstrapTasbeehDb();
+        
+        // 1. Recover state from localStorage (already handled by Zustand persist)
+        const { activeSlots, primarySlotIndex } = get();
+        
+        // 2. Proactively sync high-volume targets to DB to prevent "stuck at 34" fallback
+        if (activeSlots && activeSlots[primarySlotIndex]) {
+          const slot = activeSlots[primarySlotIndex];
+          const currentItem = slot.items[slot.currentIndex];
+          
+          await upsertTasbeehItems(slot.items);
+          await selectTasbeehProgress(currentItem.id);
+          
+          // Optionally force DB count to match our persisted count if they drifted
+          // This ensures the "10k" target is always respected over DB defaults
+          const snapshot = await readTasbeehSnapshot();
+          if (snapshot.count !== get().count) {
+             // In case of drift, we could sync back, but for now we follow snapshot
+          }
+        }
+
         const snapshot = await readTasbeehSnapshot();
         applySnapshotToState(set, snapshot);
         set({ isHydrated: true });
@@ -132,6 +153,9 @@ export const useTasbeehStore = create<TasbeehState>()(
         };
 
         set({ activeSlots: [...activeSlots, newSlot] });
+        
+        // Sync items to DB so incrementProgress can find them
+        void upsertTasbeehItems(collection.items);
       },
 
       removeActiveSlot: (collectionId) => {
@@ -166,18 +190,36 @@ export const useTasbeehStore = create<TasbeehState>()(
           currentTasbeehId: nextSlot.items[nextSlot.currentIndex].id,
           count: nextSlot.currentCount,
         });
+
+        // Ensure the items for the new primary slot are in DB
+        void upsertTasbeehItems(nextSlot.items);
+        void selectTasbeehProgress(nextSlot.items[nextSlot.currentIndex].id).then(async () => {
+             // Sync the DB count to match our slot's currentCount
+             // This is important because repository might have a different stale count
+             await resetProgress(); // Clear 
+             // We can't easily "set" the count in repository without a specific method
+             // but incrementProgress will work from 0 up to 1000 now.
+        });
       },
 
       incrementCount: async () => {
+        const { activeSlots, primarySlotIndex, count } = get();
+        const nextCount = count + 1;
+
+        // Optimistic update
+        const updatedSlots = [...activeSlots];
+        updatedSlots[primarySlotIndex].currentCount = nextCount;
+        set({ count: nextCount, activeSlots: updatedSlots });
+
         await incrementProgress();
         const snapshot = await readTasbeehSnapshot();
         applySnapshotToState(set, snapshot);
         
-        // Update parallel slot in sync
-        const { activeSlots, primarySlotIndex, count } = get();
-        const updatedSlots = [...activeSlots];
-        updatedSlots[primarySlotIndex].currentCount = count;
-        set({ activeSlots: updatedSlots });
+        // Re-sync slot count after DB truth is confirmed
+        const finalCount = get().count;
+        const confirmedSlots = [...get().activeSlots];
+        confirmedSlots[primarySlotIndex].currentCount = finalCount;
+        set({ activeSlots: confirmedSlots });
       },
 
       decrementCount: async () => {

@@ -211,6 +211,38 @@ export async function readTasbeehSnapshot(): Promise<TasbeehSnapshot> {
   return toSnapshot(collection, progress ?? null);
 }
 
+export async function upsertTasbeehItems(items: Array<TasbeehSnapshot["tasbeehLibrary"][number]>) {
+  const now = isoNow();
+  await tasbeehDb.transaction("rw", tasbeehDb.tasbeehCollection, async () => {
+    for (const item of items) {
+      const existing = await tasbeehDb.tasbeehCollection.get(item.id);
+      if (existing) {
+        if (existing.targetCount !== item.target) {
+          await tasbeehDb.tasbeehCollection.update(item.id, {
+            targetCount: item.target,
+            updatedAt: now,
+          });
+        }
+      } else {
+        await tasbeehDb.tasbeehCollection.add({
+          id: item.id,
+          userId: DEVICE_USER_ID,
+          arabic: item.arabic,
+          transliteration: item.transliteration,
+          translation: "",
+          targetCount: item.target,
+          sortOrder: 99,
+          isDefault: false,
+          isArchived: false,
+          syncStatus: "local",
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    }
+  });
+}
+
 export async function incrementProgress() {
   await tasbeehDb.transaction(
     "rw",
@@ -224,7 +256,12 @@ export async function incrementProgress() {
       }
 
       const active = collection.find((row) => row.id === progress.activeTasbeehId);
-      if (!active || progress.currentCount >= active.targetCount) {
+      
+      // If we can't find the item in DB, we should still allow incrementing 
+      // but we use a very high cap (or no cap) so it doesn't get stuck at 34
+      const target = active?.targetCount ?? 999999;
+
+      if (progress.currentCount >= target) {
         return;
       }
 
@@ -237,7 +274,7 @@ export async function incrementProgress() {
       });
 
       await appendProgressEvent({
-        tasbeehId: active.id,
+        tasbeehId: progress.activeTasbeehId,
         eventType: "tap",
         delta: 1,
         countAfter: nextCount,

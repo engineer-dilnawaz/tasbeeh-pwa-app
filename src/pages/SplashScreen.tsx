@@ -23,10 +23,10 @@ export const SplashScreen: React.FC = () => {
   }, [hasCompleted, navigate]);
 
   return (
-    <div className="fixed inset-0 bg-[#F6EDDD] flex flex-col items-center justify-between z-50 p-6 overflow-hidden">
-      {/* Background Decorative Circles - Exactly matching Onboarding */}
-      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
-      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
+    <div className="fixed inset-0 bg-base-100 flex flex-col items-center justify-between z-50 p-6 overflow-hidden">
+      {/* Background Decorative Circles - Theme Aware */}
+      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
+      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
 
       {/* Center Content */}
       <div className="flex-1 flex flex-col items-center justify-center gap-8">
@@ -51,9 +51,9 @@ export const SplashScreen: React.FC = () => {
           >
             <Text
               variant="heading"
-              className="text-[32px] font-bold text-[#2C2C2C] tracking-tight"
+              className="text-[32px] font-bold text-base-content tracking-tight"
             >
-              Tasbeeh <span className="text-[#5B6BF0]">Flow</span>
+              Tasbeeh <span className="text-primary">Flow</span>
             </Text>
           </motion.div>
 
@@ -62,7 +62,7 @@ export const SplashScreen: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
           >
-            <Text className="text-[#8A8A8A] text-[16px] font-medium tracking-wide">
+            <Text className="text-base-content/60 text-[16px] font-medium tracking-wide text-center px-8">
               Elevate your Zikr, find your focus.
             </Text>
           </motion.div>
@@ -71,12 +71,12 @@ export const SplashScreen: React.FC = () => {
 
       {/* Modern Horizontal Loader */}
       <div className="w-full max-w-[140px] pb-12">
-        <div className="h-1.5 w-full bg-[#E8DFD0] rounded-full overflow-hidden">
+        <div className="h-1.5 w-full bg-base-content/5 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
             transition={{ duration: 3, ease: "easeInOut" }}
-            className="h-full bg-[#5B6BF0]"
+            className="h-full bg-primary"
           />
         </div>
       </div>

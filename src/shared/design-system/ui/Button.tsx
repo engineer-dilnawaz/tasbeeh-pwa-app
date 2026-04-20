@@ -25,6 +25,7 @@ interface ButtonProps extends Omit<
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   isLoading?: boolean;
+  height?: number;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -57,6 +58,7 @@ export const Button: React.FC<ButtonProps> = ({
   rightIcon,
   isLoading,
   className = "",
+  height,
   ...props
 }) => {
   const isSocial = variant === "google" || variant === "apple";
@@ -81,7 +83,7 @@ export const Button: React.FC<ButtonProps> = ({
         asChild
         cornerRadius={16}
         cornerSmoothing={0.8}
-        height={sizeHeights[size]}
+        height={height || sizeHeights[size]}
       >
         <motion.button
           whileTap={{ scale: 0.97 }}

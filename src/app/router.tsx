@@ -12,18 +12,23 @@ import SettingsFeedback from "@/pages/SettingsFeedback";
 import SettingsAbout from "@/pages/SettingsAbout";
 import SettingsProfile from "@/pages/SettingsProfile";
 import TestScreen from "@/pages/TestScreen";
+import { TasbeehTestDashboard } from "@/features/tasbeeh/test/TasbeehTestDashboard";
+import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <SplashScreen />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/onboarding",
     element: <Onboarding />,
+    errorElement: <ErrorBoundary />,
   },
   {
     element: <AppShell />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         path: "/home",
@@ -66,6 +71,12 @@ export const router = createBrowserRouter([
   {
     path: "/test",
     element: <TestScreen />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/tester",
+    element: <TasbeehTestDashboard />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "*",

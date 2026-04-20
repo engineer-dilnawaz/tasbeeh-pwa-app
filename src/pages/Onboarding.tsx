@@ -94,10 +94,10 @@ export const Onboarding: React.FC = () => {
   const current = slides[currentSlide];
 
   return (
-    <div className="fixed inset-0 bg-[#F6EDDD] flex flex-col items-center justify-between overflow-hidden">
-      {/* Background Decorative Circles - Pushed Much Higher */}
-      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
-      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-[#E8DFD0] rounded-full -translate-y-1/2 pointer-events-none z-0" />
+    <div className="fixed inset-0 bg-base-100 flex flex-col items-center justify-between overflow-hidden">
+      {/* Background Decorative Circles - Theme Aware */}
+      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
+      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
 
       {/* Top Bar */}
       <div className="relative w-full px-6 pt-14 flex justify-end z-30">
@@ -106,7 +106,7 @@ export const Onboarding: React.FC = () => {
             complete();
             navigate("/home", { replace: true });
           }}
-          className="text-[#8A8A8A] text-sm font-medium hover:text-[#2C2C2C] transition-colors"
+          className="text-base-content/40 text-sm font-medium hover:text-base-content transition-colors"
         >
           Skip
         </button>
@@ -135,7 +135,7 @@ export const Onboarding: React.FC = () => {
           </AnimatePresence>
 
           {/* Peek Slide Decoration */}
-          <div className="absolute top-1/2 -right-24 w-48 h-48 bg-[#5B6BF0] opacity-[0.06] rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute top-1/2 -right-24 w-48 h-48 bg-primary opacity-[0.06] rounded-full blur-2xl pointer-events-none" />
         </div>
 
         {/* Text Content Section */}
@@ -151,19 +151,19 @@ export const Onboarding: React.FC = () => {
             >
               <Text
                 variant="heading"
-                className="text-[28px] font-bold text-[#2C2C2C] leading-tight"
+                className="text-[28px] font-bold text-base-content leading-tight"
               >
                 {current.welcomeText}
               </Text>
               <Text
                 variant="heading"
-                className="text-[28px] font-bold text-[#5B6BF0] leading-tight mb-4"
+                className="text-[28px] font-bold text-primary leading-tight mb-4"
               >
                 {current.brandText}
               </Text>
               <Text
                 variant="body"
-                className="text-[#4A4A4A] text-[16px] leading-[1.4] max-w-[280px]"
+                className="text-base-content/60 text-[16px] leading-[1.4] max-w-[280px]"
               >
                 {current.description}
               </Text>
@@ -195,8 +195,8 @@ export const Onboarding: React.FC = () => {
                 initial={false}
                 animate={{
                   width: isActive ? 32 : 8,
-                  backgroundColor: isActive ? "#5B6BF0" : "#C8C0B5",
-                  opacity: isActive ? 1 : 0.6,
+                  backgroundColor: isActive ? "var(--color-primary)" : "var(--color-base-content-20)",
+                  opacity: isActive ? 1 : 0.4,
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className="h-2 rounded-full"
@@ -210,7 +210,7 @@ export const Onboarding: React.FC = () => {
           <Squircle cornerRadius={18} cornerSmoothing={0.99} asChild>
             <Button
               size="lg"
-              className="bg-[#5B6BF0] text-white !h-[64px] !rounded-none"
+              className="bg-primary text-primary-content !h-[64px] !rounded-none"
               rightIcon={<ArrowRight size={22} className="opacity-90" />}
               onClick={handleNext}
             >

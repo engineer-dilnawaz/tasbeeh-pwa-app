@@ -88,7 +88,12 @@ export async function readAppConfigData(
   userId: string = DEVICE_USER_ID,
 ): Promise<AppConfigData> {
   const row = await getOrCreateAppConfig(userId);
-  return normalizeAppConfigData(row.data);
+  const data = normalizeAppConfigData(row.data);
+  // Mirror to localStorage for head-script fast detection
+  if (data.appearance.theme) {
+    localStorage.setItem("theme", data.appearance.theme);
+  }
+  return data;
 }
 
 export async function patchAppConfigData(
@@ -106,6 +111,11 @@ export async function patchAppConfigData(
     updatedAt: now,
     syncStatus: "pending",
   });
+
+  // Mirror update to localStorage
+  if (next.appearance.theme) {
+    localStorage.setItem("theme", next.appearance.theme);
+  }
 
   return next;
 }

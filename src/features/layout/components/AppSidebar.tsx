@@ -19,6 +19,8 @@ import { useNavigate } from "react-router-dom";
 import { Squircle } from "@/shared/design-system/ui/Squircle";
 import { useTasbeehStore } from "@/features/tasbeeh/store/tasbeehStore";
 
+import { SyncStatusIndicator } from "@/features/layout/components/HeaderActions";
+
 interface AppSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -75,7 +77,16 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
           </div>
         </Squircle>
 
-        {/* 2. Primary Navigation */}
+        {/* 2. Cloud & Activity */}
+        <div className="flex flex-col gap-1.5">
+          <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-base-content/30 mb-1">
+            Status
+          </h3>
+          <SyncStatusIndicator />
+          <div className="h-px bg-base-content/5 mx-4 mt-3 mb-2" />
+        </div>
+
+        {/* 3. Primary Navigation */}
         <div className="flex flex-col gap-1.5">
           <SidebarLink
             icon={<House size={20} />}
