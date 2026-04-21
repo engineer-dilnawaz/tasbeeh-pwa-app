@@ -19,8 +19,11 @@ import { HomeStepper } from "@/features/tasbeeh/components/Home/HomeStepper";
 import { ZikrContentCard } from "@/features/tasbeeh/components/Home/ZikrContentCard";
 import { HomeControls } from "@/features/tasbeeh/components/Home/HomeControls";
 import { ProgressDetailsSheet } from "@/features/tasbeeh/components/ProgressDetailsSheet";
+import { ZikrSuccessView } from "@/features/tasbeeh/components/Home/ZikrSuccessView";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [isHijri, setIsHijri] = useState(false);
   const { gregorian, hijri } = useDate();
 
@@ -31,9 +34,12 @@ export default function Home() {
     count,
     streakDays,
     isCompleted,
+    isCollectionCompleted,
     isZero,
     pendingTasbeeh,
     currentIndex,
+    activeSlots,
+    primarySlotIndex,
 
     // UI States
     showResetSheet,
@@ -59,11 +65,10 @@ export default function Home() {
     closeProgressDetailsSheet,
   } = useHomeTasbeeh();
 
-  const isLastTasbeeh = currentIndex === tasbeehLibrary.length - 1;
+  const isLastTasbeeh = currentIndex === (tasbeehLibrary?.length || 0) - 1;
 
   return (
     <div className="relative min-h-[calc(100vh-160px)] flex flex-col items-center bg-base-100 overflow-hidden px-4 pt-2 pb-10">
-      
       {/* Header: Streak & Interactive Date Switcher */}
       <HomeHeader
         streakDays={streakDays}
@@ -73,50 +78,70 @@ export default function Home() {
         hijriDate={hijri}
       />
 
-      {/* Zikr Progress Stepper */}
-      <div className="w-full mt-4">
-        <HomeStepper
-          library={tasbeehLibrary}
-          currentIndex={currentIndex}
-          onStepClick={handleStepClick}
-        />
-      </div>
-
-      {/* Recitation Content Card (Expandable) */}
-      <div className="w-full mt-2">
-        <ZikrContentCard currentTasbeeh={currentTasbeeh} />
-      </div>
-
-      {/* Central Immersive Ring */}
-      <div className="flex-1 flex items-center justify-center w-full pt-1 pb-2">
-        {currentTasbeeh && (
-          <TasbeehRing
-            count={count}
-            target={currentTasbeeh.target}
-            onTap={handleRecite}
-            onShowDetails={openProgressDetailsSheet}
-            isCompleted={isCompleted}
+      {/* Main Experience: Discovery/Success or Active Counting */}
+      {(activeSlots?.length || 0) === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center w-full">
+          <ZikrSuccessView
+            collectionName="today's goal"
+            onAddMore={() => navigate("/collections")}
           />
-        )}
-      </div>
+        </div>
+      ) : isCollectionCompleted ? (
+        <div className="flex-1 flex flex-col items-center justify-center w-full">
+          <ZikrSuccessView
+            collectionName={activeSlots[primarySlotIndex]?.name || "Zikr"}
+          />
+        </div>
+      ) : (
+        <>
+          {/* Zikr Progress Stepper */}
+          <div className="w-full mt-4">
+            <HomeStepper
+              library={tasbeehLibrary}
+              currentIndex={currentIndex}
+              onStepClick={handleStepClick}
+            />
+          </div>
 
-      {/* Control Center & Parallel Zikr Dashboard */}
-      <div className="w-full flex flex-col gap-3 mt-auto">
-        <HomeControls
-          isCompleted={isCompleted}
-          isZero={isZero}
-          isLastTasbeeh={isLastTasbeeh}
-          wasManuallySelected={wasManuallySelected}
-          handleRecite={handleRecite}
-          handleUndo={handleUndo}
-          onResetClick={openResetSheet}
-          showHeart={showHeart}
-          showRestartIcon={showRestartIcon}
-          showUndoRipple={showUndoRipple}
-        />
+          {/* Recitation Content Card (Expandable) */}
+          <div className="w-full mt-2">
+            <ZikrContentCard currentTasbeeh={currentTasbeeh} />
+          </div>
 
+          {/* Central Immersive Ring */}
+          <div className="flex-1 flex items-center justify-center w-full pt-1 pb-2">
+            {currentTasbeeh && (
+              <TasbeehRing
+                count={count}
+                target={currentTasbeeh.target}
+                onTap={handleRecite}
+                onShowDetails={openProgressDetailsSheet}
+                isCompleted={isCompleted}
+              />
+            )}
+          </div>
+
+          {/* Control Center & Parallel Zikr Dashboard */}
+          <div className="w-full flex flex-col gap-3 mt-auto">
+            <HomeControls
+              isCompleted={isCompleted}
+              isZero={isZero}
+              isLastTasbeeh={isLastTasbeeh}
+              wasManuallySelected={wasManuallySelected}
+              handleRecite={handleRecite}
+              handleUndo={handleUndo}
+              onResetClick={openResetSheet}
+              showHeart={showHeart}
+              showRestartIcon={showRestartIcon}
+              showUndoRipple={showUndoRipple}
+            />
+          </div>
+        </>
+      )}
+
+      {activeSlots && activeSlots.length > (isCollectionCompleted ? 1 : 0) && (
         <ZikrDashboard />
-      </div>
+      )}
 
       {/* Confirmation Drawers */}
       <Drawer
@@ -131,7 +156,8 @@ export default function Home() {
               Are you sure you want to reset?
             </p>
             <p className="text-[14px] leading-relaxed text-base-content/50 italic">
-              "Every ending is a new beginning, in the remembrance of the Divine."
+              "Every ending is a new beginning, in the remembrance of the
+              Divine."
             </p>
           </div>
 
@@ -198,10 +224,7 @@ export default function Home() {
         </div>
       </Drawer>
 
-      <VictoryOverlay
-        isOpen={showVictory}
-        onClose={closeVictory}
-      />
+      <VictoryOverlay isOpen={showVictory} onClose={closeVictory} />
 
       <ProgressDetailsSheet
         isOpen={showProgressDetailsSheet}

@@ -4264,6 +4264,11 @@ react-hook-form@^7.72.1:
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.72.1.tgz#19a8bbeaf685934f4c9fc422294cc730ade2780e"
   integrity sha512-RhwBoy2ygeVZje+C+bwJ8g0NjTdBmDlJvAUHTxRjTmSUKPYsKfMphkS2sgEMotsY03bP358yEYlnUeZy//D9Ig==
 
+react-intersection-observer@^10.0.3:
+  version "10.0.3"
+  resolved "https://registry.yarnpkg.com/react-intersection-observer/-/react-intersection-observer-10.0.3.tgz#58b2c0406f71cfb5981afb8a5ee7f4eb06512479"
+  integrity sha512-luICLMbs0zxTO/70Zy7K5jOXkABPEVSAF8T3FdZUlctsrIaPLmx8TZe2SSA+CY2HGWfz2INyNTnp82pxNNsShA==
+
 react-modal-sheet@^5.6.0:
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/react-modal-sheet/-/react-modal-sheet-5.6.0.tgz#09dc4aec8861c6507c7208c256a7ae277dc858a0"

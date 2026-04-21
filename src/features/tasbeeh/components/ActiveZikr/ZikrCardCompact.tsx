@@ -4,6 +4,7 @@ import { Text } from "@/shared/design-system/ui/Text";
 import { motion } from "framer-motion";
 
 interface ZikrCardCompactProps {
+  collectionId: string;
   transliteration: string;
   arabic: string;
   progress: number;
@@ -17,6 +18,7 @@ interface ZikrCardCompactProps {
  * Adopts the 'Inked Card' aesthetic (bg-white dark:bg-black).
  */
 export const ZikrCardCompact: React.FC<ZikrCardCompactProps> = ({
+  collectionId,
   transliteration,
   arabic,
   progress,
@@ -28,33 +30,46 @@ export const ZikrCardCompact: React.FC<ZikrCardCompactProps> = ({
 
   return (
     <motion.div
-      layout
+      layout="position"
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className="w-full cursor-pointer group"
     >
       <Squircle cornerRadius={20} cornerSmoothing={0.99} asChild>
-        <div className={`
+        <motion.div
+          layoutId={`card-bg-${collectionId}`}
+          className={`
           relative overflow-hidden w-full px-5 py-4 flex flex-col gap-2 
-          bg-white dark:bg-black border transition-all duration-300
-          ${isActive ? "border-primary/40 shadow-md" : "border-base-content/5 shadow-sm"}
-        `}>
+          bg-white dark:bg-black  transition-all duration-300`}
+        >
           {/* Row Content */}
           <div className="flex items-center justify-between gap-4">
-            <div className="flex flex-col gap-0.5">
-              <Text variant="caption" weight="black" className="uppercase tracking-widest text-[10px] text-base-content/40">
+            <div className="flex flex-col gap-2">
+              <Text
+                variant="caption"
+                weight="black"
+                className="uppercase tracking-widest text-[10px] text-base-content/60"
+              >
                 Transliteration
               </Text>
-              <Text variant="body" weight="black" className="tracking-tight text-base-content uppercase">
+              <Text
+                variant="body"
+                weight="black"
+                className="tracking-tight text-base-content uppercase"
+              >
                 {transliteration}
               </Text>
             </div>
 
-            <div className="flex flex-col items-end gap-0.5">
-              <Text variant="caption" weight="black" className="uppercase tracking-widest text-[10px] text-base-content/40">
+            <div className="flex flex-col items-end gap-2">
+              <Text
+                variant="caption"
+                weight="black"
+                className="uppercase tracking-widest text-[10px] text-base-content/60"
+              >
                 Arabic
               </Text>
-              <Text className="text-display-arabic text-lg text-base-content leading-none">
+              <Text className="text-display-arabic text-lg text-base-content">
                 {arabic}
               </Text>
             </div>
@@ -73,7 +88,7 @@ export const ZikrCardCompact: React.FC<ZikrCardCompactProps> = ({
           {isActive && (
             <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
           )}
-        </div>
+        </motion.div>
       </Squircle>
     </motion.div>
   );

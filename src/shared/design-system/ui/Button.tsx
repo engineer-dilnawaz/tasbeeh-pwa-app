@@ -82,7 +82,7 @@ export const Button: React.FC<ButtonProps> = ({
       <Squircle
         asChild
         cornerRadius={16}
-        cornerSmoothing={0.8}
+        cornerSmoothing={0.99}
         height={height || sizeHeights[size]}
       >
         <motion.button

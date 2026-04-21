@@ -20,13 +20,13 @@ export const ZikrDashboard: React.FC = () => {
   return (
     <div className="w-full flex flex-col gap-4 mt-6">
       <div className="flex items-center justify-between px-1">
-        <Text variant="caption" weight="black" className="uppercase tracking-[0.2em] text-[10px] text-base-content/30">
+        <Text variant="caption" weight="black" className="uppercase tracking-[0.2em] text-[10px] text-base-content/50">
           Your Focus Sessions ({activeSlots.length}/4)
         </Text>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <AnimatePresence mode="popLayout">
+      <motion.div layout className="flex flex-col gap-3">
+        <AnimatePresence>
           {activeSlots.map((slot, index) => {
             const isPrimary = index === primarySlotIndex;
             const isExpanded = expandedIndex === index;
@@ -34,17 +34,20 @@ export const ZikrDashboard: React.FC = () => {
             return (
               <motion.div
                 key={slot.collectionId}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                layoutId={`card-container-${slot.collectionId}`}
+                transition={{
+                  type: "spring",
+                  stiffness: 350,
+                  damping: 35,
+                  mass: 1,
+                }}
                 className="w-full"
               >
                 {isExpanded ? (
                   <ZikrCardDetailed
                     slot={slot}
                     isPrimary={isPrimary}
+                    canRemove={activeSlots.length > 1}
                     onClose={() => setExpandedIndex(null)}
                     onRemove={() => {
                         removeActiveSlot(slot.collectionId);
@@ -57,6 +60,7 @@ export const ZikrDashboard: React.FC = () => {
                   />
                 ) : (
                   <ZikrCardCompact
+                    collectionId={slot.collectionId}
                     isActive={isPrimary}
                     transliteration={slot.name}
                     arabic={slot.items[slot.currentIndex].arabic}
@@ -69,7 +73,7 @@ export const ZikrDashboard: React.FC = () => {
             );
           })}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </div>
   );
 };

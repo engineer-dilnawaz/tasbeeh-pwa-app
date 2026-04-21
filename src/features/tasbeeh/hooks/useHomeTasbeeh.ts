@@ -53,12 +53,20 @@ export function useHomeTasbeeh() {
   const isCompleted = currentTasbeeh ? count >= currentTasbeeh.target : false;
   const isZero = count === 0;
 
+  const isLastTasbeeh = currentIndex === tasbeehLibrary.length - 1;
+  const isCollectionCompleted = isCompleted && isLastTasbeeh;
+
   // --- Handlers ---
   const handleRecite = useCallback(() => {
     if (isCompleted) {
-      const isLastTasbeeh = currentIndex === tasbeehLibrary.length - 1;
+      if (isLastTasbeeh) {
+        // If the whole collection is done, we don't auto-reset.
+        // The UI will switch to SuccessView.
+        hapticService.light();
+        return;
+      }
 
-      if (wasManuallySelected || isLastTasbeeh) {
+      if (wasManuallySelected) {
         resetCount();
         setShowRestartIcon(true);
         hapticService.heavy();
@@ -143,7 +151,10 @@ export function useHomeTasbeeh() {
     currentTasbeeh,
     count,
     streakDays,
+    activeSlots,
+    primarySlotIndex,
     isCompleted,
+    isCollectionCompleted,
     isZero,
     pendingTasbeeh,
     

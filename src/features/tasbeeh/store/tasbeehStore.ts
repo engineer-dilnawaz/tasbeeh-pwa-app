@@ -160,14 +160,20 @@ export const useTasbeehStore = create<TasbeehState>()(
 
       removeActiveSlot: (collectionId) => {
         const { activeSlots, primarySlotIndex } = get();
-        if (activeSlots.length <= 1) return; // Must have at least one
-
         const newSlots = activeSlots.filter((s) => s.collectionId !== collectionId);
-        const newPrimaryIndex = Math.min(primarySlotIndex, newSlots.length - 1);
+        
+        let newPrimaryIndex = primarySlotIndex;
+        if (newSlots.length === 0) {
+          newPrimaryIndex = 0;
+        } else {
+          newPrimaryIndex = Math.min(primarySlotIndex, newSlots.length - 1);
+        }
 
         set({
           activeSlots: newSlots,
           primarySlotIndex: newPrimaryIndex,
+          // Reset legacy count if no slots left
+          ...(newSlots.length === 0 ? { count: 0, currentTasbeehId: null } : {})
         });
       },
 
