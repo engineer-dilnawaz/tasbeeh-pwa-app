@@ -1,25 +1,25 @@
-import React, { useState } from "react";
 import { useDate } from "@/shared/hooks/useDate";
+import { useState } from "react";
 
 // Hooks
 import { useHomeTasbeeh } from "@/features/tasbeeh/hooks/useHomeTasbeeh";
 
 // Shared Components
-import { Drawer } from "@/shared/design-system/ui/Drawer";
 import { Button } from "@/shared/design-system/ui/Button";
+import { Drawer } from "@/shared/design-system/ui/Drawer";
 
 // Feature Components
+import { ZikrDashboard } from "@/features/tasbeeh/components/ActiveZikr/ZikrDashboard";
 import { TasbeehRing } from "@/features/tasbeeh/components/TasbeehRing";
 import { VictoryOverlay } from "@/features/tasbeeh/components/VictoryOverlay";
-import { ZikrDashboard } from "@/features/tasbeeh/components/ActiveZikr/ZikrDashboard";
 
 // Modularized Home Components
+import { HomeControls } from "@/features/tasbeeh/components/Home/HomeControls";
 import { HomeHeader } from "@/features/tasbeeh/components/Home/HomeHeader";
 import { HomeStepper } from "@/features/tasbeeh/components/Home/HomeStepper";
 import { ZikrContentCard } from "@/features/tasbeeh/components/Home/ZikrContentCard";
-import { HomeControls } from "@/features/tasbeeh/components/Home/HomeControls";
-import { ProgressDetailsSheet } from "@/features/tasbeeh/components/ProgressDetailsSheet";
 import { ZikrSuccessView } from "@/features/tasbeeh/components/Home/ZikrSuccessView";
+import { ProgressDetailsSheet } from "@/features/tasbeeh/components/ProgressDetailsSheet";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
@@ -79,10 +79,11 @@ export default function Home() {
       />
 
       {/* Main Experience: Discovery/Success or Active Counting */}
-      {(activeSlots?.length || 0) === 0 ? (
+      {(activeSlots?.length || 0) === 0 || tasbeehLibrary.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center w-full">
           <ZikrSuccessView
             collectionName="today's goal"
+            isEmpty={tasbeehLibrary.length === 0}
             onAddMore={() => navigate("/collections")}
           />
         </div>
@@ -139,7 +140,9 @@ export default function Home() {
         </>
       )}
 
-      {activeSlots && activeSlots.length > (isCollectionCompleted ? 1 : 0) && (
+      {activeSlots && 
+       activeSlots.length > (isCollectionCompleted ? 1 : 0) && 
+       tasbeehLibrary.length > 0 && (
         <ZikrDashboard />
       )}
 

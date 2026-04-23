@@ -1,17 +1,24 @@
-import { SlidersHorizontal, Menu, ArrowLeft, BookOpen, ChartColumnBig, House, Settings as SettingsIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  ChartColumnBig,
+  House,
+  Menu,
+  Settings as SettingsIcon,
+  SlidersHorizontal,
+} from "lucide-react";
 import React, { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { BottomNav, type TabItem } from "@/shared/design-system/ui/BottomNav";
-import { Toaster } from "@/shared/design-system/ui/Toast";
-import { useSettingsStore } from "@/features/settings/store/settingsStore";
-import { Header } from "@/shared/design-system/ui/Header";
-import { SyncStatusIndicator, NotificationBell } from "@/features/layout/components/HeaderActions";
 import { AppSidebar } from "@/features/layout/components/AppSidebar";
+import { NotificationBell } from "@/features/layout/components/HeaderActions";
+import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { useTheme } from "@/shared/design-system/hooks/useTheme";
+import { BottomNav, type TabItem } from "@/shared/design-system/ui/BottomNav";
+import { Header } from "@/shared/design-system/ui/Header";
 
 const tabs: TabItem[] = [
-  { id: "home", label: "Home", icon: <House size={20} />, badge: 3 },
+  { id: "home", label: "Home", icon: <House size={20} /> },
   { id: "stats", label: "Stats", icon: <ChartColumnBig size={20} /> },
   { id: "collections", label: "Collections", icon: <BookOpen size={20} /> },
   { id: "settings", label: "Settings", icon: <SettingsIcon size={20} /> },
@@ -111,7 +118,6 @@ export default function AppShell() {
         }
         right={
           <div className="flex items-center gap-2">
-            
             {isCollectionsList && (
               <button
                 type="button"
@@ -127,12 +133,11 @@ export default function AppShell() {
           </div>
         }
       />
-      <AppSidebar 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+      <AppSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
       <Outlet />
-      <Toaster />
       {shouldHideBottomNav ? null : (
         <BottomNav
           variant={bottomNavVariant}

@@ -20,45 +20,6 @@ export interface TasbeehSnapshot {
 
 const ACTIVE_PROGRESS_ID = "active:device";
 
-const DEFAULT_TASBEEH_ROWS: Omit<TasbeehCollectionRow, "createdAt" | "updatedAt">[] = [
-  {
-    id: "subhanallah",
-    userId: DEVICE_USER_ID,
-    arabic: "سُبْحَانَ ٱللَّٰهِ",
-    transliteration: "SubhanAllah",
-    translation: "Glory be to Allah",
-    targetCount: 33,
-    sortOrder: 0,
-    isDefault: true,
-    isArchived: false,
-    syncStatus: "local",
-  },
-  {
-    id: "alhamdulillah",
-    userId: DEVICE_USER_ID,
-    arabic: "ٱلْحَمْدُ لِلَّٰهِ",
-    transliteration: "Alhamdulillah",
-    translation: "All praise is due to Allah",
-    targetCount: 33,
-    sortOrder: 1,
-    isDefault: true,
-    isArchived: false,
-    syncStatus: "local",
-  },
-  {
-    id: "allahuakbar",
-    userId: DEVICE_USER_ID,
-    arabic: "ٱللَّٰهُ أَكْبَرُ",
-    transliteration: "Allahu Akbar",
-    translation: "Allah is the Greatest",
-    targetCount: 34,
-    sortOrder: 2,
-    isDefault: true,
-    isArchived: false,
-    syncStatus: "local",
-  },
-];
-
 const todayKey = () => new Date().toISOString().slice(0, 10);
 
 const yesterdayKey = () => {
@@ -152,27 +113,16 @@ async function appendProgressEvent(params: {
 }
 
 export async function bootstrapTasbeehDb() {
-  const hasCollection = (await tasbeehDb.tasbeehCollection.count()) > 0;
-
-  if (!hasCollection) {
-    const now = isoNow();
-    await tasbeehDb.tasbeehCollection.bulkAdd(
-      DEFAULT_TASBEEH_ROWS.map((item) => ({
-        ...item,
-        createdAt: now,
-        updatedAt: now,
-      })),
-    );
-  }
+  // We no longer automatically add default tasbeehs to ensure a clean slate for the user.
+  // The user can discover and add them manually from the library/discovery view.
 
   const activeProgress = await tasbeehDb.userProgress.get(ACTIVE_PROGRESS_ID);
-  const defaultTasbeehId = DEFAULT_TASBEEH_ROWS[0].id;
-
+  
   if (!activeProgress) {
     await tasbeehDb.userProgress.add({
       id: ACTIVE_PROGRESS_ID,
       userId: DEVICE_USER_ID,
-      activeTasbeehId: defaultTasbeehId,
+      activeTasbeehId: null, // Start with no active tasbeeh
       currentCount: 0,
       streakDays: 0,
       lastCompletedOn: null,
@@ -181,27 +131,6 @@ export async function bootstrapTasbeehDb() {
       syncStatus: "local",
     });
     return;
-  }
-
-  const availableTasbeehIds = new Set(
-    (
-      await tasbeehDb.tasbeehCollection
-        .filter((row) => !row.isArchived)
-        .sortBy("sortOrder")
-    ).map((item) => item.id),
-  );
-
-  const hasValidActiveTasbeeh =
-    !!activeProgress.activeTasbeehId &&
-    availableTasbeehIds.has(activeProgress.activeTasbeehId);
-
-  if (!hasValidActiveTasbeeh) {
-    await tasbeehDb.userProgress.update(ACTIVE_PROGRESS_ID, {
-      activeTasbeehId: defaultTasbeehId,
-      updatedAt: isoNow(),
-      version: activeProgress.version + 1,
-      syncStatus: "pending",
-    });
   }
 }
 
@@ -510,4 +439,25 @@ export async function setDefaultTasbeehProgress() {
     },
   );
 }
-
+export async function factoryReset() {
+  await tasbeehDb.transaction(
+    "rw",
+    tasbeehDb.tasbeehCollection,
+    tasbeehDb.userProgress,
+    tasbeehDb.progressEvents,
+    tasbeehDb.appConfig,
+    tasbeehDb.tasbeehCollections,
+    tasbeehDb.tasbeehPhrases,
+    tasbeehDb.collectionItems,
+    async () => {
+      await tasbeehDb.tasbeehCollection.clear();
+      await tasbeehDb.userProgress.clear();
+      await tasbeehDb.progressEvents.clear();
+      await tasbeehDb.appConfig.clear();
+      await tasbeehDb.tasbeehCollections.clear();
+      await tasbeehDb.tasbeehPhrases.clear();
+      await tasbeehDb.collectionItems.clear();
+    },
+  );
+  await bootstrapTasbeehDb();
+}

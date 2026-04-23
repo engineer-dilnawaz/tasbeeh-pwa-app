@@ -34,5 +34,8 @@ export * from "./ui/Accordion";
 export * from "./ui/PullToRefresh";
 export * from "./ui/Form";
 export * from "./ui/Select";
+export * from "./ui/PillTabs";
+export * from "./ui/Divider";
 export * from "./ui/TimePicker";
+
 export * from "./hooks/useTheme";

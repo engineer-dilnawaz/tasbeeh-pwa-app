@@ -2,14 +2,14 @@ import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Squircle } from "corner-smoothing";
-import { Check, AlertCircle, Info, AlertTriangle, X, Hash } from "lucide-react";
+import { Check, AlertCircle, Info, AlertTriangle, X, Hash, type LucideIcon } from "lucide-react";
 import {
   useToastStore,
   type ToastVariant,
   type ToastMessage,
 } from "./useToast";
 
-const variantIcons: Record<ToastVariant, React.FC<any>> = {
+const variantIcons: Record<ToastVariant, LucideIcon> = {
   default: Hash,
   info: Info,
   success: Check,

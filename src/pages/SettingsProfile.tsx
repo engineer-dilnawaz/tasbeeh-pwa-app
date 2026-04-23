@@ -1,5 +1,6 @@
 import { useRef, useState, type ChangeEvent } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { Cloud, ImagePlus, ShieldCheck, Sparkles, X } from "lucide-react";
+import { useAuth, signOutUser } from "@/services/firebase/auth";
 import { useForm, useWatch } from "react-hook-form";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
@@ -17,6 +18,7 @@ import { Switch } from "@/shared/design-system/ui/Switch";
 import { Text } from "@/shared/design-system/ui/Text";
 import { TextInput } from "@/shared/design-system/ui/TextInput";
 import { toast } from "@/shared/design-system/ui/useToast";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileFormValues {
   displayName: string;
@@ -28,6 +30,8 @@ interface ProfileFormValues {
 }
 
 export default function SettingsProfile() {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, loading } = useAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const profile = useSettingsStore((state) => state.profile);
   const setProfile = useSettingsStore((state) => state.setProfile);
@@ -36,10 +40,10 @@ export default function SettingsProfile() {
   const form = useForm<ProfileFormValues>({
     mode: "onChange",
     defaultValues: {
-      displayName: profile.displayName,
-      email: profile.email,
+      displayName: user?.displayName || profile.displayName,
+      email: user?.email || profile.email,
       username: profile.username,
-      avatarUrl: profile.avatarUrl,
+      avatarUrl: user?.photoURL || profile.avatarUrl,
       bio: profile.bio,
       profileVisible: profile.profileVisible,
     },
@@ -67,6 +71,56 @@ export default function SettingsProfile() {
     event.target.value = "";
   };
 
+
+  if (loading) {
+    return (
+      <div className="flex h-[400px] w-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="mx-auto flex w-full max-w-[480px] flex-col gap-6 px-4 pt-8">
+        <Squircle
+          cornerRadius={32}
+          cornerSmoothing={0.9}
+          className="surface-card flex flex-col items-center p-8 text-center shadow-xl shadow-primary/5"
+        >
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Cloud size={44} />
+          </div>
+
+          <Text variant="heading" className="mb-2 text-2xl font-black">
+            Sync Progress
+          </Text>
+          <Text variant="body" color="subtle" className="mb-8 leading-relaxed">
+            Connect your account to save your tasbeeh collections and streaks
+            forever. Never lose your spiritual progress.
+          </Text>
+
+          <div className="flex flex-col gap-3 w-full">
+            <Squircle cornerRadius={20} cornerSmoothing={0.9} asChild>
+              <button
+                onClick={() => navigate("/signin")}
+                className="flex h-14 w-full items-center justify-center gap-2 bg-base-content font-bold text-base-100 transition-transform active:scale-[0.98]"
+              >
+                <Sparkles size={18} />
+                Sign in to Cloud
+              </button>
+            </Squircle>
+
+            <div className="flex items-center justify-center gap-2 mt-4 text-base-content/30 lowercase">
+              <ShieldCheck size={14} />
+              <Text variant="caption">Privacy First. No ads. Just sync.</Text>
+            </div>
+          </div>
+        </Squircle>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-[480px] flex-col gap-4 px-4 pt-4">
       <Form {...form}>
@@ -85,7 +139,7 @@ export default function SettingsProfile() {
               description: "Your profile changes were saved.",
             });
           })}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 pb-20"
         >
           <Squircle
             cornerRadius={22}
@@ -96,7 +150,7 @@ export default function SettingsProfile() {
               <Avatar
                 size="xl"
                 name={displayName || profile.displayName}
-                src={avatarPreview || undefined}
+                src={avatarPreview || user?.photoURL || undefined}
                 shape="circle"
                 disableHover
               />
@@ -116,7 +170,7 @@ export default function SettingsProfile() {
                   <ImagePlus size={15} />
                   Change photo
                 </button>
-                {avatarPreview ? (
+                {avatarPreview || user?.photoURL ? (
                   <button
                     type="button"
                     onClick={() => {
@@ -188,6 +242,7 @@ export default function SettingsProfile() {
                       {...field}
                       variant="ghost"
                       className="bg-transparent"
+                      disabled={!!user}
                       placeholder="name@example.com"
                     />
                   </Squircle>
@@ -311,13 +366,14 @@ export default function SettingsProfile() {
             )}
           />
 
-          <div className="sticky bottom-0 z-20 -mx-4 flex gap-2 bg-base-100/95 px-4 pb-[max(8px,env(safe-area-inset-bottom,0px))] pt-2 backdrop-blur-sm">
+
+          <div className="fixed bottom-0 left-0 right-0 z-20 flex gap-2 bg-base-100/95 px-6 pb-[max(16px,env(safe-area-inset-bottom,0px))] pt-4 backdrop-blur-sm shadow-[0_-1px_0_0_rgba(0,0,0,0.05)]">
             <Squircle cornerRadius={100} cornerSmoothing={0.92} asChild>
               <button
                 type="submit"
-                className="flex h-14 w-full items-center justify-center bg-neutral px-4 text-sm font-semibold text-white"
+                className="flex h-14 w-full items-center justify-center bg-base-content px-4 text-sm font-black text-base-100 shadow-xl shadow-base-content/10 active:scale-[0.98] transition-transform"
               >
-                Save changes
+                Save Changes
               </button>
             </Squircle>
           </div>

@@ -26,6 +26,7 @@ interface ButtonProps extends Omit<
   rightIcon?: React.ReactNode;
   isLoading?: boolean;
   height?: number;
+  pill?: boolean;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -59,6 +60,7 @@ export const Button: React.FC<ButtonProps> = ({
   isLoading,
   className = "",
   height,
+  pill,
   ...props
 }) => {
   const isSocial = variant === "google" || variant === "apple";
@@ -81,8 +83,8 @@ export const Button: React.FC<ButtonProps> = ({
     <div className="w-full sm:w-auto h-fit">
       <Squircle
         asChild
-        cornerRadius={16}
-        cornerSmoothing={0.99}
+        cornerRadius={pill ? 999 : 16}
+        cornerSmoothing={pill ? 0 : 0.99}
         height={height || sizeHeights[size]}
       >
         <motion.button

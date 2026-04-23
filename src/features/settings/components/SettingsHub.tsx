@@ -33,6 +33,7 @@ import {
   getCollectionDetails,
   listCollections,
 } from "@/features/tasbeeh/services/collectionsRepository";
+import { useTasbeehStore } from "@/features/tasbeeh/store/tasbeehStore";
 
 // const languageLabel: Record<string, string> = {
 //   english: "English",
@@ -81,8 +82,11 @@ function ToggleRow({
   );
 }
 
+import { useAuth, signOutUser } from "@/services/firebase/auth";
+
 export function SettingsHub() {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const isDev = import.meta.env.DEV;
   const [showLogoutSheet, setShowLogoutSheet] = useState(false);
   const [showDeleteSheet, setShowDeleteSheet] = useState(false);
@@ -91,6 +95,7 @@ export function SettingsHub() {
   const [showHapticsSheet, setShowHapticsSheet] = useState(false);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showReminderTimeSheet, setShowReminderTimeSheet] = useState(false);
+  const [showResetSheet, setShowResetSheet] = useState(false);
   const profile = useSettingsStore((state) => state.profile);
   const appearance = useSettingsStore((state) => state.appearance);
   const setAppearance = useSettingsStore((state) => state.setAppearance);
@@ -102,6 +107,7 @@ export function SettingsHub() {
   const setNotifications = useSettingsStore((state) => state.setNotifications);
   const language = useSettingsStore((state) => state.language);
   const setLanguage = useSettingsStore((state) => state.setLanguage);
+  const resetEverything = useTasbeehStore((state) => state.resetEverything);
   const { setTheme } = useTheme();
 
   const reminderTime = useMemo(() => {
@@ -152,16 +158,16 @@ export function SettingsHub() {
           <div className="flex items-center gap-3">
             <Avatar
               size="lg"
-              name={profile.displayName}
-              src={profile.avatarUrl || undefined}
-              status="online"
+              name={user?.displayName || profile.displayName}
+              src={user?.photoURL || profile.avatarUrl || undefined}
+              status={isAuthenticated ? "online" : undefined}
             />
             <div className="min-w-0 flex-1">
               <Text variant="heading" weight="semibold" className="truncate">
-                {profile.displayName}
+                {user?.displayName || profile.displayName}
               </Text>
               <Text variant="body" color="subtle" className="truncate">
-                {profile.email}
+                {isAuthenticated ? user?.email : "Guest Session"}
               </Text>
             </div>
             <button
@@ -169,8 +175,11 @@ export function SettingsHub() {
               onClick={() => navigate("/settings/profile")}
               aria-label="Edit Profile"
             >
-              <Badge variant="primary" size="sm">
-                Edit Profile
+              <Badge
+                variant={isAuthenticated ? "primary" : "neutral"}
+                size="sm"
+              >
+                {isAuthenticated ? "Edit Profile" : "Sign in to Cloud"}
               </Badge>
             </button>
           </div>
@@ -747,10 +756,20 @@ export function SettingsHub() {
             <button
               type="button"
               onClick={() => setShowDeleteSheet(true)}
-              className="flex w-full select-none items-center justify-between py-3 text-left"
+              className="flex w-full select-none items-center justify-between border-b border-base-content/8 py-3 text-left"
             >
               <Text variant="body" weight="medium" className="text-error">
                 Delete account
+              </Text>
+              <ChevronRight size={16} className="text-error/70" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowResetSheet(true)}
+              className="flex w-full select-none items-center justify-between py-3 text-left"
+            >
+              <Text variant="body" weight="medium" className="text-error">
+                Reset all data
               </Text>
               <ChevronRight size={16} className="text-error/70" />
             </button>
@@ -798,12 +817,18 @@ export function SettingsHub() {
         title="Logout"
         description="Logging out will end your current session on this device. You can sign in again anytime."
         primaryButtonTitle="Logout"
-        onPrimaryPress={() => {
-          setShowLogoutSheet(false);
-          toast("Logged out", {
-            variant: "success",
-            description: "You have been signed out from this device.",
-          });
+        onPrimaryPress={async () => {
+          try {
+            await signOutUser();
+            setShowLogoutSheet(false);
+            toast("Logged out", {
+              variant: "success",
+              description: "You have been signed out from this device.",
+            });
+            navigate("/signin");
+          } catch (error) {
+            toast("Log out failed", { variant: "error" });
+          }
         }}
       />
 
@@ -825,6 +850,22 @@ export function SettingsHub() {
         }}
         iconWrapperClassName="border border-error/45 bg-error/12 text-error"
         primaryButtonClassName="bg-error text-white"
+      />
+      <SettingsActionSheet
+        isOpen={showResetSheet}
+        onClose={() => setShowResetSheet(false)}
+        icon={Trash2}
+        title="Reset All Data"
+        description="This will permanently delete all your tasbeeh collections, custom items, and progress as if you just installed the app. This cannot be undone."
+        primaryButtonTitle="Reset Everything"
+        iconWrapperClassName="border border-error/45 bg-error/12 text-error"
+        primaryButtonClassName="bg-error text-white"
+        onPrimaryPress={async () => {
+          await resetEverything();
+          setShowResetSheet(false);
+          window.location.href = "/";
+        }}
+        snapPoints={["45%"]}
       />
     </>
   );

@@ -1,29 +1,19 @@
+import { Squircle } from "corner-smoothing";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle } from "lucide-react";
 import * as React from "react";
 import {
   Controller,
+  FormProvider,
   type ControllerProps,
   type FieldPath,
   type FieldValues,
-  FormProvider,
-  useFormContext,
 } from "react-hook-form";
-import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle } from "lucide-react";
-import { Squircle } from "corner-smoothing";
 import { Text } from "./Text";
 
 const Form = FormProvider;
 
-type FormFieldContextValue<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
-  name: TName;
-};
-
-const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue,
-);
+import { FormFieldContext, FormItemContext, useFormField } from "./FormContext";
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
@@ -36,37 +26,6 @@ const FormField = <
       <Controller {...props} />
     </FormFieldContext.Provider>
   );
-};
-
-type FormItemContextValue = {
-  id: string;
-};
-
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue,
-);
-
-const useFormField = () => {
-  const fieldContext = React.useContext(FormFieldContext);
-  const itemContext = React.useContext(FormItemContext);
-  const { getFieldState, formState } = useFormContext();
-
-  const fieldState = getFieldState(fieldContext.name, formState);
-
-  if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>");
-  }
-
-  const { id } = itemContext;
-
-  return {
-    id,
-    name: fieldContext.name,
-    formItemId: `${id}-form-item`,
-    formDescriptionId: `${id}-form-item-description`,
-    formMessageId: `${id}-form-item-message`,
-    ...fieldState,
-  };
 };
 
 export interface FormItemProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -115,26 +74,27 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = "FormLabel";
 
-const FormControl = React.forwardRef<
-  any,
-  React.HTMLAttributes<any>
->(({ children, ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+const FormControl = React.forwardRef<any, React.HTMLAttributes<any>>(
+  ({ children, ...props }, ref) => {
+    const { error, formItemId, formDescriptionId, formMessageId } =
+      useFormField();
 
-  if (!React.isValidElement(children)) {
-    return <>{children}</>;
-  }
+    if (!React.isValidElement(children)) {
+      return <>{children}</>;
+    }
 
-  return React.cloneElement(children as any, {
-    ref,
-    id: formItemId,
-    "aria-describedby": !error
-      ? `${formDescriptionId}`
-      : `${formDescriptionId} ${formMessageId}`,
-    "aria-invalid": !!error,
-    ...props,
-  });
-});
+    // eslint-disable-next-line react-hooks/refs
+    return React.cloneElement(children as any, {
+      ref,
+      id: formItemId,
+      "aria-describedby": !error
+        ? `${formDescriptionId}`
+        : `${formDescriptionId} ${formMessageId}`,
+      "aria-invalid": !!error,
+      ...props,
+    });
+  },
+);
 FormControl.displayName = "FormControl";
 
 const FormDescription = React.forwardRef<
@@ -274,13 +234,12 @@ const FormGroup: React.FC<FormGroupProps> = ({
 };
 
 export {
-  useFormField,
   Form,
-  FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
-  FormMessage,
   FormField,
   FormGroup,
+  FormItem,
+  FormLabel,
+  FormMessage,
 };

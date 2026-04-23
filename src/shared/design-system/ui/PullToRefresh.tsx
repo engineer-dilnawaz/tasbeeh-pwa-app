@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 
 export interface PullToRefreshProps {
@@ -36,11 +36,11 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const startY = useRef(0);
   const isPulling = useRef(false);
 
-  const handleTouchStart = (e: TouchEvent) => {
+  const handleTouchStart = useCallback((e: TouchEvent) => {
     if (disabled || isRefreshing || window.scrollY > 0) return;
     startY.current = e.touches[0].pageY;
     isPulling.current = true;
-  };
+  }, [disabled, isRefreshing]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!isPulling.current) return;
@@ -60,7 +60,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       pullDistance.set(0);
       setPullProgress(0);
     }
-  }, [disabled, isRefreshing, pullDistance, MAX_PULL, PULL_THRESHOLD]);
+  }, [pullDistance, MAX_PULL, PULL_THRESHOLD]);
 
   const handleTouchEnd = useCallback(async () => {
     if (!isPulling.current) return;
@@ -97,7 +97,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       el.removeEventListener("touchmove", handleTouchMove);
       el.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [handleTouchMove, handleTouchEnd]);
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   return (
     <div ref={containerRef} className="relative w-full">

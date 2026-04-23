@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Text } from "./Text";
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -43,8 +43,6 @@ function Wheel<T extends string | number>({
   width = 80,
 }: WheelProps<T>) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollTop, setScrollTop] = useState(0);
-  const [isScrolling, setIsScrolling] = useState(false);
 
   // Initial scroll position
   useEffect(() => {
@@ -52,15 +50,12 @@ function Wheel<T extends string | number>({
       const index = items.indexOf(selectedValue);
       if (index !== -1) {
         scrollRef.current.scrollTop = index * ITEM_HEIGHT;
-        setScrollTop(index * ITEM_HEIGHT);
       }
     }
-  }, [items]); // Re-run if items change (12h/24h)
+  }, [items, selectedValue]); // Re-run if items or selectedValue change
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
-    setScrollTop(target.scrollTop);
-    setIsScrolling(true);
 
     const timeout = setTimeout(() => {
       const index = Math.round(target.scrollTop / ITEM_HEIGHT);
@@ -68,7 +63,6 @@ function Wheel<T extends string | number>({
       if (newValue !== undefined && newValue !== selectedValue) {
         onSelect(newValue);
       }
-      setIsScrolling(false);
     }, 100);
 
     return () => clearTimeout(timeout);
@@ -207,12 +201,12 @@ export const TimePicker: React.FC<TimePickerProps> = ({
       {is12h && (
         <>
           <div className="w-2" />
-          <Wheel
-            items={phases as any}
+          <Wheel<string>
+            items={phases as unknown as string[]}
             selectedValue={currentPhase}
-            onSelect={handlePhaseSelect as any}
+            onSelect={(v) => handlePhaseSelect(v as "AM" | "PM")}
             label="PHASE"
-            format={(v) => v as string}
+            format={(v) => v}
             width={70}
           />
         </>

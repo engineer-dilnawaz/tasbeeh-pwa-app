@@ -37,11 +37,25 @@ export const TasbeehRing: React.FC<TasbeehRingProps> = ({
 
   return (
     <div className="relative flex items-center justify-center w-[300px] h-[300px] mx-auto select-none">
-      {/* 1. Progress Orbital */}
+      {/* 1. Ambient Dynamic Aura (Liquid Glow) */}
+      <motion.div
+        animate={{
+          scale: [1, 1.02, 1],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute inset-0 rounded-full border-[10px] border-primary/5 blur-xl z-0"
+      />
+
+      {/* 2. Progress Orbital (Layered Liquid Fill) */}
       <svg
         viewBox="0 0 300 300"
         className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none z-20"
       >
+        {/* Track */}
         <circle
           cx={center}
           cy={center}
@@ -51,6 +65,24 @@ export const TasbeehRing: React.FC<TasbeehRingProps> = ({
           strokeWidth="2"
         />
 
+        {/* Liquid Trail (Slower, soft) */}
+        <motion.circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          className={isCompleted ? "stroke-success/30" : "stroke-primary/30"}
+          strokeWidth="4"
+          strokeLinecap="round"
+          initial={false}
+          animate={{
+            strokeDasharray: `${(2 * Math.PI * radius * setProgress) / 100} ${2 * Math.PI * radius}`,
+          }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          style={{ filter: "blur(4px)" }}
+        />
+
+        {/* Primary Liquid Progress */}
         <motion.circle
           cx={center}
           cy={center}
@@ -63,9 +95,13 @@ export const TasbeehRing: React.FC<TasbeehRingProps> = ({
           animate={{
             strokeDasharray: `${(2 * Math.PI * radius * setProgress) / 100} ${2 * Math.PI * radius}`,
           }}
-          transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+          transition={{ 
+            duration: 0.6, 
+            ease: [0.34, 1.3, 0.64, 1] // Liquid spring
+          }}
         />
 
+        {/* Beads (Tactile feedback) */}
         {beads.map((_, i) => {
           const angle = (i * 360) / beads.length;
           const x = center + radius * Math.cos((angle * Math.PI) / 180);
@@ -87,12 +123,25 @@ export const TasbeehRing: React.FC<TasbeehRingProps> = ({
                     : "var(--color-primary)"
                   : "var(--color-base-content)",
                 opacity: isActive ? 1 : 0.15,
+                scale: isActive ? [1, 1.1, 1] : 1
               }}
               transition={{ duration: 0.3 }}
             />
           );
         })}
       </svg>
+
+      {/* 3. Haptic Feedback Ripples (Triggers on count change) */}
+      <AnimatePresence mode="popLayout">
+        <motion.div
+          key={count}
+          initial={{ scale: 0.8, opacity: 0.6 }}
+          animate={{ scale: 1.5, opacity: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="absolute w-[180px] h-[180px] rounded-full border-2 border-primary/20 pointer-events-none z-0"
+        />
+      </AnimatePresence>
 
       {/* 2. Main Interactive Core */}
       <motion.button

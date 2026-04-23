@@ -14,7 +14,7 @@ export const SplashScreen: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (hasCompleted) {
-        navigate("/home", { replace: true });
+        navigate("/signin", { replace: true });
       } else {
         navigate("/onboarding", { replace: true });
       }

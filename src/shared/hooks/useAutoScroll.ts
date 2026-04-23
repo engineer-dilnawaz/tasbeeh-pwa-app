@@ -23,9 +23,11 @@ export const useAutoScroll = (options: UseAutoScrollOptions = {}) => {
   const hasScrolledRef = useRef(false);
 
   // Reset the scroll lock when the component becomes inactive
-  if (!active && hasScrolledRef.current) {
-    hasScrolledRef.current = false;
-  }
+  useEffect(() => {
+    if (!active) {
+      hasScrolledRef.current = false;
+    }
+  }, [active]);
 
   const { ref, inView, entry } = useInView({
     threshold,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -25,26 +25,23 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
   title,
   zIndexBase = 100,
 }) => {
-  const [mounted, setMounted] = useState(false);
-
+  // Separate effect for body overflow to avoid cascading renders
   useEffect(() => {
     if (isOpen) {
-      setMounted(true);
       document.body.style.overflow = "hidden";
     } else {
-      const timer = setTimeout(() => setMounted(false), 300);
       document.body.style.overflow = "";
-      return () => clearTimeout(timer);
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
-  if (!mounted && !isOpen) return null;
-
   const drawer = (
-    <>
-      {/* Backdrop */}
-      <AnimatePresence>
-        {isOpen && (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -53,12 +50,8 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
             className="fixed inset-0 bg-black/40 backdrop-blur-[2px]"
             style={{ zIndex: zIndexBase }}
           />
-        )}
-      </AnimatePresence>
 
-      {/* Sheet */}
-      <AnimatePresence>
-        {isOpen && (
+          {/* Sheet */}
           <motion.div
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
@@ -75,6 +68,7 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
                     {title || "Menu"}
                   </span>
                   <button
+                    type="button"
                     onClick={onClose}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-base-200 text-base-content/60 active:scale-90 transition-transform"
                   >
@@ -96,10 +90,13 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
               </div>
             </Squircle>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+        </>
+      )}
+    </AnimatePresence>
   );
+
+  // Still need to check for document to avoid SSR/initialization issues if any
+  if (typeof document === "undefined") return null;
 
   return createPortal(drawer, document.body);
 };

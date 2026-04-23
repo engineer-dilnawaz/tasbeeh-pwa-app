@@ -65,9 +65,9 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
   (set, get) => ({
     profile: {
-      displayName: "Dilnawaz Khan",
-      email: "dilnawaz@example.com",
-      username: "@dilnawaz",
+      displayName: "Guest",
+      email: "guest@example.com",
+      username: "@traveler",
       avatarUrl: "",
       bio: "",
       profileVisible: true,

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 type InputSize = "xs" | "sm" | "md" | "lg" | "xl";
-type InputVariant = "bordered" | "ghost";
+type InputVariant = "bordered" | "ghost" | "transparent";
 
 interface TextInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
@@ -62,10 +63,16 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
     ref
   ) => {
     const isInvalid = error || inputProps["aria-invalid"] === true;
+    const [showPassword, setShowPassword] = useState(false);
+    const isPassword = inputProps.type === "password";
+    const currentType = isPassword ? (showPassword ? "text" : "password") : inputProps.type;
+
     const variantClass =
-      // Borderless inputs — rely on background color for affordance.
-      // (We still keep daisy's input sizing/padding classes.)
-      variant === "ghost" ? "input-ghost border-none" : "border-none";
+      variant === "ghost"
+        ? "input-ghost border-none"
+        : variant === "transparent"
+          ? "bg-transparent border-none focus:outline-none focus:ring-0"
+          : "border-none bg-white dark:bg-[#121212]";
     const radius = sizeRadius[size];
     const errorBgClass = isInvalid ? "bg-error/10" : "";
 
@@ -100,8 +107,18 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
           <input
             ref={ref}
             {...inputProps}
-            className="grow bg-transparent outline-none min-w-0"
+            type={currentType}
+            className="grow bg-transparent outline-none py-2"
           />
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-base-content/30 hover:text-base-content/60 transition-colors p-1"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          )}
           {rightIcon && (
             <span className="text-base-content/40 shrink-0">{rightIcon}</span>
           )}
@@ -116,27 +133,23 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
       );
 
     return (
-      <fieldset className={`fieldset w-full ${containerClassName}`}>
+      <div className={`w-full ${containerClassName}`}>
         {label && (
-          <legend
-            className={`fieldset-legend ${labelSizeClass[size]} bg-transparent px-0`}
-          >
+          <label className={`block mb-1.5 font-semibold text-sm text-base-content/70 px-1`}>
             {label}
-          </legend>
+          </label>
         )}
 
-        {inputElement}
+        <div className="w-full relative h-full">
+          {inputElement}
+        </div>
 
         {(error || hint) && (
-          <p
-            className={`fieldset-label ${
-              error ? "text-error" : "text-base-content/50"
-            }`}
-          >
+          <p className={`mt-1 text-xs ${error ? "text-error" : "text-base-content/50"}`}>
             {error ?? hint}
           </p>
         )}
-      </fieldset>
+      </div>
     );
   }
 );

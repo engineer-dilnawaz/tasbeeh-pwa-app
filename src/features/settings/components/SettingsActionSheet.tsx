@@ -80,7 +80,7 @@ export function SettingsActionSheet({
       zIndexBase={130}
       presentation="height"
     >
-      <div className={`mb-4 px-2 pb-4 ${containerClassName}`}>
+      <div className={`mb-4 px-2 pb-8 ${containerClassName}`}>
         <div
           className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full ${iconWrapperClassName}`}
         >

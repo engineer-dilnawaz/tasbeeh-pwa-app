@@ -6,8 +6,6 @@ import {
   type TasbeehPhraseRow,
 } from "@/features/tasbeeh/services/tasbeehDb";
 
-const FATIMA_COLLECTION_ID = "tasbeeh_fatima";
-
 const nowIso = () => new Date().toISOString();
 
 const createId = () => {
@@ -18,161 +16,10 @@ const createId = () => {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 };
 
-const DEFAULT_PHRASES: Omit<TasbeehPhraseRow, "createdAt" | "updatedAt">[] = [
-  {
-    id: "subhanallah",
-    userId: DEVICE_USER_ID,
-    arabic: "سُبْحَانَ ٱللَّٰهِ",
-    transliteration: "SubhanAllah",
-    translation: "Glory be to Allah",
-    isArchived: false,
-    syncStatus: "local",
-  },
-  {
-    id: "alhamdulillah",
-    userId: DEVICE_USER_ID,
-    arabic: "ٱلْحَمْدُ لِلَّٰهِ",
-    transliteration: "Alhamdulillah",
-    translation: "All praise is due to Allah",
-    isArchived: false,
-    syncStatus: "local",
-  },
-  {
-    id: "allahuakbar",
-    userId: DEVICE_USER_ID,
-    arabic: "ٱللَّٰهُ أَكْبَرُ",
-    transliteration: "Allahu Akbar",
-    translation: "Allah is the Greatest",
-    isArchived: false,
-    syncStatus: "local",
-  },
-  {
-    id: "durood",
-    userId: DEVICE_USER_ID,
-    arabic: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ",
-    transliteration: "Allahumma salli 'ala Muhammad wa 'ala aali Muhammad",
-    translation: "O Allah, send blessings upon Muhammad and the family of Muhammad",
-    isArchived: false,
-    syncStatus: "local",
-  },
-];
-
-const DEFAULT_COLLECTIONS: Omit<TasbeehCollectionGroupRow, "createdAt" | "updatedAt">[] =
-  [
-    {
-      id: FATIMA_COLLECTION_ID,
-      userId: DEVICE_USER_ID,
-      title: "Tasbeeh Fatima",
-      description: null,
-      scheduleType: "prayer_specific",
-      timesPerDay: 5,
-      slots: ["fajr", "dhuhr", "asr", "maghrib", "isha"],
-      slotExpiryPolicy: "next_prayer",
-      priority: "high",
-      reminderPolicy: "gentle",
-      tags: ["after-prayer", "daily"],
-      reference: { sourceType: "none" },
-      isDefault: true,
-      isArchived: false,
-      sortOrder: 0,
-      syncStatus: "local",
-    },
-  ];
-
-const DEFAULT_COLLECTION_ITEMS: Omit<CollectionItemRow, "createdAt" | "updatedAt">[] =
-  [
-    {
-      id: `${FATIMA_COLLECTION_ID}:start:durood:-1`,
-      userId: DEVICE_USER_ID,
-      collectionId: FATIMA_COLLECTION_ID,
-      phraseId: "durood",
-      role: "start",
-      targetCount: 1,
-      sortOrder: -1,
-      syncStatus: "local",
-    },
-    {
-      id: `${FATIMA_COLLECTION_ID}:main:subhanallah:0`,
-      userId: DEVICE_USER_ID,
-      collectionId: FATIMA_COLLECTION_ID,
-      phraseId: "subhanallah",
-      role: "main",
-      targetCount: 33,
-      sortOrder: 0,
-      syncStatus: "local",
-    },
-    {
-      id: `${FATIMA_COLLECTION_ID}:main:alhamdulillah:1`,
-      userId: DEVICE_USER_ID,
-      collectionId: FATIMA_COLLECTION_ID,
-      phraseId: "alhamdulillah",
-      role: "main",
-      targetCount: 33,
-      sortOrder: 1,
-      syncStatus: "local",
-    },
-    {
-      id: `${FATIMA_COLLECTION_ID}:main:allahuakbar:2`,
-      userId: DEVICE_USER_ID,
-      collectionId: FATIMA_COLLECTION_ID,
-      phraseId: "allahuakbar",
-      role: "main",
-      targetCount: 34,
-      sortOrder: 2,
-      syncStatus: "local",
-    },
-    {
-      id: `${FATIMA_COLLECTION_ID}:end:durood:99`,
-      userId: DEVICE_USER_ID,
-      collectionId: FATIMA_COLLECTION_ID,
-      phraseId: "durood",
-      role: "end",
-      targetCount: 1,
-      sortOrder: 99,
-      syncStatus: "local",
-    },
-  ];
-
 export async function bootstrapCollectionsDb() {
-  const timestamp = nowIso();
-  await tasbeehDb.transaction(
-    "rw",
-    tasbeehDb.tasbeehCollections,
-    tasbeehDb.tasbeehPhrases,
-    tasbeehDb.collectionItems,
-    async () => {
-      // Idempotent bootstrap: ensure defaults exist even if DB was seeded before.
-      for (const phrase of DEFAULT_PHRASES) {
-        const existing = await tasbeehDb.tasbeehPhrases.get(phrase.id);
-        if (existing) continue;
-        await tasbeehDb.tasbeehPhrases.put({
-          ...phrase,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        });
-      }
-
-      for (const collection of DEFAULT_COLLECTIONS) {
-        const existing = await tasbeehDb.tasbeehCollections.get(collection.id);
-        if (existing) continue;
-        await tasbeehDb.tasbeehCollections.put({
-          ...collection,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        });
-      }
-
-      for (const item of DEFAULT_COLLECTION_ITEMS) {
-        const existing = await tasbeehDb.collectionItems.get(item.id);
-        if (existing) continue;
-        await tasbeehDb.collectionItems.put({
-          ...item,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        });
-      }
-    },
-  );
+  // We no longer automatically add default collections to ensure a clean slate.
+  // Users can create their own or discover from an external source in the future.
+  return;
 }
 
 export async function listCollections(userId: string = DEVICE_USER_ID) {
@@ -222,7 +69,9 @@ export async function listPhrases(userId: string = DEVICE_USER_ID) {
     .and((row) => !row.isArchived)
     .toArray();
 
-  return rows.sort((a, b) => a.transliteration.localeCompare(b.transliteration));
+  return rows.sort((a, b) =>
+    a.transliteration.localeCompare(b.transliteration),
+  );
 }
 
 export async function createPhrase(
@@ -398,7 +247,10 @@ export async function updateCollection(params: UpdateCollectionParams) {
   const updated: TasbeehCollectionGroupRow = {
     ...existing,
     title: params.title?.trim() ?? existing.title,
-    description: params.description !== undefined ? params.description : existing.description,
+    description:
+      params.description !== undefined
+        ? params.description
+        : existing.description,
     scheduleType: params.scheduleType ?? existing.scheduleType,
     timesPerDay: params.timesPerDay ?? existing.timesPerDay,
     slots: params.slots !== undefined ? params.slots : existing.slots,
@@ -406,9 +258,11 @@ export async function updateCollection(params: UpdateCollectionParams) {
     priority: params.priority ?? existing.priority,
     reminderPolicy: params.reminderPolicy ?? existing.reminderPolicy,
     tags: params.tags ?? existing.tags,
-    reference: params.reference !== undefined ? params.reference : existing.reference,
+    reference:
+      params.reference !== undefined ? params.reference : existing.reference,
     updatedAt: timestamp,
-    syncStatus: existing.syncStatus === "synced" ? "pending" : existing.syncStatus,
+    syncStatus:
+      existing.syncStatus === "synced" ? "pending" : existing.syncStatus,
   };
 
   await tasbeehDb.transaction(
@@ -460,7 +314,7 @@ export async function archiveCollection(
   await tasbeehDb.tasbeehCollections.update(id, {
     isArchived: true,
     updatedAt: timestamp,
-    syncStatus: existing.syncStatus === "synced" ? "pending" : existing.syncStatus,
+    syncStatus:
+      existing.syncStatus === "synced" ? "pending" : existing.syncStatus,
   });
 }
-

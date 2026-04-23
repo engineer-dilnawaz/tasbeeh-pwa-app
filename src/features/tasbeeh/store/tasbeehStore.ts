@@ -6,6 +6,7 @@ import {
   cycleTasbeehProgress,
   incrementProgress,
   decrementProgress,
+  factoryReset,
   readTasbeehSnapshot,
   resetProgress,
   selectTasbeehProgress,
@@ -14,6 +15,7 @@ import {
   type TasbeehSnapshot,
 } from "@/features/tasbeeh/services/tasbeehRepository";
 
+import { queryClient } from "@/services/queryClient";
 import { type TasbeehItem, type ActiveZikrSlot } from "../types";
 
 interface TasbeehState {
@@ -49,31 +51,8 @@ interface TasbeehState {
   // Legacy Support
   setCurrentTasbeeh: (id: string) => Promise<void>;
   setDefaultTasbeeh: () => Promise<void>;
+  resetEverything: () => Promise<void>;
 }
-
-const DEFAULT_TASBEEHS: TasbeehItem[] = [
-  {
-    id: "subhanallah",
-    arabic: "سُبْحَانَ ٱللَّٰهِ",
-    transliteration: "SubhanAllah",
-    translation: "Glory be to Allah",
-    target: 33,
-  },
-  {
-    id: "alhamdulillah",
-    arabic: "ٱلْحَمْدُ لِلَّٰهِ",
-    transliteration: "Alhamdulillah",
-    translation: "All praise is due to Allah",
-    target: 33,
-  },
-  {
-    id: "allahuakbar",
-    arabic: "ٱللَّٰهُ أَكْبَرُ",
-    transliteration: "Allahu Akbar",
-    translation: "Allah is the Greatest",
-    target: 34,
-  },
-];
 
 const applySnapshotToState = (
   set: (next: Partial<TasbeehState>) => void,
@@ -91,12 +70,12 @@ const applySnapshotToState = (
 export const useTasbeehStore = create<TasbeehState>()(
   persist(
     (set, get) => ({
-      tasbeehLibrary: DEFAULT_TASBEEHS,
+      tasbeehLibrary: [],
       activeSlots: [
         {
           collectionId: "default",
           name: "Daily Adhkar",
-          items: DEFAULT_TASBEEHS,
+          items: [],
           currentIndex: 0,
           currentCount: 0,
           isCompleted: false,
@@ -104,7 +83,7 @@ export const useTasbeehStore = create<TasbeehState>()(
         },
       ],
       primarySlotIndex: 0,
-      currentTasbeehId: DEFAULT_TASBEEHS[0].id,
+      currentTasbeehId: null,
       count: 0,
       streakDays: 0,
       lastCompletedOn: null,
@@ -113,22 +92,17 @@ export const useTasbeehStore = create<TasbeehState>()(
       hydrateFromDb: async () => {
         await bootstrapTasbeehDb();
         
-        // 1. Recover state from localStorage (already handled by Zustand persist)
+        // 1. Recover state from localStorage
         const { activeSlots, primarySlotIndex } = get();
         
-        // 2. Proactively sync high-volume targets to DB to prevent "stuck at 34" fallback
+        // 2. Sync if slot exists and has items
         if (activeSlots && activeSlots[primarySlotIndex]) {
           const slot = activeSlots[primarySlotIndex];
           const currentItem = slot.items[slot.currentIndex];
           
-          await upsertTasbeehItems(slot.items);
-          await selectTasbeehProgress(currentItem.id);
-          
-          // Optionally force DB count to match our persisted count if they drifted
-          // This ensures the "10k" target is always respected over DB defaults
-          const snapshot = await readTasbeehSnapshot();
-          if (snapshot.count !== get().count) {
-             // In case of drift, we could sync back, but for now we follow snapshot
+          if (currentItem) {
+            await upsertTasbeehItems(slot.items);
+            await selectTasbeehProgress(currentItem.id);
           }
         }
 
@@ -292,6 +266,27 @@ export const useTasbeehStore = create<TasbeehState>()(
         await setDefaultTasbeehProgress();
         const snapshot = await readTasbeehSnapshot();
         applySnapshotToState(set, snapshot);
+      },
+
+      resetEverything: async () => {
+        // 1. Clear LocalStorage to prevent re-hydration of old state
+        localStorage.removeItem("tasbeeh-home-storage");
+        
+        // 2. Wipe IndexedDB (All 7 tables)
+        await factoryReset();
+        
+        // 3. Force Clear React Query Cache to remove stale collections
+        queryClient.clear();
+        
+        set({
+          tasbeehLibrary: [],
+          activeSlots: [],
+          primarySlotIndex: 0,
+          currentTasbeehId: null,
+          count: 0,
+          streakDays: 0,
+          lastCompletedOn: null,
+        });
       },
     }),
     {

@@ -63,9 +63,9 @@ export const ZikrDashboard: React.FC = () => {
                     collectionId={slot.collectionId}
                     isActive={isPrimary}
                     transliteration={slot.name}
-                    arabic={slot.items[slot.currentIndex].arabic}
+                    arabic={slot.items[slot.currentIndex]?.arabic || ""}
                     progress={slot.currentCount}
-                    target={slot.items[slot.currentIndex].target}
+                    target={slot.items[slot.currentIndex]?.target || 0}
                     onClick={() => setExpandedIndex(index)}
                   />
                 )}

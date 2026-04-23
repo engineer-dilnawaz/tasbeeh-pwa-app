@@ -69,7 +69,7 @@ export const Onboarding: React.FC = () => {
       setCurrentSlide(currentSlide + 1);
     } else {
       complete();
-      navigate("/home", { replace: true });
+      navigate("/signin", { replace: true });
     }
   };
 
@@ -104,7 +104,7 @@ export const Onboarding: React.FC = () => {
         <button
           onClick={() => {
             complete();
-            navigate("/home", { replace: true });
+            navigate("/signin", { replace: true });
           }}
           className="text-base-content/40 text-sm font-medium hover:text-base-content transition-colors"
         >
