@@ -22,6 +22,7 @@ import { TasbeehTestDashboard } from "@/features/tasbeeh/test/TasbeehTestDashboa
 import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { AuthGuard } from "@/app/router/AuthGuard";
 import { APP_ROUTES } from "@/shared/routes";
+import ComponentLab from "@/shared/design-system/lab/ComponentLab";
 
 /**
  * Public routes accessible to everyone
@@ -84,6 +85,10 @@ const utilityRoutes: RouteObject[] = [
   {
     path: APP_ROUTES.TESTER,
     element: <TasbeehTestDashboard />,
+  },
+  {
+    path: "/lab",
+    element: <ComponentLab />,
   },
   {
     path: "*",

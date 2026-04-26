@@ -7,17 +7,74 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Theme Customization (DaisyUI 4.0 Standards) */
+/* Theme Customization (Divine Atomic System Tokens) */
 [data-theme="light"] {
   --color-base-100: #F6EDDD; /* Creamy spiritual light background */
   --color-base-content: #2C2C2C;
   --color-surface-card: #FFFFFF;
+  
+  /* Atomic System Tokens - Core */
+  --ds-bg-page: #F6EDDD;
+  --ds-bg-surface: #FFFFFF;
+  --ds-bg-input: #FFFFFF;
+  --ds-text-main: #2C2C2C;
+  --ds-text-subtle: #71717A;
+  --ds-primary: #7C3AED;
+  --ds-primary-content: #FFFFFF;
+  --ds-border: rgba(44, 44, 44, 0.08);
+
+  /* Interaction & Semantic */
+  --ds-surface-hover: rgba(44, 44, 44, 0.03);
+  --ds-surface-active: rgba(44, 44, 44, 0.06);
+  --ds-success: #10B981;
+  --ds-error: #EF4444;
+  --ds-warning: #F59E0B;
 }
 
 [data-theme="dark"] {
   --color-base-100: #1C1E21; /* Deep focused dark background */
   --color-base-content: #EDEDED;
   --color-surface-card: #111214;
+
+  /* Atomic System Tokens - Core */
+  --ds-bg-page: #1C1E21;
+  --ds-bg-surface: #111214;
+  --ds-bg-input: #111214;
+  --ds-text-main: #EDEDED;
+  --ds-text-subtle: #A1A1AA;
+  --ds-primary: #8B5CF6;
+  --ds-primary-content: #FFFFFF;
+  --ds-border: rgba(237, 237, 237, 0.08);
+
+  /* Interaction & Semantic */
+  --ds-surface-hover: rgba(255, 255, 255, 0.03);
+  --ds-surface-active: rgba(255, 255, 255, 0.06);
+  --ds-success: #34D399;
+  --ds-error: #F87171;
+  --ds-warning: #FBBF24;
+}
+
+[data-theme="pineGreen"] {
+  --color-base-100: #0D2B22; /* Deep Islamic Green */
+  --color-base-content: #E6F0ED;
+  --color-surface-card: #133D31;
+
+  /* Atomic System Tokens - Core */
+  --ds-bg-page: #0D2B22;
+  --ds-bg-surface: #133D31;
+  --ds-bg-input: #133D31;
+  --ds-text-main: #E6F0ED;
+  --ds-text-subtle: #94B3AB;
+  --ds-primary: #10B981;
+  --ds-primary-content: #FFFFFF;
+  --ds-border: rgba(230, 240, 237, 0.08);
+
+  /* Interaction & Semantic */
+  --ds-surface-hover: rgba(255, 255, 255, 0.03);
+  --ds-surface-active: rgba(255, 255, 255, 0.06);
+  --ds-success: #34D399;
+  --ds-error: #F87171;
+  --ds-warning: #FBBF24;
 }
 
 :root {
@@ -30,6 +87,16 @@
   --font-arabic: "Amiri", ui-serif, Georgia, serif;
   --font-urdu: "Noto Nastaliq Urdu", serif;
   --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+  /* Divine Atomic System Extensions */
+  --color-ds-bg-page: var(--ds-bg-page);
+  --color-ds-bg-surface: var(--ds-bg-surface);
+  --color-ds-bg-input: var(--ds-bg-input);
+  --ds-text-main: var(--ds-text-main);
+  --ds-text-subtle: var(--ds-text-subtle);
+  --color-ds-primary: var(--ds-primary);
+  --color-ds-primary-content: var(--ds-primary-content);
+  --color-ds-border: var(--ds-border);
 }
 
 @layer base {
