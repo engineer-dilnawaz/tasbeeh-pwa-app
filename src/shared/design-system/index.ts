@@ -2,6 +2,7 @@ export * from "./tokens";
 export * from "./ui/Text";
 export * from "./ui/Header";
 export * from "./ui/DecorativeBackground";
+export * from "./ui/Loading";
 export * from "./ui/Button";
 export * from "./ui/Squircle";
 export * from "./ui/Badge";

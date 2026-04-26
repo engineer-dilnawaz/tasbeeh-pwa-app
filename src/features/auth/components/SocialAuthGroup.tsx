@@ -29,16 +29,18 @@ export function SocialAuthGroup({
         <SocialAuthButton network="facebook" onClick={onFacebook} />
       </div>
 
-      <Button
-        variant="ghost"
-        pill={true}
-        height={48}
-        onClick={onGuest}
-        className="mt-2 text-sm text-base-content/50 hover:text-base-content/80"
-        leftIcon={<Sparkles size={16} />}
-      >
-        Continue as Guest
-      </Button>
+      <div className="mt-2">
+        <Button
+          variant="google"
+          pill={true}
+          height={48}
+          onClick={onGuest}
+          className="text-sm text-base-content/60 hover:text-base-content/90"
+          leftIcon={<Sparkles size={16} className="text-primary/60" />}
+        >
+          Continue as Guest
+        </Button>
+      </div>
     </div>
   );
 }

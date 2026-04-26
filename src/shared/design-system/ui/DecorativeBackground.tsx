@@ -18,12 +18,26 @@ interface DecorativeBackgroundProps {
  * 
  * Use this as the first child of a relative container (like a Screen or Page).
  */
-export const DecorativeBackground: React.FC<DecorativeBackgroundProps> = ({
+export const DecorativeBackground = React.memo<DecorativeBackgroundProps>(({
   className = "",
   showDots = true,
   showCircles = true,
   showGlows = true,
 }) => {
+  // Memoize particle data to prevent re-randomization on every re-render
+  const particles = React.useMemo(() => {
+    if (!showDots) return [];
+    return [...Array(60)].map((_, i) => ({
+      id: i,
+      size: Math.random() * 3 + 2,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animateX: [0, Math.random() * 120 - 60, Math.random() * 120 - 60, 0],
+      animateY: [0, Math.random() * 120 - 60, Math.random() * 120 - 60, 0],
+      duration: Math.random() * 20 + 15,
+    }));
+  }, [showDots]);
+
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none z-0 ${className}`}>
       {/* Background Decorative Circles */}
@@ -45,34 +59,33 @@ export const DecorativeBackground: React.FC<DecorativeBackgroundProps> = ({
       {/* Animated Particles (Dots) */}
       {showDots && (
         <div className="absolute inset-0 z-0 overflow-hidden">
-          {[...Array(60)].map((_, i) => {
-            const size = Math.random() * 3 + 2; // 2px to 5px
-            return (
-              <motion.div
-                key={i}
-                className="absolute rounded-full bg-base-content/40"
-                style={{
-                  width: size,
-                  height: size,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                }}
-                animate={{
-                  x: [0, Math.random() * 120 - 60, Math.random() * 120 - 60, 0],
-                  y: [0, Math.random() * 120 - 60, Math.random() * 120 - 60, 0],
-                  opacity: [0.3, 0.6, 0.3],
-                  scale: [1, 1.3, 1],
-                }}
-                transition={{
-                  duration: Math.random() * 20 + 15,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            );
-          })}
+          {particles.map((p) => (
+            <motion.div
+              key={p.id}
+              className="absolute rounded-full bg-base-content/40"
+              style={{
+                width: p.size,
+                height: p.size,
+                left: p.left,
+                top: p.top,
+              }}
+              animate={{
+                x: p.animateX,
+                y: p.animateY,
+                opacity: [0.3, 0.6, 0.3],
+                scale: [1, 1.3, 1],
+              }}
+              transition={{
+                duration: p.duration,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
         </div>
       )}
     </div>
   );
-};
+});
+
+DecorativeBackground.displayName = "DecorativeBackground";

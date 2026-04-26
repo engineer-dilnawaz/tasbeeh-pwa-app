@@ -1,9 +1,9 @@
-import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import React, { useState } from "react";
 import { Squircle } from "./Squircle";
 
 type InputSize = "xs" | "sm" | "md" | "lg" | "xl";
-type InputVariant = "bordered" | "ghost" | "transparent";
+type InputVariant = "bordered" | "ghost" | "transparent" | "white";
 
 interface TextInputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -79,7 +79,9 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
         ? "input-ghost border-none"
         : variant === "transparent"
           ? "bg-transparent border-none focus:outline-none focus:ring-0"
-          : "border-none bg-base-content/5 dark:bg-white/5 focus:bg-base-content/8 dark:focus:bg-white/8";
+          : variant === "white"
+            ? "bg-[var(--color-surface-card)] border-none focus:bg-[var(--color-surface-card)]"
+            : "border-none bg-base-content/5 dark:bg-white/5 focus:bg-base-content/8 dark:focus:bg-white/8";
     const radius = sizeRadius[size];
     const errorBgClass = isInvalid ? "bg-error/10" : "";
 
@@ -100,6 +102,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
       variantClass,
       className,
       errorBgClass,
+      inputProps.disabled ? "opacity-60 cursor-not-allowed select-none" : "",
     ]
       .filter(Boolean)
       .join(" ");

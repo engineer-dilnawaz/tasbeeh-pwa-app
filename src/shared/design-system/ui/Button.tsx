@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import type { HTMLMotionProps } from "framer-motion";
 import { Squircle } from "@squircle-js/react";
 import { TOKENS } from "../tokens";
+import { Loading } from "./Loading";
 
 type ButtonVariant =
   | "primary"
@@ -64,10 +65,10 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const isSocial = variant === "google" || variant === "apple";
-  const needsSolidBase = 
-    variant === "ghost" || 
-    variant === "outline" || 
-    variant === "google" || 
+  const needsSolidBase =
+    variant === "ghost" ||
+    variant === "outline" ||
+    variant === "google" ||
     variant === "apple";
 
   // Use DaisyUI 'loading' class if isLoading is true
@@ -75,28 +76,26 @@ export const Button: React.FC<ButtonProps> = ({
     ? `relative flex items-center justify-center gap-3 font-semibold transition-all w-full h-full border-none ${variantClasses[variant]}`
     : `btn relative animate-none font-semibold border-none w-full h-full ${variantClasses[variant]}`;
 
-  const classes = [
-    baseClasses,
-    "disabled:cursor-not-allowed",
-    isLoading ? "" : "disabled:opacity-50",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   const buttonHeight = height || sizeHeights[size];
   const radius = pill ? 999 : 16;
   const smoothing = pill ? 0 : 0.99;
 
+  // Separate layout classes from component classes if needed, 
+  // but for now applying to wrapper is more robust for layout.
+  const wrapperClasses = `relative z-10 ${className}`;
+
   return (
-    <div className="w-full sm:w-auto h-fit relative">
+    <div 
+      className={wrapperClasses} 
+      style={{ height: buttonHeight }}
+    >
       {needsSolidBase && (
         <div className="absolute inset-0 z-0">
           <Squircle
             cornerRadius={radius}
             cornerSmoothing={smoothing}
             height={buttonHeight}
-            className="bg-base-100"
+            className="bg-base-100 opacity-100 w-full h-full"
           />
         </div>
       )}
@@ -109,18 +108,23 @@ export const Button: React.FC<ButtonProps> = ({
         <motion.button
           whileTap={{ scale: 0.97 }}
           transition={TOKENS.motion.spring}
-          className={`${classes} z-10`}
+          className={`${baseClasses} ${isLoading ? "" : "disabled:opacity-50"} disabled:cursor-not-allowed relative z-10 w-full h-full p-0 flex items-center justify-center overflow-hidden ${needsSolidBase ? "bg-base-100" : ""}`}
           disabled={isLoading || props.disabled}
           {...props}
         >
+          {/* Subtle overlay to match variant aesthetic while remaining opaque - only for social/ghost/outline */}
+          {needsSolidBase && (
+            <div className="absolute inset-0 z-0 bg-base-content/5 pointer-events-none" />
+          )}
+          
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-base-content/5 backdrop-blur-[1px]">
-              <span className="loading loading-spinner h-5 w-5 text-current" />
+            <div className="absolute inset-0 flex items-center justify-center bg-base-content/5 backdrop-blur-[1px] z-20">
+              <Loading size="md" className="text-current" />
             </div>
           )}
 
           <div
-            className={`flex items-center justify-center gap-2 ${isLoading ? "opacity-0" : "opacity-100"}`}
+            className={`flex items-center justify-center gap-2 relative z-10 w-full h-full ${isLoading ? "opacity-0" : "opacity-100"}`}
           >
             {leftIcon && <span className="flex items-center">{leftIcon}</span>}
             {children}

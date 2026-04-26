@@ -3,6 +3,8 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/services/firebase/auth";
 import { APP_ROUTES } from "@/shared/routes";
 
+import { Loading } from "@/shared/design-system";
+
 interface AuthGuardProps {
   children: React.ReactNode;
 }
@@ -13,28 +15,22 @@ interface AuthGuardProps {
  * authentication once the static flag or actual auth state is wired.
  */
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { user, loading } = useAuth();
-  const isAuthenticated = !!user;
+  const { user, loading, isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // Static flag to toggle protection for development/testing
-  const IS_PROTECTION_ENABLED = true;
-
   if (loading) {
+    return <Loading fullScreen />;
+  }
+
+  if (!isAuthenticated) {
+    // Redirect to signin but save the attempted location
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-base-100">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
+      <Navigate to={APP_ROUTES.SIGNIN} state={{ from: location }} replace />
     );
   }
 
-  if (IS_PROTECTION_ENABLED && !isAuthenticated) {
-    // Redirect to signin but save the attempted location
-    return <Navigate to={APP_ROUTES.SIGNIN} state={{ from: location }} replace />;
-  }
-
   // Enforce email verification for non-anonymous (email/social) users
-  if (IS_PROTECTION_ENABLED && isAuthenticated && !user?.isAnonymous && !user?.emailVerified) {
+  if (isAuthenticated && !user?.isAnonymous && !user?.emailVerified) {
     return <Navigate to={APP_ROUTES.VERIFY_EMAIL} replace />;
   }
 

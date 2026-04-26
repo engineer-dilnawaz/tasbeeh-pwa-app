@@ -47,6 +47,6 @@ export function useAppLottie(key: LottieAnimationKey, options: UseAppLottieOptio
   });
 
   return {
-    LottieView: React.cloneElement(View as React.ReactElement, { key }),
+    LottieView: View,
   };
 }

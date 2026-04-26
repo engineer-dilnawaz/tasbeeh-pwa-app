@@ -1,6 +1,6 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useAuth } from "@/services/firebase/auth";
 import { Cloud, ImagePlus, ShieldCheck, Sparkles, X } from "lucide-react";
-import { useAuth, signOutUser } from "@/services/firebase/auth";
+import { useRef, useState, type ChangeEvent } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
@@ -70,7 +70,6 @@ export default function SettingsProfile() {
     });
     event.target.value = "";
   };
-
 
   if (loading) {
     return (
@@ -201,18 +200,12 @@ export default function SettingsProfile() {
               <FormItem>
                 <FormLabel>Display Name</FormLabel>
                 <FormControl>
-                  <Squircle
-                    cornerRadius={18}
-                    cornerSmoothing={0.9}
-                    className="surface-card w-full p-1"
-                  >
-                    <TextInput
-                      {...field}
-                      variant="ghost"
-                      className="bg-transparent"
-                      placeholder="Your display name"
-                    />
-                  </Squircle>
+                  <TextInput
+                    {...field}
+                    variant="white"
+                    className="shadow-sm"
+                    placeholder="Your display name"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -233,19 +226,13 @@ export default function SettingsProfile() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Squircle
-                    cornerRadius={18}
-                    cornerSmoothing={0.9}
-                    className="surface-card w-full p-1"
-                  >
-                    <TextInput
-                      {...field}
-                      variant="ghost"
-                      className="bg-transparent"
-                      disabled={!!user}
-                      placeholder="name@example.com"
-                    />
-                  </Squircle>
+                  <TextInput
+                    {...field}
+                    variant="white"
+                    disabled={!!user}
+                    className="shadow-sm"
+                    placeholder="name@example.com"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -258,26 +245,20 @@ export default function SettingsProfile() {
             rules={{
               required: "Username is required.",
               pattern: {
-                value: /^@[a-zA-Z0-9_]{3,20}$/,
-                message: "Use @name format with 3-20 valid characters.",
+                value: /^@?[a-zA-Z0-9._]{3,30}$/,
+                message: "Use @name format with 3-30 valid characters (letters, numbers, . or _).",
               },
             }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Squircle
-                    cornerRadius={18}
-                    cornerSmoothing={0.9}
-                    className="surface-card w-full p-1"
-                  >
-                    <TextInput
-                      {...field}
-                      variant="ghost"
-                      className="bg-transparent"
-                      placeholder="@username"
-                    />
-                  </Squircle>
+                  <TextInput
+                    {...field}
+                    variant="white"
+                    className="shadow-sm"
+                    placeholder="@username"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -302,19 +283,20 @@ export default function SettingsProfile() {
                   </Text>
                 </div>
                 <FormControl>
-                  <Squircle
-                    cornerRadius={18}
-                    cornerSmoothing={0.9}
-                    className="surface-card w-full p-1"
-                  >
-                    <textarea
-                      {...field}
-                      rows={3}
-                      maxLength={120}
-                      placeholder="A short line about you..."
-                      className="w-full resize-none bg-transparent px-4 py-3 text-sm text-base-content outline-none placeholder:text-base-content/40"
-                    />
-                  </Squircle>
+                  <div className="w-full relative">
+                    <Squircle cornerRadius={18} cornerSmoothing={0.9} asChild>
+                      <div className="absolute inset-0 bg-base-100 pointer-events-none" />
+                    </Squircle>
+                    <Squircle cornerRadius={18} cornerSmoothing={0.9} asChild>
+                      <textarea
+                        {...field}
+                        rows={3}
+                        maxLength={120}
+                        placeholder="A short line about you..."
+                        className="w-full resize-none bg-(--color-surface-card) px-4 py-3 text-sm text-base-content outline-none placeholder:text-base-content/40 relative z-10 block shadow-sm"
+                      />
+                    </Squircle>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -365,7 +347,6 @@ export default function SettingsProfile() {
               </FormItem>
             )}
           />
-
 
           <div className="fixed bottom-0 left-0 right-0 z-20 flex gap-2 bg-base-100/95 px-6 pb-[max(16px,env(safe-area-inset-bottom,0px))] pt-4 backdrop-blur-sm shadow-[0_-1px_0_0_rgba(0,0,0,0.05)]">
             <Squircle cornerRadius={100} cornerSmoothing={0.92} asChild>
