@@ -64,6 +64,11 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const isSocial = variant === "google" || variant === "apple";
+  const needsSolidBase = 
+    variant === "ghost" || 
+    variant === "outline" || 
+    variant === "google" || 
+    variant === "apple";
 
   // Use DaisyUI 'loading' class if isLoading is true
   const baseClasses = isSocial
@@ -79,18 +84,32 @@ export const Button: React.FC<ButtonProps> = ({
     .filter(Boolean)
     .join(" ");
 
+  const buttonHeight = height || sizeHeights[size];
+  const radius = pill ? 999 : 16;
+  const smoothing = pill ? 0 : 0.99;
+
   return (
-    <div className="w-full sm:w-auto h-fit">
+    <div className="w-full sm:w-auto h-fit relative">
+      {needsSolidBase && (
+        <div className="absolute inset-0 z-0">
+          <Squircle
+            cornerRadius={radius}
+            cornerSmoothing={smoothing}
+            height={buttonHeight}
+            className="bg-base-100"
+          />
+        </div>
+      )}
       <Squircle
         asChild
-        cornerRadius={pill ? 999 : 16}
-        cornerSmoothing={pill ? 0 : 0.99}
-        height={height || sizeHeights[size]}
+        cornerRadius={radius}
+        cornerSmoothing={smoothing}
+        height={buttonHeight}
       >
         <motion.button
           whileTap={{ scale: 0.97 }}
           transition={TOKENS.motion.spring}
-          className={classes}
+          className={`${classes} z-10`}
           disabled={isLoading || props.disabled}
           {...props}
         >

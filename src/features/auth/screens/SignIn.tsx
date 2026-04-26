@@ -5,7 +5,7 @@ import {
   SocialAuthGroup,
 } from "@/features/auth";
 import { useSignInAction } from "@/features/auth/hooks/useSignInAction";
-import { PillTabs } from "@/shared/design-system";
+import { PillTabs, DecorativeBackground } from "@/shared/design-system";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
@@ -31,21 +31,7 @@ export default function SignIn() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center pt-16 bg-base-100 overflow-hidden px-6 pb-20 gap-8 text-base-content">
-      {/* Background Decorative Circles - Theme Aware */}
-      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
-      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
-      <div className="absolute top-1/2 -right-24 w-64 h-64 bg-primary opacity-[0.06] rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="absolute bottom-[-100px] -left-24 w-80 h-80 bg-primary opacity-[0.04] rounded-full blur-3xl pointer-events-none z-0" />
-
-      {/* Subtle Dot Pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.15] pointer-events-none z-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 2px 2px, var(--color-base-content) 1px, transparent 0)",
-          backgroundSize: "32px 32px",
-        }}
-      />
+      <DecorativeBackground />
       {/* Heading Section */}
       <div className="w-full max-w-[420px] text-center space-y-2 select-none">
         <motion.h1
@@ -61,7 +47,7 @@ export default function SignIn() {
             willChange: "transform, opacity",
             backfaceVisibility: "hidden",
           }}
-          className="text-3xl font-medium text-black dark:text-white"
+          className="text-3xl font-medium"
         >
           {mode === "signin" ? "Welcome Back" : "Create Account"}
         </motion.h1>
@@ -79,7 +65,7 @@ export default function SignIn() {
             willChange: "transform, opacity",
             backfaceVisibility: "hidden",
           }}
-          className="text-base text-gray-500"
+          className="text-base text-base-content/60"
         >
           {mode === "signin"
             ? "Your personal companion for spiritual consistency"

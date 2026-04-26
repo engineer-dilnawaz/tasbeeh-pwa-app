@@ -16,34 +16,36 @@ import SettingsFeedback from "@/pages/SettingsFeedback";
 import SettingsAbout from "@/pages/SettingsAbout";
 import SettingsProfile from "@/pages/SettingsProfile";
 import { SignIn, ForgotPassword } from "@/features/auth";
+import { VerifyEmail } from "@/pages/VerifyEmail";
 import TestScreen from "@/pages/TestScreen";
 import { TasbeehTestDashboard } from "@/features/tasbeeh/test/TasbeehTestDashboard";
 import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { AuthGuard } from "@/app/router/AuthGuard";
+import { APP_ROUTES } from "@/shared/routes";
 
 /**
  * Public routes accessible to everyone
  */
 const publicRoutes: RouteObject[] = [
   {
-    path: "/",
+    path: APP_ROUTES.INDEX,
     element: <SplashScreen />,
-    errorElement: <ErrorBoundary />,
   },
   {
-    path: "/onboarding",
+    path: APP_ROUTES.ONBOARDING,
     element: <Onboarding />,
-    errorElement: <ErrorBoundary />,
   },
   {
-    path: "/signin",
+    path: APP_ROUTES.SIGNIN,
     element: <SignIn />,
-    errorElement: <ErrorBoundary />,
   },
   {
-    path: "/forgot-password",
+    path: APP_ROUTES.FORGOT_PASSWORD,
     element: <ForgotPassword />,
-    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: APP_ROUTES.VERIFY_EMAIL,
+    element: <VerifyEmail />,
   },
 ];
 
@@ -57,17 +59,16 @@ const protectedRoutes: RouteObject[] = [
         <AppShell />
       </AuthGuard>
     ),
-    errorElement: <ErrorBoundary />,
     children: [
-      { path: "/home", element: <Home /> },
-      { path: "/stats", element: <Stats /> },
-      { path: "/settings", element: <Settings /> },
-      { path: "/collections", element: <Collections /> },
-      { path: "/collections/new", element: <CollectionsNew /> },
-      { path: "/collections/filter", element: <CollectionsFilter /> },
-      { path: "/settings/feedback", element: <SettingsFeedback /> },
-      { path: "/settings/about", element: <SettingsAbout /> },
-      { path: "/settings/profile", element: <SettingsProfile /> },
+      { path: APP_ROUTES.HOME, element: <Home /> },
+      { path: APP_ROUTES.STATS, element: <Stats /> },
+      { path: APP_ROUTES.SETTINGS, element: <Settings /> },
+      { path: APP_ROUTES.COLLECTIONS, element: <Collections /> },
+      { path: APP_ROUTES.COLLECTIONS_NEW, element: <CollectionsNew /> },
+      { path: APP_ROUTES.COLLECTIONS_FILTER, element: <CollectionsFilter /> },
+      { path: APP_ROUTES.SETTINGS_FEEDBACK, element: <SettingsFeedback /> },
+      { path: APP_ROUTES.SETTINGS_ABOUT, element: <SettingsAbout /> },
+      { path: APP_ROUTES.SETTINGS_PROFILE, element: <SettingsProfile /> },
     ],
   },
 ];
@@ -77,23 +78,29 @@ const protectedRoutes: RouteObject[] = [
  */
 const utilityRoutes: RouteObject[] = [
   {
-    path: "/test",
+    path: APP_ROUTES.TEST,
     element: <TestScreen />,
-    errorElement: <ErrorBoundary />,
   },
   {
-    path: "/tester",
+    path: APP_ROUTES.TESTER,
     element: <TasbeehTestDashboard />,
-    errorElement: <ErrorBoundary />,
   },
   {
     path: "*",
-    element: <Navigate to="/" replace />,
+    element: <Navigate to={APP_ROUTES.INDEX} replace />,
   },
 ];
 
+import RootLayout from "@/app/layout/RootLayout";
+
 export const router = createBrowserRouter([
-  ...publicRoutes,
-  ...protectedRoutes,
-  ...utilityRoutes,
+  {
+    element: <RootLayout />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      ...publicRoutes,
+      ...protectedRoutes,
+      ...utilityRoutes,
+    ],
+  },
 ]);

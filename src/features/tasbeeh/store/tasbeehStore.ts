@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { indexedDbStorage } from "@/shared/utils/indexedDbStorage";
 import {
   bootstrapTasbeehDb,
   completeRoundProgress,
@@ -92,7 +93,7 @@ export const useTasbeehStore = create<TasbeehState>()(
       hydrateFromDb: async () => {
         await bootstrapTasbeehDb();
         
-        // 1. Recover state from localStorage
+        // 1. Recover state from Storage (IndexedDB)
         const { activeSlots, primarySlotIndex } = get();
         
         // 2. Sync if slot exists and has items
@@ -269,8 +270,8 @@ export const useTasbeehStore = create<TasbeehState>()(
       },
 
       resetEverything: async () => {
-        // 1. Clear LocalStorage to prevent re-hydration of old state
-        localStorage.removeItem("tasbeeh-home-storage");
+        // 1. Clear Storage to prevent re-hydration of old state
+        await indexedDbStorage.removeItem("tasbeeh-home-storage");
         
         // 2. Wipe IndexedDB (All 7 tables)
         await factoryReset();
@@ -291,7 +292,7 @@ export const useTasbeehStore = create<TasbeehState>()(
     }),
     {
       name: "tasbeeh-home-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => indexedDbStorage),
     },
   ),
 );

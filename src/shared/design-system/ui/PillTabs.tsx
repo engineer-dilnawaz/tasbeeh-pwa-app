@@ -25,7 +25,12 @@ export function PillTabs<T extends string>({
   className = "",
 }: PillTabsProps<T>) {
   return (
-    <div className={`p-1.5 bg-white border border-base-content/5 rounded-full flex items-center gap-1 ${className}`}>
+    <div className="relative p-1.5 flex items-center gap-1">
+      {/* Solid background to prevent pattern bleed-through */}
+      <div className="absolute inset-0 bg-base-100 rounded-full" />
+      {/* Themed overlay */}
+      <div className="absolute inset-0 bg-base-content/5 dark:bg-white/5 border border-base-content/5 rounded-full" />
+      
       {options.map((option) => {
         const isActive = activeTab === option.id;
         
@@ -34,7 +39,7 @@ export function PillTabs<T extends string>({
             key={option.id}
             onClick={() => onChange(option.id)}
             className={`relative flex-1 py-3 px-6 rounded-full text-sm font-semibold transition-colors duration-200 z-10 ${
-              isActive ? "text-primary-content" : "text-base-content/50 hover:text-base-content/80"
+              isActive ? "text-primary-content" : "text-base-content/60 hover:text-base-content"
             }`}
           >
             {isActive && (

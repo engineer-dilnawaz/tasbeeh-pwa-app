@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/services/firebase/auth";
+import { APP_ROUTES } from "@/shared/routes";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -29,7 +30,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   if (IS_PROTECTION_ENABLED && !isAuthenticated) {
     // Redirect to signin but save the attempted location
-    return <Navigate to="/signin" state={{ from: location }} replace />;
+    return <Navigate to={APP_ROUTES.SIGNIN} state={{ from: location }} replace />;
+  }
+
+  // Enforce email verification for non-anonymous (email/social) users
+  if (IS_PROTECTION_ENABLED && isAuthenticated && !user?.isAnonymous && !user?.emailVerified) {
+    return <Navigate to={APP_ROUTES.VERIFY_EMAIL} replace />;
   }
 
   return <>{children}</>;

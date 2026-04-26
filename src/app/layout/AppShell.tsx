@@ -16,6 +16,7 @@ import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { useTheme } from "@/shared/design-system/hooks/useTheme";
 import { BottomNav, type TabItem } from "@/shared/design-system/ui/BottomNav";
 import { Header } from "@/shared/design-system/ui/Header";
+import { useFirestoreNetwork } from "@/shared/hooks/useFirestoreNetwork";
 
 const tabs: TabItem[] = [
   { id: "home", label: "Home", icon: <House size={20} /> },
@@ -41,27 +42,12 @@ export default function AppShell() {
   const location = useLocation();
   const { setTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const hydrateFromDb = useSettingsStore((state) => state.hydrateFromDb);
-  const isHydrated = useSettingsStore((state) => state.isHydrated);
+
+  // Manage Firebase network state (offline/online)
+  useFirestoreNetwork();
   const bottomNavVariant = useSettingsStore(
     (state) => state.appearance.bottomNavVariant ?? "bar",
   );
-  const theme = useSettingsStore((state) => state.appearance.theme);
-
-  // One-time hydration of settings from IndexedDB.
-  // Keeps localStorage out of the loop entirely.
-  React.useEffect(() => {
-    if (!isHydrated) {
-      void hydrateFromDb();
-    }
-  }, [hydrateFromDb, isHydrated]);
-
-  // Keep DOM theme in sync with hydrated store.
-  React.useEffect(() => {
-    if (isHydrated) {
-      setTheme(theme);
-    }
-  }, [setTheme, theme, isHydrated]);
 
   const activeTab = location.pathname.startsWith("/settings")
     ? "settings"
@@ -101,18 +87,22 @@ export default function AppShell() {
               type="button"
               onClick={() => navigate(backTarget)}
               aria-label="Go back"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-base-content/20 bg-base-200/55 text-base-content/80 transition-colors hover:bg-base-200"
+              className="group relative flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
             >
-              <ArrowLeft size={18} />
+              <div className="absolute inset-0 bg-base-100 rounded-full" />
+              <div className="absolute inset-0 bg-base-content/5 border border-base-content/10 rounded-full group-hover:bg-base-content/10 transition-colors" />
+              <ArrowLeft size={18} className="relative z-10 text-base-content/80" />
             </button>
           ) : (
             <button
               type="button"
               onClick={() => setIsSidebarOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-base-200/50 text-base-content/70 active:scale-90 transition-transform"
+              className="group relative flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
               aria-label="Open sidebar"
             >
-              <Menu size={18} />
+              <div className="absolute inset-0 bg-base-100 rounded-full" />
+              <div className="absolute inset-0 bg-base-content/5 rounded-full group-hover:bg-base-content/10 transition-colors" />
+              <Menu size={18} className="relative z-10 text-base-content/70" />
             </button>
           )
         }

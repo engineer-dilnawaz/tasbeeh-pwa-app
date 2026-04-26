@@ -14,6 +14,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  DecorativeBackground,
 } from "@/shared/design-system";
 import { TextInput } from "@/shared/design-system/ui/TextInput";
 import { useSignInAction } from "../hooks/useSignInAction";
@@ -41,34 +42,24 @@ export default function ForgotPassword() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-base-100 overflow-hidden text-base-content">
-      {/* Background Decorative Circles - Theme Aware */}
-      <div className="absolute top-[-250px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
-      <div className="absolute top-[-220px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-base-content/5 rounded-full -translate-y-1/2 pointer-events-none z-0" />
-      <div className="absolute top-1/2 -right-24 w-64 h-64 bg-primary opacity-[0.06] rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="absolute bottom-[-100px] -left-24 w-80 h-80 bg-primary opacity-[0.04] rounded-full blur-3xl pointer-events-none z-0" />
-
-      {/* Subtle Dot Pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.15] pointer-events-none z-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 2px 2px, var(--color-base-content) 1px, transparent 0)",
-          backgroundSize: "32px 32px",
-        }}
-      />
+      <DecorativeBackground />
 
       {/* Common Header */}
       <Header
         left={
           <button
             onClick={() => navigate("/signin")}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-base-content/5 text-base-content transition-transform active:scale-90"
+            className="group relative flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-90"
           >
-            <ChevronLeft size={20} />
+            {/* Solid base */}
+            <div className="absolute inset-0 bg-base-100 rounded-full" />
+            {/* Themed overlay */}
+            <div className="absolute inset-0 bg-base-content/5 text-base-content rounded-full group-hover:bg-base-content/10 transition-colors" />
+            <ChevronLeft size={20} className="relative z-10" />
           </button>
         }
         title="Reset Password"
-        className="bg-transparent"
+        className="border-none"
       />
 
       <div className="relative z-10 flex-1 flex flex-col items-center px-6 pt-12 pb-20 gap-8">

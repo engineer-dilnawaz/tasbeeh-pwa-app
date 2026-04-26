@@ -129,6 +129,7 @@ class TasbeehDexieDb extends Dexie {
   tasbeehCollections!: EntityTable<TasbeehCollectionGroupRow, "id">;
   tasbeehPhrases!: EntityTable<TasbeehPhraseRow, "id">;
   collectionItems!: EntityTable<CollectionItemRow, "id">;
+  kvStore!: EntityTable<{ key: string; value: any }, "key">;
 
   constructor() {
     super("tasbeehFlowDb");
@@ -187,7 +188,7 @@ class TasbeehDexieDb extends Dexie {
       appConfig: "id,userId,updatedAt,syncStatus",
     });
 
-    this.version(4).stores({
+    this.version(5).stores({
       tasbeehCollection:
         "id,[userId+sortOrder],[userId+isArchived],isDefault,updatedAt,syncStatus",
       userProgress: "id,userId,updatedAt,syncStatus,[userId+updatedAt]",
@@ -199,6 +200,7 @@ class TasbeehDexieDb extends Dexie {
       tasbeehPhrases: "id,userId,isArchived,updatedAt,syncStatus",
       collectionItems:
         "id,userId,collectionId,phraseId,role,sortOrder,updatedAt,syncStatus,[collectionId+sortOrder]",
+      kvStore: "key",
     });
   }
 }

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { indexedDbStorage } from "@/shared/utils/indexedDbStorage";
 
 interface OnboardingState {
   hasCompletedOnboarding: boolean;
@@ -16,7 +17,7 @@ export const useOnboardingStore = create<OnboardingState>()(
     }),
     {
       name: "onboarding-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => indexedDbStorage),
     }
   )
 );

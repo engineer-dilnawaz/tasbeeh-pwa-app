@@ -19,7 +19,7 @@ export function SocialAuthGroup({
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-base-content/10"></div>
         </div>
-        <span className="relative px-4 text-sm font-medium text-black dark:text-white bg-base-100 uppercase tracking-widest text-[10px]">
+        <span className="relative px-4 font-medium text-base-content/40 bg-base-100 uppercase tracking-widest text-[10px]">
           or continue with
         </span>
       </div>

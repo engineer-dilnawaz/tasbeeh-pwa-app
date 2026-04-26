@@ -30,9 +30,13 @@ export const Header: React.FC<HeaderProps> = ({
             <Squircle
               cornerRadius={24}
               cornerSmoothing={0.8}
-              className={`flex h-[72px] w-full items-center justify-between px-4 bg-white dark:bg-black pt-4 ${className}`}
+              className={`flex h-[72px] w-full items-center justify-between px-4 bg-base-100 pt-4 relative ${className}`}
             >
-              <div className="flex h-14 w-full items-center justify-between">
+              {/* Solid base layer + Overlay to match inputs/buttons */}
+              <div className="absolute inset-0 bg-base-100" />
+              <div className="absolute inset-0 bg-base-content/5" />
+              
+              <div className="relative z-10 flex h-14 w-full items-center justify-between">
                 {/* Left Slot */}
                 <div className="flex w-1/4 items-center justify-start gap-2">
                   {left}

@@ -4,13 +4,15 @@ import {
   patchAppConfigData,
   readAppConfigData,
 } from "@/features/settings/services/appConfigRepository";
+import { updateUserSettings } from "@/services/firebase/userService";
+import { auth } from "@/services/firebase/config";
 
 export type AnimationLevel = "full" | "reduced" | "off";
 export type HapticIntensity = "light" | "medium" | "strong";
 export type BeadSoundType = "click" | "wood" | "soft";
 export type AppLanguage = "english" | "arabic" | "urdu";
 
-interface ProfileSettings {
+export interface ProfileSettings {
   displayName: string;
   email: string;
   username: string;
@@ -19,26 +21,26 @@ interface ProfileSettings {
   profileVisible: boolean;
 }
 
-interface AppearanceSettings {
+export interface AppearanceSettings {
   theme: "light" | "dark";
   animationLevel: AnimationLevel;
   bottomNavVariant: "bar" | "glass-dock";
 }
 
-interface InteractionSettings {
+export interface InteractionSettings {
   hapticsEnabled: boolean;
   hapticsIntensity: HapticIntensity;
   beadSoundEnabled: boolean;
   beadSoundType: BeadSoundType;
 }
 
-interface AccessibilitySettings {
+export interface AccessibilitySettings {
   largeText: boolean;
   highContrast: boolean;
   reduceMotion: boolean;
 }
 
-interface NotificationSettings {
+export interface NotificationSettings {
   enabled: boolean;
   dailyReminderTime: string;
   streakReminderEnabled: boolean;
@@ -99,6 +101,11 @@ export const useSettingsStore = create<SettingsState>()(
 
     hydrateFromDb: async () => {
       const data = await readAppConfigData();
+      
+      // Sync theme to localStorage cache for flash prevention on next load
+      if (data.appearance.theme) {
+        localStorage.setItem("tasbeeh-theme", data.appearance.theme);
+      }
       set({
         appearance: {
           ...get().appearance,
@@ -130,29 +137,42 @@ export const useSettingsStore = create<SettingsState>()(
       });
     },
 
-    setProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
+    setProfile: (patch) => {
+      set((state) => ({ profile: { ...state.profile, ...patch } }));
+      const user = auth.currentUser;
+      if (user) {
+        void updateUserSettings(user.uid, { profile: { ...get().profile } });
+      }
+    },
     setAppearance: (patch) => {
       set((state) => ({ appearance: { ...state.appearance, ...patch } }));
-      const next = { ...get().appearance, ...patch };
+      const next = { ...get().appearance };
+
+      // Sync theme to localStorage cache for flash prevention on next load
+      if (patch.theme) {
+        localStorage.setItem("tasbeeh-theme", patch.theme);
+      }
+
       void patchAppConfigData({
-        appearance: {
-          theme: next.theme,
-          animationLevel: next.animationLevel,
-          bottomNavVariant: next.bottomNavVariant,
-        },
+        appearance: next,
       });
+
+      const user = auth.currentUser;
+      if (user) {
+        void updateUserSettings(user.uid, { "settings.appearance": next });
+      }
     },
     setInteraction: (patch) => {
       set((state) => ({ interaction: { ...state.interaction, ...patch } }));
-      const next = { ...get().interaction, ...patch };
+      const next = { ...get().interaction };
       void patchAppConfigData({
-        interaction: {
-          hapticsEnabled: next.hapticsEnabled,
-          hapticsIntensity: next.hapticsIntensity,
-          beadSoundEnabled: next.beadSoundEnabled,
-          beadSoundType: next.beadSoundType,
-        },
+        interaction: next,
       });
+
+      const user = auth.currentUser;
+      if (user) {
+        void updateUserSettings(user.uid, { "settings.interaction": next });
+      }
     },
     setLanguage: (language) => {
       set({ language });
@@ -161,29 +181,35 @@ export const useSettingsStore = create<SettingsState>()(
           appLanguage: language,
         },
       });
+
+      const user = auth.currentUser;
+      if (user) {
+        void updateUserSettings(user.uid, { "settings.language": language });
+      }
     },
     setAccessibility: (patch) => {
       set((state) => ({ accessibility: { ...state.accessibility, ...patch } }));
-      const next = { ...get().accessibility, ...patch };
+      const next = { ...get().accessibility };
       void patchAppConfigData({
-        accessibility: {
-          largeText: next.largeText,
-          highContrast: next.highContrast,
-          reduceMotion: next.reduceMotion,
-        },
+        accessibility: next,
       });
+
+      const user = auth.currentUser;
+      if (user) {
+        void updateUserSettings(user.uid, { "settings.accessibility": next });
+      }
     },
     setNotifications: (patch) => {
       set((state) => ({ notifications: { ...state.notifications, ...patch } }));
-      const next = { ...get().notifications, ...patch };
+      const next = { ...get().notifications };
       void patchAppConfigData({
-        notifications: {
-          enabled: next.enabled,
-          dailyReminderTime: next.dailyReminderTime,
-          streakReminderEnabled: next.streakReminderEnabled,
-        },
+        notifications: next,
       });
+
+      const user = auth.currentUser;
+      if (user) {
+        void updateUserSettings(user.uid, { "settings.notifications": next });
+      }
     },
   }),
 );
-

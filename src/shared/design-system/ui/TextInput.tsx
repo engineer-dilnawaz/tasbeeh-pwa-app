@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { Squircle } from "./Squircle";
 
 type InputSize = "xs" | "sm" | "md" | "lg" | "xl";
 type InputVariant = "bordered" | "ghost" | "transparent";
 
-interface TextInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
+interface TextInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "size"
+> {
   size?: InputSize;
   variant?: InputVariant;
   label?: string;
@@ -60,98 +63,121 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
       className = "",
       ...inputProps
     },
-    ref
+    ref,
   ) => {
     const isInvalid = error || inputProps["aria-invalid"] === true;
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = inputProps.type === "password";
-    const currentType = isPassword ? (showPassword ? "text" : "password") : inputProps.type;
+    const currentType = isPassword
+      ? showPassword
+        ? "text"
+        : "password"
+      : inputProps.type;
 
     const variantClass =
       variant === "ghost"
         ? "input-ghost border-none"
         : variant === "transparent"
           ? "bg-transparent border-none focus:outline-none focus:ring-0"
-          : "border-none bg-white dark:bg-[#121212]";
+          : "border-none bg-base-content/5 dark:bg-white/5 focus:bg-base-content/8 dark:focus:bg-white/8";
     const radius = sizeRadius[size];
     const errorBgClass = isInvalid ? "bg-error/10" : "";
 
     // Ensure error color classes win over consumer-provided classes.
     // (If a consumer sets `border-*`, we still want `input-error` to take precedence.)
     const baseClasses = [
-      "input",
       "w-full",
       "outline-none",
+      "border-none",
       "transition-colors",
+      "focus:outline-none",
+      "focus:ring-0",
+      "focus-within:outline-none",
+      "focus-within:ring-0",
       "focus-visible:outline-none",
       "focus-visible:ring-0",
-      sizeClass[size],
+      "placeholder:text-base-content/30",
       variantClass,
       className,
-      // Prefer soft-error background over border color changes.
-      // Keep border styling stable; let background communicate the error state.
       errorBgClass,
     ]
       .filter(Boolean)
       .join(" ");
 
+    const sizeHeightClass: Record<InputSize, string> = {
+      xs: "h-8 px-3 text-xs",
+      sm: "h-10 px-3 text-sm",
+      md: "h-12 px-4 text-base",
+      lg: "h-14 px-4 text-lg",
+      xl: "h-16 px-5 text-xl",
+    };
+
     const inputElement =
       leftIcon || rightIcon ? (
-        <label
-          className={`${baseClasses} flex items-center gap-2`}
-          style={{ borderRadius: radius }}
-        >
-          {leftIcon && (
-            <span className="text-base-content/40 shrink-0">{leftIcon}</span>
-          )}
+        <Squircle cornerRadius={radius} cornerSmoothing={0.9} asChild>
+          <label
+            className={`${baseClasses} ${sizeHeightClass[size]} flex items-center gap-2 !border-none !outline-none !ring-0`}
+          >
+            {leftIcon && (
+              <span className="text-base-content/40 shrink-0">{leftIcon}</span>
+            )}
+            <input
+              ref={ref}
+              {...inputProps}
+              type={currentType}
+              className="grow bg-transparent outline-none py-2 border-none focus:ring-0"
+            />
+            {isPassword && (
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-base-content/30 hover:text-base-content/60 transition-colors p-1"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            )}
+            {rightIcon && (
+              <span className="text-base-content/40 shrink-0">{rightIcon}</span>
+            )}
+          </label>
+        </Squircle>
+      ) : (
+        <Squircle cornerRadius={radius} cornerSmoothing={0.9} asChild>
           <input
             ref={ref}
             {...inputProps}
-            type={currentType}
-            className="grow bg-transparent outline-none py-2"
+            className={`${baseClasses} ${sizeHeightClass[size]} !border-none !outline-none !ring-0`}
           />
-          {isPassword && (
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-base-content/30 hover:text-base-content/60 transition-colors p-1"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          )}
-          {rightIcon && (
-            <span className="text-base-content/40 shrink-0">{rightIcon}</span>
-          )}
-        </label>
-      ) : (
-        <input
-          ref={ref}
-          {...inputProps}
-          className={baseClasses}
-          style={{ borderRadius: radius }}
-        />
+        </Squircle>
       );
 
     return (
       <div className={`w-full ${containerClassName}`}>
         {label && (
-          <label className={`block mb-1.5 font-semibold text-sm text-base-content/70 px-1`}>
+          <label
+            className={`block mb-1.5 font-semibold text-sm text-base-content/70 px-1`}
+          >
             {label}
           </label>
         )}
 
         <div className="w-full relative h-full">
+          <Squircle cornerRadius={radius} cornerSmoothing={0.9} asChild>
+            <div className="absolute inset-0 bg-base-100 pointer-events-none" />
+          </Squircle>
           {inputElement}
         </div>
 
         {(error || hint) && (
-          <p className={`mt-1 text-xs ${error ? "text-error" : "text-base-content/50"}`}>
+          <p
+            className={`mt-1 text-xs ${error ? "text-error" : "text-base-content/50"}`}
+          >
             {error ?? hint}
           </p>
         )}
       </div>
     );
-  }
+  },
 );
 
 TextInput.displayName = "TextInput";

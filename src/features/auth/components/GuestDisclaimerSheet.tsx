@@ -16,36 +16,34 @@ export function GuestDisclaimerSheet({
     <Drawer
       isOpen={isOpen}
       onClose={onClose}
-      snapPoints={["65%"]}
-      title={
-        <div className="flex items-center justify-center gap-2 text-black dark:text-white font-bold">
-          <span>Guest Mode Notice</span>
-        </div>
-      }
+      snapPoints={["70%"]}
       presentation="height"
     >
       <div className="flex flex-col gap-6 py-2 px-4">
         <div className="space-y-4">
           <p className="text-base text-base-content/70 leading-relaxed">
-            In Guest Mode, all your tasbeeh counts, streaks, and settings are
+            You are about to enter as a guest. Your spiritual progress is
             <span className="font-semibold text-base-content">
               {" "}
-              stored locally on this device only.
+              saved only on this device.
             </span>
           </p>
           <Squircle cornerRadius={24} cornerSmoothing={0.9} asChild>
-            <ul className="p-4 pl-8 bg-base-200/50 border border-base-content/5 space-y-2 list-disc">
+            <ul className="p-5 pl-10 bg-base-200/50 border border-base-content/5 space-y-3 list-disc">
               <li className="text-sm text-base-content/60 leading-relaxed">
-                No data synchronization between different devices.
+                Your counts, streaks, and custom collections stay local.
               </li>
               <li className="text-sm text-base-content/60 leading-relaxed">
-                Uninstalling the app will result in permanent data loss.
+                No syncing if you change phones or use another device.
+              </li>
+              <li className="text-sm text-base-content/60 leading-relaxed">
+                Clearing app data or uninstalling will erase your journey.
               </li>
             </ul>
           </Squircle>
           <p className="text-sm text-base-content/50 italic">
-            We highly recommend signing in to keep your spiritual journey safe
-            across all your devices.
+            Signing in ensures your remembrance is preserved and reachable
+            wherever you go.
           </p>
         </div>
 

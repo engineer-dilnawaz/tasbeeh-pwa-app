@@ -15,3 +15,18 @@ export type ActiveZikrSlot = {
   isCompleted: boolean;
   totalTaps: number;
 };
+
+/**
+ * Represents a historical log of a tasbeeh session.
+ * Stored in the 'tasbeeh-entries' collection.
+ */
+export type TasbeehEntry = {
+  id?: string;
+  userId: string;
+  zikrName: string;
+  zikrArabic: string;
+  countReached: number;
+  target: number;
+  timestamp: any; // Firestore Timestamp
+  durationSeconds?: number;
+};

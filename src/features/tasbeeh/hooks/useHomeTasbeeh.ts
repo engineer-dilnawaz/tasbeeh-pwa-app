@@ -3,8 +3,13 @@ import { useTasbeehStore } from "@/features/tasbeeh/store/tasbeehStore";
 import { hapticService } from "@/shared/services/hapticService";
 import { soundService } from "@/shared/services/soundService";
 import { confettiService } from "@/shared/services/confettiService";
+import { useAuth } from "@/services/firebase/auth";
+import { logAppEvent } from "@/services/firebase/analytics";
+import { ANALYTICS_EVENTS } from "@/services/firebase/analyticsEvents";
+import { logTasbeehSession } from "@/services/firebase/tasbeehService";
 
 export function useHomeTasbeeh() {
+  const { user } = useAuth();
   // --- Persistent Store State ---
   const activeSlots = useTasbeehStore((state) => state.activeSlots);
   const primarySlotIndex = useTasbeehStore((state) => state.primarySlotIndex);
@@ -87,6 +92,25 @@ export function useHomeTasbeeh() {
 
     if (currentTasbeeh && count + 1 === currentTasbeeh.target) {
       confettiService.cannon();
+      
+      // Cloud Sync: Log the completion if user is logged in
+      if (user) {
+        void logTasbeehSession({
+          userId: user.uid,
+          zikrName: currentTasbeeh.transliteration || currentTasbeeh.id,
+          zikrArabic: currentTasbeeh.arabic,
+          countReached: currentTasbeeh.target,
+          target: currentTasbeeh.target,
+        });
+      }
+
+      // Analytics: Track milestone
+      logAppEvent(ANALYTICS_EVENTS.TASBEEH_COMPLETED, {
+        zikr_name: currentTasbeeh.transliteration || currentTasbeeh.id,
+        target: currentTasbeeh.target,
+        is_authenticated: !!user,
+      });
+
       const isLastTasbeeh = currentIndex === tasbeehLibrary.length - 1;
       if (isLastTasbeeh) {
         setTimeout(() => setShowVictory(true), 600);
@@ -105,6 +129,7 @@ export function useHomeTasbeeh() {
     tasbeehLibrary.length,
     wasManuallySelected,
     cycleTasbeeh,
+    user,
   ]);
 
   const handleUndo = useCallback(() => {

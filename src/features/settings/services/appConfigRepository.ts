@@ -1,3 +1,4 @@
+import deepmerge from "deepmerge";
 import { DEVICE_USER_ID, type AppConfigRow, tasbeehDb } from "@/features/tasbeeh/services/tasbeehDb";
 import type {
   AnimationLevel,
@@ -89,10 +90,6 @@ export async function readAppConfigData(
 ): Promise<AppConfigData> {
   const row = await getOrCreateAppConfig(userId);
   const data = normalizeAppConfigData(row.data);
-  // Mirror to localStorage for head-script fast detection
-  if (data.appearance.theme) {
-    localStorage.setItem("theme", data.appearance.theme);
-  }
   return data;
 }
 
@@ -102,7 +99,7 @@ export async function patchAppConfigData(
 ): Promise<AppConfigData> {
   const row = await getOrCreateAppConfig(userId);
   const current = normalizeAppConfigData(row.data);
-  const next = deepMerge(current, patch);
+  const next = deepmerge(current, patch as any) as AppConfigData;
 
   const now = new Date().toISOString();
   await tasbeehDb.appConfig.put({
@@ -111,11 +108,6 @@ export async function patchAppConfigData(
     updatedAt: now,
     syncStatus: "pending",
   });
-
-  // Mirror update to localStorage
-  if (next.appearance.theme) {
-    localStorage.setItem("theme", next.appearance.theme);
-  }
 
   return next;
 }
@@ -126,32 +118,6 @@ type PartialDeep<T> = T extends object
 
 function normalizeAppConfigData(input: Record<string, unknown>): AppConfigData {
   const parsed = input as Partial<AppConfigData>;
-  return deepMerge(DEFAULT_APP_CONFIG, parsed);
-}
-
-function deepMerge<T extends Record<string, unknown>>(
-  base: T,
-  patch: PartialDeep<T> | undefined,
-): T {
-  if (!patch) return base;
-  const out: Record<string, unknown> = { ...base };
-  for (const key of Object.keys(patch) as (keyof T)[]) {
-    const pv = patch[key];
-    if (pv == null) continue;
-    const bv = base[key];
-    if (isPlainObject(bv) && isPlainObject(pv)) {
-      out[key as string] = deepMerge(
-        bv as Record<string, unknown>,
-        pv as PartialDeep<Record<string, unknown>>,
-      );
-      continue;
-    }
-    out[key as string] = pv as unknown;
-  }
-  return out as T;
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return deepmerge(DEFAULT_APP_CONFIG, parsed as any) as AppConfigData;
 }
 

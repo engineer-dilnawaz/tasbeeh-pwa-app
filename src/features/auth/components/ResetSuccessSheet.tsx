@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { Drawer } from "@/shared/design-system/ui/Drawer";
 import { Button, Text, Squircle } from "@/shared/design-system";
 import { useAppLottie } from "@/shared/hooks/useAppLottie";
+import { AUTH_EN } from "../en";
 
 interface ResetSuccessSheetProps {
   isOpen: boolean;
@@ -23,23 +24,23 @@ export function ResetSuccessSheet({
     <Drawer
       isOpen={isOpen}
       onClose={onClose}
-      title="Check Your Email"
-      snapPoints={["65%"]}
+      title={AUTH_EN.reset_success.drawer_title}
+      snapPoints={["70%"]}
       presentation="height"
     >
-      <div className="flex flex-col items-center text-center px-6 pt-2 pb-8 gap-6">
+      <div className="flex flex-col items-center text-center px-2 pt-2 pb-8 gap-6">
         <div className="w-32 h-32 flex items-center justify-center">
-          {LottieView}
+          {isOpen && LottieView}
         </div>
 
         <div className="flex flex-col gap-2">
           <Text variant="heading" className="text-2xl font-black">
-            Reset Link Sent!
+            {AUTH_EN.reset_success.title}
           </Text>
           <Text variant="body" color="subtle" className="leading-relaxed">
-            We've sent a password reset link to{" "}
-            <span className="text-base-content font-bold">{email}</span>. Please
-            check your inbox and follow the instructions.
+            {AUTH_EN.reset_success.description_pre}
+            <span className="text-base-content font-bold">{email}</span>
+            {AUTH_EN.reset_success.description_post}
           </Text>
         </div>
 
@@ -52,11 +53,10 @@ export function ResetSuccessSheet({
             variant="caption"
             className="font-bold uppercase tracking-widest text-[10px] text-base-content/40"
           >
-            Didn't get the email?
+            {AUTH_EN.reset_success.missing_email_label}
           </Text>
           <Text variant="caption" color="subtle">
-            Check your spam folder or wait a few minutes. If it still doesn't
-            arrive, try sending it again.
+            {AUTH_EN.reset_success.missing_email_help}
           </Text>
         </Squircle>
 
@@ -66,7 +66,7 @@ export function ResetSuccessSheet({
           pill={true}
           className="w-full text-lg font-semibold mt-2"
         >
-          Back to Login
+          {AUTH_EN.reset_success.back_to_login}
           <ArrowRight size={18} className="ml-2" />
         </Button>
       </div>

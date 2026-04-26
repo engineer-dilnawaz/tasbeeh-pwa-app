@@ -71,12 +71,14 @@ export const NotificationBell = () => {
   return (
     <button
       type="button"
-      className="relative flex h-9 w-9 items-center justify-center rounded-full bg-base-200/50 text-base-content/70 transition-all hover:bg-base-200 active:scale-90"
+      className="group relative flex h-9 w-9 items-center justify-center rounded-full transition-all active:scale-90"
       aria-label="Notifications"
     >
-      <Bell size={18} />
+      <div className="absolute inset-0 bg-base-100 rounded-full" />
+      <div className="absolute inset-0 bg-base-content/5 rounded-full group-hover:bg-base-content/10 transition-colors" />
+      <Bell size={18} className="relative z-10 text-base-content/70" />
       {/* Tiny notification dot if needed */}
-      <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+      <span className="absolute top-1.5 right-1.5 flex h-2 w-2 z-20">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
         <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
       </span>
