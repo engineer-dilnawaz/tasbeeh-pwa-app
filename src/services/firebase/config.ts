@@ -1,11 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, indexedDBLocalPersistence, setPersistence } from "firebase/auth";
-import { 
-  initializeFirestore, 
-  persistentLocalCache, 
-  persistentMultipleTabManager 
-} from "firebase/firestore";
 
+/**
+ * Firebase Configuration
+ * 
+ * Loaded from environment variables (.env.local)
+ */
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -16,19 +15,4 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Services
-export const auth = getAuth(app);
-// Ensure Auth uses IndexedDB and never localStorage
-void setPersistence(auth, indexedDBLocalPersistence);
-
-// Enable persistent offline cache
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
-  }),
-});
-
-export default app;
+export const app = initializeApp(firebaseConfig);

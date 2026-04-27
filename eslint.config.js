@@ -19,5 +19,27 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          prefer: "type-imports",
+          fixStyle: "separate-type-imports",
+        },
+      ],
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "react",
+              importNames: ["default"],
+              message: "Avoid default React import. Use named imports for hooks (e.g., import { useState } from 'react').",
+            },
+          ],
+        },
+      ],
+    },
   },
 ]);

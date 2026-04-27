@@ -1,181 +1,21 @@
-@import "tailwindcss";
-
-@plugin "daisyui" {
-  themes: light, dark;
-  logs: false;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* Theme Customization (Divine Atomic System Tokens) */
-[data-theme="light"] {
-  --color-base-100: #F6EDDD; /* Creamy spiritual light background */
-  --color-base-content: #2C2C2C;
-  --color-surface-card: #FFFFFF;
-  
-  /* Atomic System Tokens - Core */
-  --ds-bg-page: #F6EDDD;
-  --ds-bg-surface: #FFFFFF;
-  --ds-bg-input: #FFFFFF;
-  --ds-text-main: #2C2C2C;
-  --ds-text-subtle: #71717A;
-  --ds-primary: #7C3AED;
-  --ds-primary-content: #FFFFFF;
-  --ds-border: rgba(44, 44, 44, 0.08);
-
-  /* Interaction & Semantic */
-  --ds-surface-hover: rgba(44, 44, 44, 0.03);
-  --ds-surface-active: rgba(44, 44, 44, 0.06);
-  --ds-success: #10B981;
-  --ds-error: #EF4444;
-  --ds-warning: #F59E0B;
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
-[data-theme="dark"] {
-  --color-base-100: #1C1E21; /* Deep focused dark background */
-  --color-base-content: #EDEDED;
-  --color-surface-card: #111214;
-
-  /* Atomic System Tokens - Core */
-  --ds-bg-page: #1C1E21;
-  --ds-bg-surface: #111214;
-  --ds-bg-input: #111214;
-  --ds-text-main: #EDEDED;
-  --ds-text-subtle: #A1A1AA;
-  --ds-primary: #8B5CF6;
-  --ds-primary-content: #FFFFFF;
-  --ds-border: rgba(237, 237, 237, 0.08);
-
-  /* Interaction & Semantic */
-  --ds-surface-hover: rgba(255, 255, 255, 0.03);
-  --ds-surface-active: rgba(255, 255, 255, 0.06);
-  --ds-success: #34D399;
-  --ds-error: #F87171;
-  --ds-warning: #FBBF24;
+button:active {
+  opacity: 1;
 }
 
-[data-theme="pineGreen"] {
-  --color-base-100: #0D2B22; /* Deep Islamic Green */
-  --color-base-content: #E6F0ED;
-  --color-surface-card: #133D31;
-
-  /* Atomic System Tokens - Core */
-  --ds-bg-page: #0D2B22;
-  --ds-bg-surface: #133D31;
-  --ds-bg-input: #133D31;
-  --ds-text-main: #E6F0ED;
-  --ds-text-subtle: #94B3AB;
-  --ds-primary: #10B981;
-  --ds-primary-content: #FFFFFF;
-  --ds-border: rgba(230, 240, 237, 0.08);
-
-  /* Interaction & Semantic */
-  --ds-surface-hover: rgba(255, 255, 255, 0.03);
-  --ds-surface-active: rgba(255, 255, 255, 0.06);
-  --ds-success: #34D399;
-  --ds-error: #F87171;
-  --ds-warning: #FBBF24;
-}
-
-:root {
-  --font-primary: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --radius-squircle: 22px;
-}
-
-@theme {
-  --font-sans: var(--font-primary);
-  --font-arabic: "Amiri", ui-serif, Georgia, serif;
-  --font-urdu: "Noto Nastaliq Urdu", serif;
-  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
-
-  /* Divine Atomic System Extensions */
-  --color-ds-bg-page: var(--ds-bg-page);
-  --color-ds-bg-surface: var(--ds-bg-surface);
-  --color-ds-bg-input: var(--ds-bg-input);
-  --ds-text-main: var(--ds-text-main);
-  --ds-text-subtle: var(--ds-text-subtle);
-  --color-ds-primary: var(--ds-primary);
-  --color-ds-primary-content: var(--ds-primary-content);
-  --color-ds-border: var(--ds-border);
-}
-
-@layer base {
-  *, ::before, ::after {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  html {
-    font-family: var(--font-primary);
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    @apply bg-base-100 text-base-content;
-  }
-
-  body {
-    margin: 0;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    -webkit-user-select: none;
-    user-select: none;
-  }
-
-  input,
-  textarea,
-  [contenteditable="true"] {
-    -webkit-user-select: text;
-    user-select: text;
-  }
-
-  .theme-transitioning,
-  .theme-transitioning *,
-  .theme-transitioning *::before,
-  .theme-transitioning *::after {
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
-    transition-duration: 240ms;
-    transition-timing-function: ease-in-out;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .theme-transitioning,
-    .theme-transitioning *,
-    .theme-transitioning *::before,
-    .theme-transitioning *::after {
-      transition: none !important;
-    }
-  }
-}
-
-@layer components {
-  .text-display-arabic {
-    font-family: var(--font-arabic);
-    @apply text-4xl md:text-6xl leading-[1.8] font-normal;
-  }
-
-  .text-display-urdu {
-    font-family: var(--font-urdu);
-    @apply text-3xl md:text-5xl leading-[2.2] font-normal;
-  }
-
-  .text-counter {
-    font-family: var(--font-display);
-    @apply font-black tracking-tighter tabular-nums;
-  }
-
-  .text-heading {
-    @apply font-semibold tracking-tight;
-    font-family: var(--font-sans);
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .surface-card {
-    background-color: var(--color-surface-card);
-  }
+.ds-button:active:not(:disabled) {
+  transform: scale(0.96);
 }
