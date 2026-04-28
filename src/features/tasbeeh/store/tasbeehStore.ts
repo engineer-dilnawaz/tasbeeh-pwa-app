@@ -142,7 +142,7 @@ export const useTasbeehStore = create<TasbeehState>()(
       },
 
       advanceInCollection: () => {
-        const { selectedCollectionId, selectedId, collections, items, counts } = get();
+        const { selectedCollectionId, selectedId, collections } = get();
         const collection = collections.find((c) => c.id === selectedCollectionId);
         if (!collection || !selectedId) return;
 

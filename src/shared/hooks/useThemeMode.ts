@@ -17,23 +17,31 @@ export function useThemeMode() {
   });
 
   const [systemMode, setSystemMode] = useState<PaletteMode>(() => {
-    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+    if (typeof window === "undefined") return "light";
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     return prefersDark ? "dark" : "light";
   });
 
   useEffect(() => {
-    const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
-    if (!mq) return;
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+
     const onChange = () => setSystemMode(mq.matches ? "dark" : "light");
 
-    // addEventListener is supported in modern browsers; fall back for older.
-    if ("addEventListener" in mq) {
-      mq.addEventListener("change", onChange);
-      return () => mq.removeEventListener("change", onChange);
-    }
-
-    mq.addListener(onChange);
-    return () => mq.removeListener(onChange);
+    // Modern browsers
+    mq.addEventListener("change", onChange);
+    return () => {
+      // Older Safari may not fully support removeEventListener on MediaQueryList typings;
+      // this is safe in modern browsers and ignored if unsupported.
+      try {
+        mq.removeEventListener("change", onChange);
+      } catch {
+        // Legacy fallback (deprecated)
+        (mq as unknown as { removeListener?: (cb: () => void) => void }).removeListener?.(
+          onChange,
+        );
+      }
+    };
   }, []);
 
   const mode: PaletteMode = useMemo(
