@@ -1,0 +1,416 @@
+---
+alwaysApply: true
+---
+
+ALWAYS follow these rules strictly. Do not violate under any circumstances.
+
+# App Overview
+
+This is a Tasbeeh (Zikr counter) web application focused on simplicity, spirituality, and distraction-free interaction.
+
+Core features:
+
+- Tasbeeh counter (primary screen)
+- Tasbeeh list (multiple zikr items)
+- Add/Edit tasbeeh
+- Progress tracking (optional future)
+
+---
+
+# Engineering Principles
+
+## Component-Driven Development (CDD)
+
+- Build UI using small, reusable, composable components
+- Components must be:
+  - Isolated
+  - Reusable
+  - Testable
+- No large monolithic components
+- Extract shared UI into common components early
+
+---
+
+# Project Architecture (Scalable & Production-Grade)
+
+Use a feature-based + shared architecture:
+
+src/
+app/
+providers/
+routes/
+theme/
+
+features/
+tasbeeh/
+components/
+screens/
+store/
+types/
+utils/
+
+shared/
+components/
+hooks/
+utils/
+constants/
+locales/
+types/
+
+assets/
+
+---
+
+# Folder Rules
+
+- Each folder MUST have barrel exports (`index.ts`)
+- No deep relative imports (use absolute imports)
+- Group logic by feature, not by type
+
+---
+
+# Routing
+
+- All routes MUST be defined in constants
+- No hardcoded route strings
+- Use a central route config
+
+Example:
+shared/constants/routes.ts
+
+---
+
+# Localization (i18n-ready)
+
+- All user-facing text MUST come from locale files
+- No hardcoded strings in components
+
+Structure:
+shared/locales/en.ts
+shared/locales/index.ts
+
+- Default language: English
+- Must be easily extendable to Arabic / Urdu
+
+---
+
+# State Management
+
+Use Zustand for state management.
+
+Rules:
+
+- Store must be feature-based
+- No global dumping store
+- Keep state minimal and normalized
+- Avoid deeply nested objects
+
+Persistence:
+
+- Use localStorage
+- Abstract persistence logic (no direct usage in components)
+
+---
+
+# Data Modeling
+
+- Use normalized and flat structures
+- Avoid duplication
+- Use IDs for referencing
+- Keep data structures scalable
+
+---
+
+# Design System (Material UI)
+
+All UI MUST use **:contentReference[oaicite:0]{index=0}** components.
+
+DO:
+
+- Use MUI components (Box, Stack, Typography, Button, Card)
+- Follow MUI composition patterns
+- Use theme tokens only
+
+DO NOT:
+
+- Use raw HTML if MUI alternative exists
+- Mix UI libraries
+- Override styles unnecessarily
+
+---
+
+# Theming (STRICT)
+
+- NO hardcoded colors anywhere in the app
+- All colors MUST come from theme
+
+Define:
+
+- Light theme
+- Dark theme
+
+Location:
+
+app/theme/
+
+Theme must include:
+
+- palette (primary, secondary, background)
+- spacing
+- typography
+- shape (border radius)
+
+Custom tokens allowed:
+
+theme.custom.\*
+
+---
+
+# Styling Rules
+
+- Prefer `sx` with theme tokens
+- No inline hardcoded values like:
+  - colors
+  - spacing
+- Use theme spacing:
+
+# Styling Rules
+
+- Prefer `sx` with theme tokens
+- No inline hardcoded values like:
+  - colors
+  - spacing
+- Use theme spacing:
+  theme.spacing()
+
+# Styling Rules
+
+- Prefer theme-based spacing and styling via MUI `sx`
+- No inline hardcoded values for colors, spacing, or typography
+
+## Visual Effects Restriction (STRICT)
+
+- DO NOT use `borderWidth`, `boxShadow`, or custom shadow styles
+- DO NOT manually add elevation, shadow, or border effects
+
+These can ONLY be used if explicitly requested for a specific UI requirement.
+
+Default UI should rely on:
+
+- spacing
+- typography hierarchy
+- layout structure
+- background contrast
+
+Reason:
+Maintain a clean, minimal, distraction-free design system
+
+---
+
+# Component Patterns
+
+## Buttons
+
+- Primary → contained
+- Secondary → outlined/text
+
+## Cards
+
+- Used for tasbeeh items
+- Consistent padding and radius
+
+## Layout
+
+- Use Stack for spacing
+- Avoid manual margins
+
+---
+
+# Settings UI Rule
+
+Settings screens MUST:
+
+- Be grouped by intent (Appearance, Data, Behavior, etc.)
+- Never be a flat list of actions
+- Use section headers for clarity
+- Use cards or grouped containers for logical separation
+- Prioritize scanability over minimal item count
+
+# Screens
+
+## Counter Screen
+
+- Large centered counter
+- One primary CTA (Tap)
+- Optional reset (secondary)
+
+## Tasbeeh List Screen
+
+- Card list
+- Floating action button (Add)
+
+## Add/Edit Screen
+
+- Form with inputs
+- Primary save button
+
+---
+
+# Reusable Components (MANDATORY)
+
+Create shared components like:
+
+- Button (wrapped)
+- Input (wrapped)
+- Card (wrapped)
+- ScreenContainer
+
+Never use raw MUI components directly everywhere.
+
+---
+
+# Code Standards
+
+- Functional components only
+- Strict typing (TypeScript)
+- No `any`
+- Keep components small
+- Extract logic into hooks when needed
+
+---
+
+# Barrel Exports
+
+Every folder must have:
+index.ts
+
+Export:
+
+- components
+- hooks
+- types
+- constants
+
+---
+
+# Constants
+
+Centralize all constants:
+
+- routes
+- keys
+- config
+- limits
+
+Location:
+shared/constants/
+
+---
+
+# No Hardcoding Rule (STRICT)
+
+Do NOT hardcode:
+
+- strings → use locales
+- colors → use theme
+- routes → use constants
+- values → use config/constants
+
+---
+
+# Behavior
+
+- UI must reflect state clearly
+- Keep interactions fast
+- Avoid unnecessary animations
+
+---
+
+# Goal
+
+Generate clean, scalable, maintainable, production-ready UI using Material UI, following strict architectural and design system rules.
+
+# MCP UI Agent Behavior (STRICT)
+
+When using Material UI MCP, the agent MUST behave as a senior frontend engineer.
+
+## Primary Goal
+
+Generate UI that is:
+
+- Visually polished (production-grade Material UI patterns)
+- Performance optimized
+- Consistent with Material UI official documentation patterns
+- Aligned with project design system rules
+
+---
+
+## Material UI MCP Usage Rules
+
+- ALWAYS prefer patterns from Material UI official documentation
+- Use MCP to ensure correct component composition
+- Do NOT invent custom UI patterns if MUI already provides a solution
+- Prefer composition over custom styling
+
+---
+
+## UI Quality Standards
+
+All generated UI MUST:
+
+- Follow Material UI best practices from docs
+- Use built-in MUI components before custom implementations
+- Be responsive by default
+- Avoid unnecessary re-renders or inline logic inside JSX
+- Keep component trees shallow and readable
+
+---
+
+## Performance Rules
+
+- Avoid unnecessary wrappers or nested Box structures
+- Prefer MUI system props (`sx`) over custom styled components unless required
+- Avoid recalculations inside render
+- Keep components pure and memoizable where relevant
+
+---
+
+## Styling Philosophy (STRICT)
+
+- No border width or shadow unless explicitly requested
+- No custom visual effects unless required for UX clarity
+- Use spacing + typography + layout hierarchy for visual design
+
+---
+
+## Design System Priority Order
+
+When generating UI:
+
+1. Project design system rules (.cursor/rules/ui.mdc)
+2. Material UI official documentation patterns (via MCP)
+3. Minimal necessary customization
+4. Avoid creative deviation unless explicitly asked
+
+---
+
+## Component Selection Rules
+
+Prefer in this order:
+
+1. Material UI core components
+2. MUI composable patterns
+3. Custom wrapper components (only if needed)
+4. Never create unnecessary abstractions
+
+---
+
+## Final Output Expectation
+
+Generated UI should look:
+
+- Production ready
+- Clean and minimal
+- Material Design aligned
+- Consistent across screens
+- Scalable for future features

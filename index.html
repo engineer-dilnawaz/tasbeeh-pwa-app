@@ -1,75 +1,22 @@
 <!doctype html>
 <html lang="en" class="no-overscroll">
   <head>
-    <script>
-      (function() {
-        try {
-          // Check localStorage for cached theme (performance optimization only)
-          const cachedTheme = localStorage.getItem('tasbeeh-theme');
-          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          const theme = cachedTheme || (isDark ? 'dark' : 'light');
-          document.documentElement.setAttribute('data-theme', theme);
-          
-          const themeColors = {
-            'light': '#f8fafc',
-            'dark': '#1e293b',
-            'pineGreen': '#1B4D3E'
-          };
-          const meta = document.createElement('meta');
-          meta.name = 'theme-color';
-          meta.content = themeColors[theme] || themeColors.light;
-          document.head.appendChild(meta);
-        } catch (e) {
-          console.error('Theme detection failed', e);
-        }
-      })();
-    </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Tasbeeh Flow</title>
-    <script>
-      (function() {
-        const THEME_STORAGE_KEY = "tasbeeh-app-theme";
-        const saved = localStorage.getItem(THEME_STORAGE_KEY);
-        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const theme = (saved && ["light", "dark", "pineGreen"].includes(saved)) 
-          ? saved 
-          : (systemDark ? "dark" : "light");
-        
-        document.documentElement.setAttribute("data-theme", theme);
-        if (theme === "dark") document.documentElement.classList.add("dark");
-      })();
-    </script>
     <link rel="manifest" href="/manifest.json" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
-    <link rel="icon" href="/icon-192.png" sizes="192x192" type="image/png" />
-    <link rel="icon" href="/icon-512.png" sizes="512x512" type="image/png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <!-- Amiri / Noto: Arabic & Urdu copy (`font-arabic`, `font-urdu`). UI font via `initAppFont` + Google Fonts link injection. -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap"
-      rel="stylesheet"
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
     />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      // Clear out any old lingering service workers that are causing HTTP 206 cache errors
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-          }
-        });
-      }
-    </script>
   </body>
 </html>
